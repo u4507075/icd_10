@@ -1,7 +1,7 @@
 # Use machine learning model to predict ICD-10
 
 ## Team member
-1. Assistant Piyapong Khumrin, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
+1. Assistant Professor Piyapong Khumrin, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
 2. Dr. Krit Khwanngern, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
 3. Associate Professor Nipon Theera-Umpon, PhD, Biomedical Engineering Institute, Chiang Mai University
 4. Terence Siganakis, CEO, Growing Data Pty Ltd
@@ -11,10 +11,16 @@
 6 months (March - August 2019)
 
 ## Introduction
-Over one million patients visit Maharaj Nakhon Chiang Mai hospital at the outer patient department (reported in [2018](http://www.med.cmu.ac.th/hospital/medrec/2011/index.php?option=com_content&view=category&id=130&Itemid=589)). Every year, the hospital needs to report data to the government to claim for budget. 
+Over one million patients visit Maharaj Nakhon Chiang Mai hospital at the outer patient department (reported in [2018](http://www.med.cmu.ac.th/hospital/medrec/2011/index.php?option=com_content&view=category&id=130&Itemid=589)). Every year, the hospital needs to report data to the government for billing. 
 ### Problem statement
-The amount of budget claim depends on the quality and completeness of the document. One major problem is the diagnosis (representing in ICD-10 code) has not been filled. The current process to fix this missing information is the medical coders review medical record and manually provide a proper diagnosis code which is impossible to complete on time. Therefore, we see a potential benefit to develop a system driven by machine learning model to automate the ICD-10 labelling process.
+The amount of budget which can be obtained from the billing depends on the quality and completeness of the document. One major problem is the diagnosis (representing in ICD-10 code) has not been filled. The current process is a labour intersive work which requires technical coders review to medical record and manually provide a proper diagnosis code. Therefore, we see a potential benefit to develop a system driven by machine learning model to automate the ICD-10 labelling process.
 ### Prior work
+[ICD-10](https://en.wikipedia.org/wiki/ICD-10) is a medical classification list for medical related terms such as diseases, signs and symptoms, abnormal findings, defined by the World Health Organization (WHO). In this case, ICD-10 is used to standardized the diagnosis before submitting the report to the government. Prior research showed the success of applying machine learning for auto-coding ICD-10. 
+
+[Serguei et al.](https://watermark.silverchair.com/13-5-516.pdf?token=AQECAHi208BE49Ooan9kkhW_Ercy7Dm3ZL_9Cf3qfKAc485ysgAAAmkwggJlBgkqhkiG9w0BBwagggJWMIICUgIBADCCAksGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM_rB6l2CXCEn65rFzAgEQgIICHNR0jGPFkz5CcmYleFTpxEzR1savr-C4O6Z00kG0BdtRIJS3RYpvI82St6UFm3i1S9e3JiFyMnm9LvsD3t0KiqIrBnruV91HJiba-iLVcANAs2U2P9bSpD4MiJizcuRH4pW7v6E2b5uEIwQ5j0QGrjrvSsRCeuQA3kFSPFCOMxq7HBBLMDLsFlXSBERfHxtnkMhRBtrxRQZ3a_tAgJ70oRFF5LiTJpbANSmhGShufU3H6HlhPJSxetkkznEaZ_1r4e26TmnFYHvNjAUwLDSrV3eopiKjxnR_s-mDe6PWRoeXWmBz2JmB29l0IE9fkG86wlgx-7J0FGuJjOMbRBDTvo2TzU2cPqwcUNlBCcNgN2P2o2PY8rjw_Gr4J-DmuLNjkxayrSYZVi3p75YGaQr_XLwPw-HkTqZtdjwCk9fA2GzcNubW4l4k2o4469PImjxmDnm6gXi_STkQ0im_dc6eXZP8Z_fHiEI4gxWA4I4Br_h021L29TgRiva-thtvaPROop3G3lw1HtMy5mArx_16IfTHcFGXF28N3AH2qFert6cfPnbOZn-FGqKUQVJCce6Cfz8FLjpWq2qYZ2CeWMUC3IjooCHp7VtjGxAW4il61LD2stSJSrv4OMBeWyciPNTJczrZOUVyjX8MIVupQvFVPwOBWW3Q7a8N4mZhI3XuYlZanI0gvfp3KXbtg6NMJxBrAD3yztwGkslU1zLiTw) applied simple filters or criteria to predict ICD-10 code such as assuming that a high frequency code that shares the same keywords is a correct code, or gender specific diagnsis (use gender to separate female and male specific diseases). Other cases which were not solved by those filters, then use a machine learning model (Naive Bayes) or bag of words technique. They used the SNoW implementation of the naïve Bayes classifier to solve the large number of classification, and Phrase Chunker Component for mixed approach to solve a classification. The model evaluation showed that over 80% of entities were correctly classified (with precision, recall, and F-measure above 90%). The limitations of the study were the features were treated independently which might lead to a wrong classification, continuous value such as age interfered how the diseases are classified, and lower number of reference standard (cased manually labelled by human coder).
+
+[Koopman et al.](https://www.sciencedirect.com/science/article/pii/S1386505615300289) developed a machine learning model to automatically classify ICD-10 of cancers from free-text death certificates. Natural language processing and SNOMED-CT were used to extract features to term-based and concept-based features. SVM was trained and deployed into two levels: 1) cancer/nocancer (F-measure 0.94) and 2) if cancer, then classify type of cancer (F-measure 0.7). 
+
 ## Objectives
 ## Time line
 ## How to use
