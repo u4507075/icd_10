@@ -32,7 +32,7 @@ In summary, prior research shows that machine learning model plays a role in aut
 2. Use machine learning models to verify ICD-10 labelled by human.
 
 ## Aims
-1. The performance of machine learning model shows precision, recall, and F-measure greater than 80%.
+1. The performance of machine learning model shows precision, recall, and F-measure are greater than 80%.
 2. Present one year cost-benefit analysis compared between before and after using machine learning models to fill ICD-10.
 
 ## Time line
