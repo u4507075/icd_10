@@ -1,4 +1,4 @@
-# Use machine learning model to predict ICD-10
+# Auto-mapping ICD-10 using machine learning model
 
 ## Researchers
 1. Assistant Professor Piyapong Khumrin, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
