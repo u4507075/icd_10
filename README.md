@@ -59,6 +59,20 @@ Our objectives are to develop machine learning model to mapp missing or verify I
 ### June - August 2019
   * Write and submit a paper.
   
+## Materials and methods
+### Target group
+Clinical records of outer-patient visits from 2006 - 2017 (2006 - 2016 for a training set, and 2017 for a test set) are retrospectively retrieved from the Maharaj Nakhon Chiang Mai electronic health records. Approximately one million records are expected to retrieve per year. Only encoded data (number, string) are included in the experiment (excluded images and scanned document).
+
+### Data preprocessing
+All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data of interest include:
+  * Demographic data such as date of birth, gender
+  * History taking and physical examination (including discharge summary)
+  * Laboratory and investigation reports
+  * ICD-10 (coded by a technical coder)
+  
+## Data analysis
+Data from 2006 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
+
 ## How to use
 ## How it works
 ## Model evaluation
