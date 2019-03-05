@@ -21,7 +21,20 @@ The amount of budget which can be obtained from the billing depends on the quali
 
 [Koopman et al.](https://www.sciencedirect.com/science/article/pii/S1386505615300289) developed a machine learning model to automatically classify ICD-10 of cancers from free-text death certificates. Natural language processing and SNOMED-CT were used to extract features to term-based and concept-based features. SVM was trained and deployed into two levels: 1) cancer/nocancer (F-measure 0.94) and 2) if cancer, then classify type of cancer (F-measure 0.7). 
 
+[Medori and Fairon](https://aclanthology.info/pdf/W/W10/W10-1113.pdf) mapped clinical text with standardized medical terminologies (UMLS) to formulate features to train a Naive Bayes model to predict ICD-6(81% recall). 
+
+[Boytcheva](http://www.aclweb.org/anthology/W11-4203) matched ICD-10 codes to diagnoses extracted from discharge letters using SVM. The precision, recall, F-measure of the model were 97.3% 74.68% 84.5%, respectively. 
+
+In summary, prior research shows that machine learning model plays a role in auto-matching ICD-10 to clinical data. The common approach used in the preprocessing process is using NLP process to digest raw text and map with standardized medical terminologies to build input features. This is the first step challenge of our research to develop a preprocessing protocol. Then, the second step is to design an approach how to deal with a large number of input features and target classes (ICD-10).
+
 ## Objectives
+1. Use machine learning models to predict missing ICD-10.
+2. Use machine learning models to verify ICD-10 labelled by human.
+
+## Aims
+1. The performance of machine learning model shows precision, recall, and F-measure greater than 80%.
+2. Present one year cost-benefit analysis compared between before and after using machine learning models to fill ICD-10.
+
 ## Time line
 ## How to use
 ## How it works
