@@ -7,11 +7,12 @@
 4. Terence Siganakis, CEO, Growing Data Pty Ltd
 5. Alexander Dokumentov, Data Scientist, Growing Data Pty Ltd
 
-## Technical supports
-1. Atcharaporn
-2. Pim
-3. Benz
-4. Nong
+## Technical support
+1. Atcharaporn Angsuratanawech 
+2. Sittipong Moraray
+3. Pimpaka Chuamsakul
+4. Pitupoom Chumpoo
+5. Prawinee Mokmoongmuang
 
 ## Duration
 6 months (March - August 2019)
