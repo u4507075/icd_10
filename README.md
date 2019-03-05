@@ -36,6 +36,20 @@ In summary, prior research shows that machine learning model plays a role in aut
 2. Present one year cost-benefit analysis compared between before and after using machine learning models to fill ICD-10.
 
 ## Time line
+### March 2019
+  * Write and submit a research proposal and ethic.
+  * Setup a new server.
+  * Duplicate clinical data to the server.
+  * Map and label column name and description.
+  * Join the table data and create a single dataset.
+### April 2019
+  * Apply NLP and standard medical terminologies to preprocess input features.
+  * Design and evaluate machine learning model.
+### May 2019
+  * Close the project either, the model performance is greater than 80% or it is the last week of May.
+### June - August 2019
+  * Write and submit a paper.
+  
 ## How to use
 ## How it works
 ## Model evaluation
