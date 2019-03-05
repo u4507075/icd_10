@@ -1,11 +1,17 @@
 # Use machine learning model to predict ICD-10
 
-## Team member
+## Researchers
 1. Assistant Professor Piyapong Khumrin, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
 2. Dr. Krit Khwanngern, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
 3. Associate Professor Nipon Theera-Umpon, PhD, Biomedical Engineering Institute, Chiang Mai University
 4. Terence Siganakis, CEO, Growing Data Pty Ltd
 5. Alexander Dokumentov, Data Scientist, Growing Data Pty Ltd
+
+## Technical supports
+1. Atcharaporn
+2. Pim
+3. Benz
+4. Nong
 
 ## Duration
 6 months (March - August 2019)
