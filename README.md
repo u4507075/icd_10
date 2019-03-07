@@ -2,7 +2,7 @@
 
 ## Researchers
 1. Assistant Professor Piyapong Khumrin, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
-2. Dr. Krit Khwanngern, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
+2. Assistant Professor Krit Khwanngern, MD, Faculty of Medicine, Chiang Mai University, Chiang Mai, Thailand
 3. Associate Professor Nipon Theera-Umpon, PhD, Biomedical Engineering Institute, Chiang Mai University
 4. Terence Siganakis, CEO, Growing Data Pty Ltd
 5. Alexander Dokumentov, Data Scientist, Growing Data Pty Ltd
