@@ -87,6 +87,15 @@ git fetch
 git checkout dev
 git pull
 ```
+3. Commit and push
+```
+git add .
+git commit -m "your message"
+git push
+
+#check remote
+git remote -v
+```
 ## How it works
 ## Model evaluation
 ## Limitations
