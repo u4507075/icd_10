@@ -68,6 +68,7 @@ All identification data such as name, surname, address, national identification,
   * Demographic data such as date of birth, gender
   * History taking and physical examination (including discharge summary)
   * Laboratory and investigation reports
+  * Medical prescription (investigation, drug)
   * ICD-10 (coded by a technical coder)
   
 ## Data analysis
