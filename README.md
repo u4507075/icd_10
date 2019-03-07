@@ -74,6 +74,18 @@ All identification data such as name, surname, address, national identification,
 Data from 2006 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
 
 ## How to use
+1. Clone the project and change to dev branch
+```
+git clone https://github.com/u4507075/icd_10.git
+cd icd_10
+git checkout dev
+```
+2. Check out and update dev branch
+```
+git fetch
+git checkout dev
+git pull
+```
 ## How it works
 ## Model evaluation
 ## Limitations
