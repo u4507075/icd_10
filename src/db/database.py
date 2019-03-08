@@ -1,2 +1,4 @@
-def getdata():
-	print('Hello database')
+
+
+def getdata(config):
+	print(config.DATABASE_CONFIG)

@@ -1,4 +1,9 @@
 from db.database import getdata
 import sys
-print(sys.path)
-getdata()
+import os
+from pathlib import Path
+sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
+
+import config
+
+getdata(config)
