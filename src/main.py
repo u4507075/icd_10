@@ -1,3 +1,4 @@
 from db.database import getdata
-print('Hello')
+import sys
+print(sys.path)
 getdata()
