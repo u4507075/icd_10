@@ -3,6 +3,13 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 
+from sklearn import preprocessing
+from sklearn import model_selection
+from sklearn.utils import shuffle
+from sklearn.metrics import confusion_matrix,classification_report
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+
 def convert(x):
     try:
         return x.encode('latin-1','replace').decode('tis-620','replace')
@@ -117,11 +124,29 @@ def mapdata():
 			df.to_csv(p2)
 		print('Append mapped data')
 
-def train_word2vec():
-	p = '../../secret/data/data_map.csv'
-	for df in  pd.read_csv(p, chunksize=1000000):
-		df = df[df['DX1'].notnull()]
-		y = df.pop('DX1').values
+def get_dataset(trainingset, validation_size):
+	n = len(trainingset.columns)-1
+	array = trainingset.values
+	X = array[:,0:n]
+	Y = array[:,n]
+	seed = 7
+	X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+	X_train, Y_train = shuffle(X_train, Y_train, random_state=seed)
+	return X_train, X_validation, Y_train, Y_validation
+
+def train_model():
+	p = '../../secret/data/drug_onehot.csv'
+	for df in  pd.read_csv(p, chunksize=1000):
+		df = df[df.columns.tolist().remove(['TXN','DX1'])+['DX1']]
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.2)
+		c = SVC()
+		c.fit(X_train, Y_train)
+		p = c.predict(X_validation)
+		cf = confusion_matrix(Y_validation, p)
+		print(cf)
+		cr = classification_report(Y_validation, p)
+		print(cr)
+		break
 
 
 
