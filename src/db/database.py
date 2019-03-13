@@ -136,8 +136,13 @@ def get_dataset(trainingset, validation_size):
 
 def train_model():
 	p = '../../secret/data/drug_onehot.csv'
-	for df in  pd.read_csv(p, chunksize=1000):
-		df = df[df.columns.tolist().remove(['TXN','DX1'])+['DX1']]
+	for df in  pd.read_csv(p, chunksize=10000):
+		l = df.columns.tolist()
+		l.remove('TXN')
+		l.remove('DX1')
+		l = l + ['DX1']
+
+		df = df[l]
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.2)
 		c = SVC()
 		c.fit(X_train, Y_train)
@@ -146,6 +151,7 @@ def train_model():
 		print(cf)
 		cr = classification_report(Y_validation, p)
 		print(cr)
+
 		break
 
 
