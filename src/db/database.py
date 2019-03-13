@@ -99,7 +99,6 @@ def train_word2vec():
 	for df in  pd.read_csv(p, chunksize=1000000):
 		df = df[df['DX1'].notnull()]
 		y = df.pop('DX1').values
-		x = 
 
 
 
