@@ -1,6 +1,7 @@
 import mysql.connector as sql
 import pandas as pd
 from pathlib import Path
+import numpy as np
 
 def convert(x):
     try:
@@ -12,7 +13,7 @@ def remove_space(x):
 	try:
 		return x.replace(' ','')
 	except AttributeError:
-        return x
+		return x
 
 def decode(df):
 	for c in df.columns:
@@ -78,6 +79,28 @@ def readdata():
 	d = { i : value[i] for i in range(0, len(value) ) }
 	df = pd.DataFrame.from_dict({'drug':value, 'code': list(range(len(value)))})
 	df.to_csv('../../secret/data/drug_code.csv')
+
+def onehotdrug():
+	p = '../../secret/data/data_clean.csv'
+	p2 = '../../secret/data/data_map.csv'
+	p3 = '../../secret/data/drug_onehot.csv'
+	drug_list = pd.read_csv('../../secret/data/drug_code.csv')['drug'].values.tolist()
+	#drug_list = ['TXN']+drug_list+['DX1']
+	for df in  pd.read_csv(p, chunksize=100000):
+		df = df[['TXN','drug','DX1']]
+		df2 = pd.get_dummies(df['drug'])
+		df2['TXN'] = df['TXN'].copy() 
+		df2['DX1'] = df['DX1'].copy()
+		df3 = df2.groupby(['TXN','DX1']).agg('sum')
+		result = df3.reindex(columns=drug_list)
+		result.fillna(0, inplace=True)
+		file = Path(p3)
+		if file.is_file():
+			with open(p3, 'a') as f:
+				result.to_csv(f, header=False)
+		else:
+			result.to_csv(p3)
+		print('Append clean data')
 
 def mapdata():
 	p = '../../secret/data/data_clean.csv'

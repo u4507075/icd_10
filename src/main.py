@@ -1,6 +1,7 @@
 from db.database import getdata
 from db.database import cleandata
 from db.database import readdata
+from db.database import onehotdrug
 from db.database import mapdata
 from db.database import train_word2vec
 import sys
@@ -13,6 +14,7 @@ import config
 #getdata(config)
 #cleandata()
 #readdata()
+onehotdrug()
 #mapdata()
-train_word2vec()
+#train_word2vec()
 
