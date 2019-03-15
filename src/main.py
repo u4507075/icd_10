@@ -14,7 +14,7 @@ import config
 #getdata(config)
 #cleandata()
 #readdata()
-#onehotdrug()
+onehotdrug()
 #mapdata()
-train_model()
+#train_model()
 

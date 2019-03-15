@@ -43,7 +43,7 @@ def getdata(config):
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
 	n = 1000000
-	offset = 0	
+	offset = 0
 	while True:
 		df = pd.read_sql(getquery(n,offset), con=db_connection)
 		print(len(df))
@@ -94,11 +94,11 @@ def onehotdrug():
 	drug_list = pd.read_csv('../../secret/data/drug_code.csv')['drug'].values.tolist()
 	#drug_list = ['TXN']+drug_list+['DX1']
 	for df in  pd.read_csv(p, chunksize=100000):
-		df = df[['TXN','drug','DX1']]
+		df = df[['TXN','drug','icd10']]
 		df2 = pd.get_dummies(df['drug'])
 		df2['TXN'] = df['TXN'].copy() 
-		df2['DX1'] = df['DX1'].copy()
-		df3 = df2.groupby(['TXN','DX1']).agg('sum')
+		df2['icd10'] = df['icd10'].copy()
+		df3 = df2.groupby(['TXN','icd10']).agg('sum')
 		result = df3.reindex(columns=drug_list)
 		result.fillna(0, inplace=True)
 		file = Path(p3)
@@ -136,15 +136,15 @@ def get_dataset(trainingset, validation_size):
 
 def train_model():
 	p = '../../secret/data/drug_onehot.csv'
-	for df in  pd.read_csv(p, chunksize=10000):
+	for df in  pd.read_csv(p, chunksize=1000):
 		l = df.columns.tolist()
 		l.remove('TXN')
-		l.remove('DX1')
-		l = l + ['DX1']
+		l.remove('icd10')
+		l = l + ['icd10']
 
 		df = df[l]
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.2)
-		c = SVC()
+		c = GaussianNB()
 		c.fit(X_train, Y_train)
 		p = c.predict(X_validation)
 		cf = confusion_matrix(Y_validation, p)
