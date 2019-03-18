@@ -1,9 +1,8 @@
-from db.database import getdata
-from db.database import cleandata
-from db.database import readdata
-from db.database import onehotdrug
-from db.database import mapdata
-from db.database import train_model
+from db.getdata import getdata
+from db.getdata import remove_space_data
+from db.onehot import get_total_feature
+from db.onehot import onehot
+from db.trainmodel import train_model
 import sys
 import os
 from pathlib import Path
@@ -11,10 +10,11 @@ sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
 
 import config
 
-#getdata(config)
-#cleandata()
-#readdata()
-#onehotdrug()
-#mapdata()
-train_model()
+feature = 'drug'
+
+#getdata(config,feature)
+#remove_space_data(feature)
+#get_total_feature(feature)
+#onehot(feature)
+train_model(feature)
 
