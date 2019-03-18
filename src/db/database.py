@@ -138,7 +138,7 @@ def train_model():
 	p = '../../secret/data/drug_onehot.csv'
 	c = GaussianNB()
 	n = 0
-	for df in  pd.read_csv(p, chunksize=5000):
+	for df in  pd.read_csv(p, chunksize=1000):
 		l = df.columns.tolist()
 		l.remove('TXN')
 		l.remove('icd10')
@@ -146,7 +146,7 @@ def train_model():
 
 		df = df[l]
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
-		if n < 20:
+		if n < 5000:
 			c.fit(X_train, Y_train)
 		else:
 			p = c.predict(X_train)
