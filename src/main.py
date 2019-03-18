@@ -21,4 +21,4 @@ feature = 'drug'
 #onehot(feature)
 #train_model(feature)
 
-get_lab_data()
+get_lab_data(config)

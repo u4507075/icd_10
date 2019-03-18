@@ -38,7 +38,7 @@ def get_lab_data(config):
 			(SELECT CODE,COUNT(TXN) AS n FROM icd10.ilab GROUP BY CODE)
 			;
 			'''	
-	df = pd.read_sql(q)
+	df = pd.read_sql(q, con=db_connection)
 	df = df[df['n'] >= 500]
 	for index,row in df.iterrows():	
 		print(row)
