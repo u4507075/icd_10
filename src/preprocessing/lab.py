@@ -16,14 +16,47 @@ def decode(df):
 			df[c] = df[c].apply(convert)
 	return df
 
-def getquery(file,n,f):
-	# Open and read the file as a single buffer
-	fd = open('../../secret/'+file+'.sql', 'r')
-	sql = fd.read()
-	fd.close()
+def getquery(t1,t2,code,n,f):
+	sql = 	'''
+				SELECT 
+					 dx.TXN,
+					 lab.LST AS name,
+					 lab.REP as value,
+					 dx.icd10
+				 
+				FROM icd10.%t1 dx
+				INNER JOIN icd10.%t2 lab
+				ON dx.TXN = lab.TXN
+				WHERE lab.REP IS NOT NULL AND lab.REP != "" AND dx.icd10 IS NOT NULL
+				AND lab.CODE = %code
+				LIMIT %n OFFSET %f;
+			'''
+	sql = sql.replace('%t1',str(t1))	
+	sql = sql.replace('%t2',str(t2))
+	sql = sql.replace('%code',str(code))
 	sql = sql.replace('%f',str(f))
 	sql = sql.replace('%n',str(n))
 	return sql
+
+def save_data(t1,t2,code):
+	n = 1000000
+	offset = 0
+	
+	while True:
+		df = pd.read_sql(getquery(query_file,n,offset), con=db_connection)
+		print(len(df))
+		if len(df) == 0:
+			break
+		df = decode(df)
+		p = '../../secret/data/lab/'+code+'.csv'
+		file = Path(p)
+		if file.is_file():
+			with open(p, 'a') as f:
+				df.to_csv(f, header=False)
+		else:
+			df.to_csv(p)
+		offset = offset + n
+		print('Save '+code+' chunk: '+str(offset))
 
 def get_lab_data(config):
 
@@ -41,25 +74,8 @@ def get_lab_data(config):
 	df = pd.read_sql(q, con=db_connection)
 	df = df[df['n'] >= 500]
 	for index,row in df.iterrows():	
-		print(row)
-	'''
-	n = 1000000
-	offset = 0
-	while True:
-		df = pd.read_sql(getquery(query_file,n,offset), con=db_connection)
-		print(len(df))
-		if len(df) == 0:
-			break
-		df = decode(df)
-		p = '../../secret/data/'+featuree+'.csv'
-		file = Path(p)
-		if file.is_file():
-			with open(p, 'a') as f:
-				df.to_csv(f, header=False)
-		else:
-			df.to_csv(p)
-		offset = offset + n
-		print('Save data chunk: '+str(offset))
-	'''
+		save_data('idx','ilab',row['CODE'])
+		save_data('odx','lab',row['CODE'])
+
 
 
