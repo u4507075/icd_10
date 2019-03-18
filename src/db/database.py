@@ -146,7 +146,7 @@ def train_model():
 
 		df = df[l]
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
-		if n < 100:
+		if n < 5000:
 			c.fit(X_train, Y_train)
 		else:
 			p = c.predict(X_train)
@@ -157,24 +157,4 @@ def train_model():
 
 			break
 		n = n+1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		print('Batch '+str(n))
