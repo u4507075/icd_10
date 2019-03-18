@@ -21,16 +21,16 @@ def decode(df):
 			df[c] = df[c].apply(convert)
 	return df
 
-def getquery(feature,n,f):
+def getquery(file,n,f):
 	# Open and read the file as a single buffer
-	fd = open('../../secret/'+feature+'.sql', 'r')
+	fd = open('../../secret/'+file+'.sql', 'r')
 	sql = fd.read()
 	fd.close()
 	sql = sql.replace('%f',str(f))
 	sql = sql.replace('%n',str(n))
 	return sql
 
-def getdata(config,feature):
+def getdata(config,query_file,feature):
 
 	db_connection = sql.connect(	host=config.DATABASE_CONFIG['host'], 
 											database=config.DATABASE_CONFIG['dbname'], 
@@ -40,7 +40,7 @@ def getdata(config,feature):
 	n = 1000000
 	offset = 0
 	while True:
-		df = pd.read_sql(getquery(feature,n,offset), con=db_connection)
+		df = pd.read_sql(getquery(query_file,n,offset), con=db_connection)
 		print(len(df))
 		if len(df) == 0:
 			break

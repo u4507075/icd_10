@@ -12,7 +12,8 @@ import config
 
 feature = 'drug'
 
-#getdata(config,feature)
+#getdata(config,'drug_opd',feature)
+#getdata(config,'drug_ipd',feature)
 #remove_space_data(feature)
 #get_total_feature(feature)
 #onehot(feature)
