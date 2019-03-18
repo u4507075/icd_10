@@ -136,6 +136,8 @@ def get_dataset(trainingset, validation_size):
 
 def train_model():
 	p = '../../secret/data/drug_onehot.csv'
+	c = GaussianNB()
+	n = 0
 	for df in  pd.read_csv(p, chunksize=1000):
 		l = df.columns.tolist()
 		l.remove('TXN')
@@ -143,16 +145,18 @@ def train_model():
 		l = l + ['icd10']
 
 		df = df[l]
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.2)
-		c = GaussianNB()
-		c.fit(X_train, Y_train)
-		p = c.predict(X_validation)
-		cf = confusion_matrix(Y_validation, p)
-		print(cf)
-		cr = classification_report(Y_validation, p)
-		print(cr)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
+		if n < 100:
+			c.fit(X_train, Y_train)
+		else:
+			p = c.predict(X_train)
+			cf = confusion_matrix(Y_train, p)
+			print(cf)
+			cr = classification_report(Y_train, p)
+			print(cr)
 
-		break
+			break
+		n = n+1
 
 
 
