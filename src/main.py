@@ -6,7 +6,7 @@ from preprocessing.trainmodel import train_model
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
-
+from preprocessing.lab import clean_lab_data
 import sys
 import os
 from pathlib import Path
@@ -24,4 +24,5 @@ feature = 'drug'
 #train_model(feature)
 
 #get_lab_data(config)
-split_lab_data()
+#split_lab_data()
+clean_lab_data()
