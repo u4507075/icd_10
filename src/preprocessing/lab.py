@@ -84,7 +84,7 @@ def split_lab_data():
 	for lab in files:
 		p = '../../secret/data/lab/raw/'+lab
 		p2 = '../../secret/data/lab/split'+lab
-		for df in  pd.read_csv(p, chunksize=100):
+		for df in  pd.read_csv(p, chunksize=1000000):
 			d = df['value'].str.split(';',expand=True)
 			c = lab.replace('.csv','')
 			d = d.add_prefix(c+'_')
@@ -99,6 +99,7 @@ def split_lab_data():
 					d.to_csv(f, header=False)
 			else:
 				d.to_csv(p2)
+			print('Append data')
 		print('Save '+lab)
 
 
