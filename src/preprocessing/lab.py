@@ -28,7 +28,7 @@ def getquery(t1,t2,code,n,f):
 				INNER JOIN icd10.%t2 lab
 				ON dx.TXN = lab.TXN
 				WHERE lab.REP IS NOT NULL AND lab.REP != "" AND dx.icd10 IS NOT NULL
-				AND lab.CODE = %code
+				AND lab.CODE = "%code"
 				LIMIT %n OFFSET %f;
 			'''
 	sql = sql.replace('%t1',str(t1))	
@@ -38,17 +38,18 @@ def getquery(t1,t2,code,n,f):
 	sql = sql.replace('%n',str(n))
 	return sql
 
-def save_data(t1,t2,code):
+def save_data(db_connection,t1,t2,code):
 	n = 1000000
 	offset = 0
 	
 	while True:
-		df = pd.read_sql(getquery(query_file,n,offset), con=db_connection)
+		df = pd.read_sql(getquery(t1,t2,code,n,offset), con=db_connection)
 		print(len(df))
 		if len(df) == 0:
 			break
 		df = decode(df)
-		p = '../../secret/data/lab/'+code+'.csv'
+		code_name = code.replace(' ','')
+		p = '../../secret/data/lab/'+code_name+'.csv'
 		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
@@ -74,8 +75,8 @@ def get_lab_data(config):
 	df = pd.read_sql(q, con=db_connection)
 	df = df[df['n'] >= 500]
 	for index,row in df.iterrows():	
-		save_data('idx','ilab',row['CODE'])
-		save_data('odx','lab',row['CODE'])
+		save_data(db_connection,'idx','ilab',row['CODE'])
+		save_data(db_connection,'odx','lab',row['CODE'])
 
 
 

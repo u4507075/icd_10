@@ -24,7 +24,7 @@ def train_model(feature):
 	p = '../../secret/data/'+feature+'_onehot.csv'
 	c = GaussianNB()
 	n = 0
-	for df in  pd.read_csv(p, chunksize=1000):
+	for df in  pd.read_csv(p, chunksize=10000):
 		l = df.columns.tolist()
 		l.remove('TXN')
 		l.remove('icd10')
@@ -32,7 +32,7 @@ def train_model(feature):
 
 		df = df[l]
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
-		if n < 1000:
+		if n < 100:
 			c.fit(X_train, Y_train)
 		else:
 			p = c.predict(X_train)
