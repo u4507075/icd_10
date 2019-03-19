@@ -93,14 +93,12 @@ def split_lab_data():
 			d.fillna(0, inplace=True)
 			d.insert(0,'TXN',df['TXN'])
 			d['icd10'] = df['icd10'].copy()
-			print(d)
-			p3 = '../../secret/data/lab/split/'+lab
-			file = Path(p3)
+			file = Path(p2)
 			if file.is_file():
-				with open(p3, 'a') as f:
+				with open(p2, 'a') as f:
 					d.to_csv(f, header=False)
 			else:
-				d.to_csv(p3)
+				d.to_csv(p2)
 		print('Save '+lab)
 
 
