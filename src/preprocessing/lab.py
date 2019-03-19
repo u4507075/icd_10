@@ -88,9 +88,9 @@ def split_lab_data():
 			d = df['value'].str.split(';',expand=True)
 			c = lab.replace('.csv','')
 			d = d.add_prefix(c+'_')
-			for col in d.columns:
-				d[col] = pd.to_numeric(d[col],errors='coerce')
-			d.fillna(0, inplace=True)
+			#for col in d.columns:
+			#	d[col] = pd.to_numeric(d[col],errors='coerce')
+			#d.fillna(0, inplace=True)
 			d.insert(0,'TXN',df['TXN'])
 			d['icd10'] = df['icd10'].copy()
 			file = Path(p2)
