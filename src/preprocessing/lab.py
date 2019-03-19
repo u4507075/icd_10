@@ -2,6 +2,7 @@ import mysql.connector as sql
 import pandas as pd
 from pathlib import Path
 import numpy as np
+import os
 
 def convert(x):
     try:
@@ -49,7 +50,7 @@ def save_data(db_connection,t1,t2,code):
 			break
 		df = decode(df)
 		code_name = code.replace(' ','')
-		p = '../../secret/data/lab/'+code_name+'.csv'
+		p = '../../secret/data/lab/raw/'+code_name+'.csv'
 		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
@@ -77,6 +78,27 @@ def get_lab_data(config):
 	for index,row in df.iterrows():	
 		save_data(db_connection,'idx','ilab',row['CODE'])
 		save_data(db_connection,'odx','lab',row['CODE'])
+
+def split_lab_data():
+	files = os.listdir('../../secret/data/lab/raw/')
+	print(files)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
