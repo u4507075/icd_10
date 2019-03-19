@@ -81,8 +81,18 @@ def get_lab_data(config):
 
 def split_lab_data():
 	files = os.listdir('../../secret/data/lab/raw/')
-	print(files)
-
+	for f in files:
+		p = '../../secret/data/lab/raw/'+f
+		p2 = '../../secret/data/lab/split'+f
+		for df in  pd.read_csv(p, chunksize=100):
+			d = df['value'].str.split(';',expand=True)
+			c = f.replace('.csv','')
+			d = d.add_prefix(c+'_')
+			d.insert(0,'TXN',df['TXN'])
+			d['icd10'] = df['icd10'].copy()
+			print(d)
+			break
+		break
 
 
 
