@@ -148,6 +148,14 @@ def split_num_from_text(x):
 		else:
 			return x
 	return x
+
+def save_file(df,p):
+	file = Path(p)
+	if file.is_file():
+		with open(p, 'a') as f:
+			df.to_csv(f, header=False)
+	else:
+		df.to_csv(p)
 def clean_lab_data():
 
 	#B05, B06, B07, B08 one hot 1 feature
@@ -167,7 +175,7 @@ def clean_lab_data():
 				'L1056221','L101763','L10981','B13','L84','L10573','L09011']
 	for lab in files:
 		p = '../../secret/data/lab/split/'+lab+'.csv'
-		for df in  pd.read_csv(p, chunksize=100):
+		for df in  pd.read_csv(p, chunksize=100000):
 			for col in df.columns:
 				if col != 'TXN' and col != 'icd10':
 					df[col] = df[col].apply(get_value)
@@ -175,8 +183,8 @@ def clean_lab_data():
 					if col.startswith('L1081'):
 						df[col] = df[col].apply(split_num_from_text)
 			#df = df.loc[:, (df != 0).any(axis=0)]
-			print(df)
-			break
+			print('Save clean data: '+str(lab))
+			save_file(df,'../../secret/data/lab/clean/'+lab+'.csv')
 		
 
 
