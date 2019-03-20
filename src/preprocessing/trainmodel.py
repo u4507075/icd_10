@@ -28,7 +28,19 @@ def eval(testset,model):
 	cr = classification_report(Y_train, p)
 	print(cr)
 
-
+def get_target_class(feature):
+	p = '../../secret/data/drug_onehot.csv'
+	value = []
+	for df in  pd.read_csv(p, chunksize=1000000):
+		df = df[df[feature].notnull()]
+		v = df[feature].unique().tolist()
+		value = value + v
+		value = list(set(value))       
+		value.sort()
+	df = pd.DataFrame([value],columns=[feature])
+	df.to_csv('../../secret/data/target_class.csv')
+	print(df)
+		
 def train_model(feature):
 	p = '../../secret/data/'+feature+'_onehot.csv'
 	c = GaussianNB()
