@@ -3,6 +3,7 @@ from preprocessing.getdata import remove_space_data
 from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.trainmodel import train_model
+from preprocessing.trainmodel import get_target_class
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -21,7 +22,8 @@ feature = 'drug'
 #remove_space_data(feature)
 #get_total_feature(feature)
 #onehot(feature)
-train_model(feature)
+get_target_class('icd10')
+#train_model(feature)
 
 #get_lab_data(config)
 #split_lab_data()
