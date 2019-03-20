@@ -3,6 +3,8 @@ import pandas as pd
 from pathlib import Path
 import numpy as np
 import os
+import re
+import math
 
 def convert(x):
     try:
@@ -102,9 +104,80 @@ def split_lab_data():
 			print('Append data')
 		print('Save '+lab)
 
+def get_value(x):
+	#try:
+	if x == np.nan:
+		return 0
+	else:
+		s = str(x).split(' ')
+		if s[0] == np.nan or s[0] == 'nan' or s[0] == '':
+			return 0
+		else:
+			s[0] = s[0].replace('<','')
+			s[0] = s[0].replace('>','')
+			s[0] = s[0].replace(',','')
+			s[0] = s[0].replace('|','')
+			s[0] = s[0].lower()
+			#print(s[0])
+			if '/' in s[0]:
+				s[0] = split_num_from_text(s[0])
+				
+				if re.match('^[a-z]+', str(s[0])) is not None:
+					
+					return 0
+				else:
+					return s[0]
+			elif s[0] == 'p' or s[0] == 'pos' or s[0] == 'positive':
+				return 'positive'
+			elif s[0] == 'n' or s[0] == 'neg' or s[0] == 'negative':
+				return 'negative'
+			elif s[0].startswith('r='):
+				return s[0].replace('r=','')
+			elif str(s[0]) == '' or str(s[0]) == '%':
+				return 0
+			else:
+				return s[0]
+	#except AttributeError:
+	#	print('MMM')
+	#	return 0
+def split_num_from_text(x):
+	if x != 0:
+		v = re.findall('\d+\.?\d+',str(x))
+		if len(v) > 0:
+			return v[0]
+		else:
+			return x
+	return x
+def clean_lab_data():
 
-
-
+	#B05, B06, B07, B08 one hot 1 feature
+	#B09, B13.1 one hot 2 feature
+	
+	files = ['L01','L1901','L090','L10044','L07','L10962','L1001',
+				'L4301','L421','L1005','L1032','L1904','L091','L1081',
+				'L1903','L422','L531','L61', 'L1022','L10041','L029',
+				'L093','L10591','L1031','L107018','L073','L025','L107011',
+				'L105621','L10502','L36','L0261','L0371','L0414','GMCL001',
+				'L1911','L1906','L0421','L1907','L083','L071','L092',
+				'L5712','L10561','L078','L0411','L551','L1905','L1902',
+				'L037','L02','L1910','B06','L1052','L022','L1084','L1040',
+				'L54','L024','L1914','L10501','L10221','L10042','B13.1',
+				'L077','L1030','L105933','L106011','L2082','L027','L10961',
+				'L0221','L074','L581','L58','L202','L105932','L072',
+				'L1056221','L101763','L10981','B13','L84','L10573','L09011']
+	for lab in files:
+		p = '../../secret/data/lab/split/'+lab+'.csv'
+		for df in  pd.read_csv(p, chunksize=100):
+			for col in df.columns:
+				if col != 'TXN' and col != 'icd10':
+					df[col] = df[col].apply(get_value)
+					df[col] = pd.to_numeric(df[col],errors='ignore')
+					if col.startswith('L1081'):
+						df[col] = df[col].apply(split_num_from_text)
+			#df = df.loc[:, (df != 0).any(axis=0)]
+			print(df)
+			break
+		
 
 
 
