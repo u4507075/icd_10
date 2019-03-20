@@ -22,8 +22,8 @@ feature = 'drug'
 #remove_space_data(feature)
 #get_total_feature(feature)
 #onehot(feature)
-get_target_class('icd10')
-#train_model(feature)
+#get_target_class('icd10')
+train_model(feature)
 
 #get_lab_data(config)
 #split_lab_data()
