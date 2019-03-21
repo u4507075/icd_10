@@ -174,17 +174,19 @@ def clean_lab_data():
 				'L0221','L074','L581','L58','L202','L105932','L072',
 				'L1056221','L101763','L10981','B13','L84','L10573','L09011']
 	for lab in files:
-		p = '../../secret/data/lab/split/'+lab+'.csv'
-		for df in  pd.read_csv(p, chunksize=100000):
-			for col in df.columns:
-				if col != 'TXN' and col != 'icd10':
-					df[col] = df[col].apply(get_value)
-					df[col] = pd.to_numeric(df[col],errors='ignore')
-					if col.startswith('L1081'):
-						df[col] = df[col].apply(split_num_from_text)
-			#df = df.loc[:, (df != 0).any(axis=0)]
-			print('Save clean data: '+str(lab))
-			save_file(df,'../../secret/data/lab/clean/'+lab+'.csv')
+		file = Path('../../secret/data/lab/clean/'+lab+'.csv')
+		if not file.is_file():
+			p = '../../secret/data/lab/split/'+lab+'.csv'
+			for df in  pd.read_csv(p, chunksize=100000):
+				for col in df.columns:
+					if col != 'TXN' and col != 'icd10':
+						df[col] = df[col].apply(get_value)
+						df[col] = pd.to_numeric(df[col],errors='ignore')
+						if col.startswith('L1081'):
+							df[col] = df[col].apply(split_num_from_text)
+				#df = df.loc[:, (df != 0).any(axis=0)]
+				print('Save clean data: '+str(lab))
+				save_file(df,'../../secret/data/lab/clean/'+lab+'.csv')
 		
 
 

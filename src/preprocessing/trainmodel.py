@@ -9,6 +9,12 @@ from sklearn.utils import shuffle
 from sklearn.metrics import confusion_matrix,classification_report
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import Perceptron
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.linear_model import PassiveAggressiveClassifier
+
 
 def get_dataset(trainingset, validation_size):
 	n = len(trainingset.columns)-1
@@ -42,14 +48,37 @@ def get_target_class(feature):
 	df.to_csv('../../secret/data/target_class.csv')
 	print(df)
 
+def get_small_sample():
+	p = '../../secret/data/drug_onehot.csv'
+	value = []
+	feature = 'icd10'
+	for df in  pd.read_csv(p, chunksize=50000):
+		df.to_csv('../../secret/data/drug_onehot_s.csv')
+		v = df[feature].unique().tolist()
+		value = value + v
+		value = list(set(value))
+		value.sort()
+		df = pd.DataFrame.from_dict({feature:value})
+		df.to_csv('../../secret/data/target_class_s.csv')
+		break
+
+def icd10_head(x):
+	return x[0]
+
 def train_model(feature):
 	p = '../../secret/data/'+feature+'_onehot.csv'
-	class_list = pd.read_csv('../../secret/data/target_class.csv')['icd10'].tolist()
-	c = GaussianNB()
+	df = pd.read_csv('../../secret/data/target_class.csv')
+	df['icd10'] = df['icd10'].apply(icd10_head)
+	class_list = df['icd10'].tolist()
+	#c = MultinomialNB()
+	#c = BernoulliNB()
+	c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
+	#c = SGDClassifier(loss='log')
+	#c = Perceptron(n_jobs=-1,warm_start=True)
 	n = 0
 	testset = None
 	l = None
-	chunk = 5000
+	chunk = 100
 	
 	for df in  pd.read_csv(p, chunksize=chunk):
 		if l is None:
@@ -59,7 +88,7 @@ def train_model(feature):
 			l = l + ['icd10']
 
 		df = df[l]
-		
+		df['icd10'] = df['icd10'].apply(icd10_head)
 		if testset is None:
 			testset = df.tail(1)
 		else:

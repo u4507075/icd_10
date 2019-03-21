@@ -4,6 +4,7 @@ from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.trainmodel import train_model
 from preprocessing.trainmodel import get_target_class
+from preprocessing.trainmodel import get_small_sample
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -23,6 +24,7 @@ feature = 'drug'
 #get_total_feature(feature)
 #onehot(feature)
 #get_target_class('icd10')
+#get_small_sample()
 train_model(feature)
 
 #get_lab_data(config)
