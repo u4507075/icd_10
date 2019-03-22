@@ -21,16 +21,29 @@ def decode(df):
 			df[c] = df[c].apply(convert)
 	return df
 
-def getquery(file,n,f):
-	# Open and read the file as a single buffer
-	fd = open('../../secret/'+file+'.sql', 'r')
-	sql = fd.read()
-	fd.close()
+def getquery(t,n,f):
+	d = 'dru'
+	if t == 'idx':
+		d = 'idru'
+	sql = 	'''
+		SELECT 
+    		dx.TXN,
+    		dru.CODE AS drug,
+    		dx.icd10
+ 		
+		FROM icd10.%t dx
+		INNER JOIN icd10.%d dru
+		ON dx.TXN = dru.TXN
+		WHERE dru.CODE IS NOT NULL AND dx.icd10 IS NOT NULL
+		LIMIT %n OFFSET %f;
+		'''
+	sql = sql.replace('%t',str(t))
 	sql = sql.replace('%f',str(f))
 	sql = sql.replace('%n',str(n))
+	sql = sql.replace('%d',str(d))
 	return sql
 
-def getdata(config,query_file,feature):
+def getdata(config,t,feature):
 
 	db_connection = sql.connect(	host=config.DATABASE_CONFIG['host'], 
 											database=config.DATABASE_CONFIG['dbname'], 
@@ -40,12 +53,12 @@ def getdata(config,query_file,feature):
 	n = 1000000
 	offset = 0
 	while True:
-		df = pd.read_sql(getquery(query_file,n,offset), con=db_connection)
+		df = pd.read_sql(getquery(t,n,offset), con=db_connection)
 		print(len(df))
 		if len(df) == 0:
 			break
 		df = decode(df)
-		p = '../../secret/data/'+featuree+'.csv'
+		p = '../../secret/data/'+feature+'/'+feature+'.csv'
 		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
