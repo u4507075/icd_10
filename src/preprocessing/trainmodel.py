@@ -35,7 +35,7 @@ def eval(testset,model):
 	print(cr)
 
 def get_target_class(feature):
-	p = '../../secret/data/drug_onehot.csv'
+	p = '../../secret/data/drug/drug_onehot.csv'
 	value = []
 	for df in  pd.read_csv(p, chunksize=10000):
 		v = df[feature].unique().tolist()
@@ -45,7 +45,7 @@ def get_target_class(feature):
 		print(len(value))
 
 	df = pd.DataFrame.from_dict({feature:value})
-	df.to_csv('../../secret/data/target_class.csv')
+	df.to_csv('../../secret/data/drug/target_class.csv')
 	print(df)
 
 def get_small_sample():

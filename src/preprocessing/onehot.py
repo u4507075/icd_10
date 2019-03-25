@@ -5,7 +5,7 @@ import numpy as np
 
 
 def get_total_feature(feature):
-	p = '../../secret/data/'+feature+'_clean.csv'
+	p = '../../secret/data/'+feature+'/'+feature+'_clean.csv'
 	value = []
 	for df in  pd.read_csv(p, chunksize=1000000):
 		df = df[df[feature].notnull()]
@@ -16,12 +16,12 @@ def get_total_feature(feature):
 		print(len(value))
 	d = { i : value[i] for i in range(0, len(value) ) }
 	df = pd.DataFrame.from_dict({feature:value, 'code': list(range(len(value)))})
-	df.to_csv('../../secret/data/'+feature+'_code.csv')
+	df.to_csv('../../secret/data/'+feature+'/'+feature+'_code.csv')
 
 def onehot(feature):
-	p = '../../secret/data/'+feature+'_clean.csv'
-	p2 = '../../secret/data/'+feature+'_onehot.csv'
-	drug_list = pd.read_csv('../../secret/data/'+feature+'_code.csv')[feature].values.tolist()
+	p = '../../secret/data/'+feature+'/'+feature+'_clean.csv'
+	p2 = '../../secret/data/'+feature+'/'+feature+'_onehot.csv'
+	drug_list = pd.read_csv('../../secret/data/'+feature+'/'+feature+'_code.csv')[feature].values.tolist()
 	#drug_list = ['TXN']+drug_list+['DX1']
 	for df in  pd.read_csv(p, chunksize=100000):
 		df = df[['TXN',feature,'icd10']]

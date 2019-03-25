@@ -19,14 +19,13 @@ import config
 feature = 'drug'
 
 #getdata(config,'odx',feature)
-getdata(config,'idx',feature)
+#getdata(config,'idx',feature)
 #remove_space_data(feature)
 #get_total_feature(feature)
-#onehot(feature)
-#get_target_class('icd10')
-#get_small_sample()
+##onehot(feature)
+get_target_class('icd10')
 #train_model(feature)
 
-#get_lab_data(config)
+##get_lab_data(config)
 #split_lab_data()
 #clean_lab_data()

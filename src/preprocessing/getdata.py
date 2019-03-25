@@ -69,12 +69,11 @@ def getdata(config,t,feature):
 		print('Save data chunk: '+str(offset))
 
 def remove_space_data(feature):
-	p = '../../secret/data/'+feature+'.csv'
-	p2 = '../../secret/data/'+feature+'_clean.csv'
+	p = '../../secret/data/'+feature+'/'+feature+'.csv'
+	p2 = '../../secret/data/'+feature+'/'+feature+'_clean.csv'
 	for df in  pd.read_csv(p, chunksize=1000000):
-		for i in feature:
-			#df['drug'] = df['drug'].apply(remove_space)
-			df[i] = df[i].apply(remove_space)
+		#df['drug'] = df['drug'].apply(remove_space)
+		df[feature] = df[feature].apply(remove_space)
 		file = Path(p2)
 		if file.is_file():
 			with open(p2, 'a') as f:
