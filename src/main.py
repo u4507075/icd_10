@@ -9,6 +9,9 @@ from preprocessing.trainmodel import get_small_sample
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
 from preprocessing.lab import clean_lab_data
+
+from preprocessing.demographic import save_demographic_data
+
 import sys
 import os
 from pathlib import Path
@@ -23,9 +26,11 @@ feature = 'drug'
 #remove_space_data(feature)
 #get_total_feature(feature)
 ##onehot(feature)
-get_target_class('icd10')
+#get_target_class('icd10')
 #train_model(feature)
 
 ##get_lab_data(config)
 #split_lab_data()
 #clean_lab_data()
+
+save_demographic_data(config)

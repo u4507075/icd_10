@@ -52,7 +52,7 @@ def save_data(db_connection,t1):
 		else:
 			df.to_csv(p)
 		offset = offset + n
-		print('Save '+code+' chunk: '+str(offset))
+		print('Save chunk '+str(offset))
 
 def save_demographic_data(config):
 	db_connection = sql.connect(	host=config.DATABASE_CONFIG['host'], 
