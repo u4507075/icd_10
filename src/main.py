@@ -30,30 +30,10 @@ feature = 'drug'
 #get_target_class('icd10')
 #train_model(feature)
 
-##get_lab_data(config)
+#get_lab_data(config)
 #split_lab_data()
 #clean_lab_data()
 
 #save_demographic_data(config)
-<<<<<<< HEAD
-=======
-clean_demographic_data()
+#clean_demographic_data()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> c2afe2ee8b25611e2e2a6d4b77f3274af955af99
