@@ -33,4 +33,4 @@ feature = 'drug'
 #split_lab_data()
 #clean_lab_data()
 
-save_demographic_data(config)
+#save_demographic_data(config)
