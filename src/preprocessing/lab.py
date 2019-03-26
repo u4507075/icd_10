@@ -193,15 +193,13 @@ def onehot_lab_data():
 	files = os.listdir('../../secret/data/lab/clean/')
 	for lab in files:
 		p = '../../secret/data/lab/clean/'+lab
-		for d in  pd.read_csv(p, chunksize=5000):
-			if len(d) == 5000:
-				for c in d.columns:
-					if c != 'TXN' and c != 'icd10':
-						d[c] = d[c].apply(pd.to_numeric,errors='coerce').fillna(0)
-						print(d[c].unique())
-				#for df in  pd.read_csv(p, chunksize=1000):
-				#	print(df)
-		break
+		for df in  pd.read_csv(p, chunksize=1000000):
+			for c in df.columns:
+				if c != 'TXN' and c != 'icd10':
+					df[c] = df[c].apply(pd.to_numeric,errors='coerce').fillna(0)
+
+			save_file(df,'../../secret/data/lab/numeric/'+lab):
+			print('Saved '+lab)
 
 
 
