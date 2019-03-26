@@ -189,9 +189,15 @@ def clean_lab_data():
 				save_file(df,'../../secret/data/lab/clean/'+lab+'.csv')
 		
 
-
-
-
+def onehot_lab_data():
+	files = os.listdir('../../secret/data/lab/clean/')
+	for lab in files:
+		p = '../../secret/data/lab/clean/'+lab
+		for d in  pd.read_csv(p, chunksize=5000):
+			if len(d) == 5000:
+				for df in  pd.read_csv(p, chunksize=1000):
+					print(df)
+		break
 
 
 

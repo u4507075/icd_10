@@ -10,6 +10,7 @@ from preprocessing.trainmodel import get_small_sample
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
 from preprocessing.lab import clean_lab_data
+from preprocessing.lab import onehot_lab_data
 
 from preprocessing.demographic import save_demographic_data
 from preprocessing.demographic import clean_demographic_data
@@ -36,6 +37,7 @@ feature = 'drug'
 #get_lab_data(config)
 #split_lab_data()
 #clean_lab_data()
+onehot_lab_data
 
 #save_demographic_data(config)
 #clean_demographic_data()
