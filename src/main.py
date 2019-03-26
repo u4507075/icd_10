@@ -11,6 +11,7 @@ from preprocessing.lab import split_lab_data
 from preprocessing.lab import clean_lab_data
 
 from preprocessing.demographic import save_demographic_data
+from preprocessing.demographic import clean_demographic_data
 
 import sys
 import os
@@ -34,3 +35,25 @@ feature = 'drug'
 #clean_lab_data()
 
 #save_demographic_data(config)
+<<<<<<< HEAD
+=======
+clean_demographic_data()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> c2afe2ee8b25611e2e2a6d4b77f3274af955af99

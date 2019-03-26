@@ -62,7 +62,35 @@ def save_demographic_data(config):
 											port=config.DATABASE_CONFIG['port'])
 	save_data(db_connection,'odx')
 	save_data(db_connection,'idx')
-	
+
+def clean_sex(x):
+	x = x.replace(' ','')
+	if x == 'ช':
+		return 'm'
+	elif x == 'ญ':
+		return 'f'
+	else:
+		return ''
+
+def clean_age(x):
+	if x > 150:
+		return 0
+	else:
+		return x
+def clean_roomname(x):
+	x = x.lower()
+	return re.sub(r'[\d-]+', '', x)
+def clean_demographic_data():
+	p = '../../secret/data/demographic/demographic.csv'
+	for df in  pd.read_csv(p, chunksize=100):
+		df = df[['TXN','sex','age','wt','pulse','resp','temp','bp','blood','rh','room','room_dc','icd10']]
+		df = df.fillna(0)		
+		df['sex'] = df['sex'].apply(clean_sex)		
+		df['age'] = df['age'].apply(clean_age)
+		df['room'] = df['room'].apply(clean_roomname)
+		df['room_dc'] = df['room_dc'].apply(clean_roomname)
+		print(df)
+		break
 
 
 		
