@@ -3,6 +3,7 @@ from preprocessing.getdata import remove_space_data
 from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.trainmodel import train_model
+from preprocessing.trainmodel import train_model_onetime
 from preprocessing.trainmodel import get_target_class
 from preprocessing.trainmodel import get_small_sample
 
@@ -12,6 +13,7 @@ from preprocessing.lab import clean_lab_data
 
 from preprocessing.demographic import save_demographic_data
 from preprocessing.demographic import clean_demographic_data
+from preprocessing.demographic import onehot_demographic_data
 
 import sys
 import os
@@ -29,6 +31,7 @@ feature = 'drug'
 ##onehot(feature)
 #get_target_class('icd10')
 #train_model(feature)
+#train_model_onetime('../../secret/data/demographic/demographic_onehot.csv')
 
 #get_lab_data(config)
 #split_lab_data()
@@ -36,4 +39,8 @@ feature = 'drug'
 
 #save_demographic_data(config)
 #clean_demographic_data()
+#onehot_demographic_data()
+
+
+
 

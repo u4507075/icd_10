@@ -102,3 +102,16 @@ def train_model(feature):
 			eval(testset,c)
 	eval(testset,c)
 
+def train_model_onetime(target):
+	df = pd.read_csv(target)
+	X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+	
+	c = MultinomialNB()
+	c.fit(X_train, Y_train)
+
+	p = model.predict(X_validation)
+	cf = confusion_matrix(Y_validation, p)
+	print(cf)
+	cr = classification_report(Y_validation, p)
+	print(cr)
+
