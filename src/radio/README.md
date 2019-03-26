@@ -12,7 +12,7 @@ We know that radiological reports contain a lot of useful information. In the re
 ## Data type
 1. Type of imaging: plain file, CT, MRI, etc (text).
 2. Location of investigatin: head, chest, abdoment, etc (text).
-3. Radiologic findings: describe relevant (normal/abnormal) findings of the investigation results, suggest diagnosis or abnormalities related to the patient based on the evidences.
+3. Radiological findings: describe relevant (normal/abnormal) findings of the investigation results, suggest diagnosis or abnormalities related to the patient based on the evidences.
 
 ## Review matching patterns between the reports and ICD-10
 1. Exact match
