@@ -64,34 +64,83 @@ def save_demographic_data(config):
 	save_data(db_connection,'idx')
 
 def clean_sex(x):
-	x = x.replace(' ','')
+	x = str(x).replace(' ','')
 	if x == 'ช':
 		return 'm'
 	elif x == 'ญ':
 		return 'f'
 	else:
-		return ''
+		return 0
 
 def clean_age(x):
 	if x > 150:
 		return 0
 	else:
 		return x
+def clean_blood_group(x):
+	x = str(x).lower()
+	if x == 'o' or x == 'a' or x == 'b' or x == 'ab':
+		return x
+	else:
+		return 0
+def clean_rh(x):
+	x = str(x).lower()
+	if x == '+' or x == 'p':
+		return 'p'
+	elif x == '-' or x == 'n':
+		return 'n'
+	else:
+		return 0
 def clean_roomname(x):
-	x = x.lower()
-	return re.sub(r'[\d-]+', '', x)
+	x = str(x).lower()
+	x = x.replace('*','')
+	x = x.replace(' ','')
+	if x == '':
+		return 0
+	else:
+		return re.sub(r'[\d-]+', '', x)
+def save_clean_data(df):
+	p = '../../secret/data/demographic/demographic_clean.csv'
+	file = Path(p)
+	if file.is_file():
+		with open(p, 'a') as f:
+			df.to_csv(f, header=False)
+	else:
+		df.to_csv(p)
 def clean_demographic_data():
 	p = '../../secret/data/demographic/demographic.csv'
-	for df in  pd.read_csv(p, chunksize=100):
+	for df in  pd.read_csv(p, chunksize=100000):
 		df = df[['TXN','sex','age','wt','pulse','resp','temp','bp','blood','rh','room','room_dc','icd10']]
-		df = df.fillna(0)		
+			
 		df['sex'] = df['sex'].apply(clean_sex)		
 		df['age'] = df['age'].apply(clean_age)
+		df['blood'] = df['blood'].apply(clean_blood_group)
+		df['rh'] = df['rh'].apply(clean_rh)
 		df['room'] = df['room'].apply(clean_roomname)
 		df['room_dc'] = df['room_dc'].apply(clean_roomname)
-		print(df)
-		break
+		df = df.fillna(0)	
+		save_clean_data(df)
+		print('Append clean data')
 
+def onehot_demographic_data():
+	df = pd.read_csv('../../secret/data/demographic/demographic_clean.csv', index_col=0)
+	d = df['bp'].str.split('/',expand=True)
+	d.columns = ['sbp','dbp']
+	for c in d.columns:
+		d[c] = pd.to_numeric(d[c], errors='coerce')
+	d.fillna(0, inplace=True)
+	
+	icd10 = df['icd10']
+	df.drop(columns=['bp','icd10'], inplace=True)
+	df['sbp'] = d['sbp']
+	df['dbp'] = d['dbp']
+	df2 = pd.get_dummies(data=df, columns=['sex','blood','rh','room','room_dc'])
+
+	for c in df2.columns:
+		if '0' in c and c in df2.columns:
+			df2.drop(columns=[c], inplace=True)
+	df2['icd10'] = icd10 
+	df2.to_csv('../../secret/data/demographic/demographic_onehot.csv')
 
 		
 
