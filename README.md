@@ -72,7 +72,51 @@ All identification data such as name, surname, address, national identification,
   * ICD-10 (coded by a technical coder)
   
 ## Data analysis
-Data from 2006 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
+Data from 2005 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
+
+## Dataset
+Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were deidentified and preprocessed. All data that could be potentially able to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We used **TXN** (a unique number representing a patient visit) to be a joining key. The dataset was divided into five groups.
+
+1. Registration data
+2. Admission data
+3. Laboratory data
+4. Radiological report data
+5. Drug prescription data
+
+### Registration data
+
+The data cover the demographic information of patients visited at Maharaj Nakhon Chiang Mai hospital.
+<details><summary>registration metadata</summary>
+<p>
+
+| Features | Types | Description |
+| :--- | :--- | :--- |
+| TXN | numeric | key identification for a patient visit |
+| age | numeric | age (year) |
+| wt | numeric | weight (kg) |
+| pulse | numeric | pulse rate (times/min) |
+| resp | numeric | respiratory rate (times/min) |
+| temp | numeric | body temperature (celcius) |
+| sbp | numeric | systolic blood pressure (mmHg) |
+| dbp | numeric | diastolic blood pressure (mmHg) |
+| sex_f | binary | female |
+| sex_m | binary | male |
+| blood_a | binary | blood group A |
+| blood_ab | binary | blood group AB |
+| blood_b | binary | blood group B |
+| blood_o | binary | blood group O |
+| rh_n | binary | blood group Rh negative |
+| rh_p | binary | blood group Rh positive |
+| room_xxx | binary | Different type of rooms that patients visited: room_.,room_adm,room_adn,room_b,room_bs,room_che,room_chs,room_co,room_ctu,room_d,room_e,room_ecc,room_ent,room_er,room_eye,room_f,room_gmc,room_hp,room_hpro,room_ivt,room_j,room_jb,room_l,room_m,room_mdf,room_mdm,room_mdr,room_medsp,room_mnk,room_n,room_o,room_obbf,room_obthl,room_obui,room_opdslt,room_ors,room_p,room_ped,room_phyd,room_r,room_rado,room_re,room_rt,room_s,room_sgf,room_smi,room_spr,room_ss,room_t,room_ta,room_tb,room_tc,room_td,room_ttcm,room_vip,room_w,room_x,room_zwcmu,room_zxcmu,room_zycmu,room_zzcmu,room_ยา# |
+| icd10 | text | ICD-10 code (diagnosis) |
+
+</p>
+</details>
+
+### Admission data
+### Laboratory data
+### Radiological report data
+### Drug prescription data
 
 ## How to use
 1. Clone the project and change to dev branch
