@@ -44,7 +44,7 @@ def save_data(db_connection,t1):
 		if len(df) == 0:
 			break
 		df = decode(df)
-		p = '../../secret/data/demographic/demographic.csv'
+		p = '../../secret/data/admit/admit.csv'
 		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
@@ -54,7 +54,7 @@ def save_data(db_connection,t1):
 		offset = offset + n
 		print('Save chunk '+str(offset))
 
-def save_demographic_data(config):
+def save_admit_data(config):
 	db_connection = sql.connect(	host=config.DATABASE_CONFIG['host'], 
 											database=config.DATABASE_CONFIG['dbname'], 
 											user=config.DATABASE_CONFIG['user'], 
@@ -100,15 +100,15 @@ def clean_roomname(x):
 	else:
 		return re.sub(r'[\d-]+', '', x)
 def save_clean_data(df):
-	p = '../../secret/data/demographic/demographic_clean.csv'
+	p = '../../secret/data/admit/admit_clean.csv'
 	file = Path(p)
 	if file.is_file():
 		with open(p, 'a') as f:
 			df.to_csv(f, header=False)
 	else:
 		df.to_csv(p)
-def clean_demographic_data():
-	p = '../../secret/data/demographic/demographic.csv'
+def clean_admit_data():
+	p = '../../secret/data/admit/admit.csv'
 	for df in  pd.read_csv(p, chunksize=100000):
 		df = df[['TXN','sex','age','wt','pulse','resp','temp','bp','blood','rh','room','room_dc','icd10']]
 			
@@ -122,8 +122,8 @@ def clean_demographic_data():
 		save_clean_data(df)
 		print('Append clean data')
 
-def onehot_demographic_data():
-	df = pd.read_csv('../../secret/data/demographic/demographic_clean.csv', index_col=0)
+def onehot_admit_data():
+	df = pd.read_csv('../../secret/data/admit/admit_clean.csv', index_col=0)
 	d = df['bp'].str.split('/',expand=True)
 	d.columns = ['sbp','dbp']
 	for c in d.columns:
@@ -140,7 +140,7 @@ def onehot_demographic_data():
 		if '0' in c and c in df2.columns:
 			df2.drop(columns=[c], inplace=True)
 	df2['icd10'] = icd10 
-	df2.to_csv('../../secret/data/demographic/demographic_onehot.csv')
+	df2.to_csv('../../secret/data/admit/admit_onehot.csv')
 
 		
 
