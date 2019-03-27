@@ -117,6 +117,8 @@ def get_value(x):
 			s[0] = s[0].replace('>','')
 			s[0] = s[0].replace(',','')
 			s[0] = s[0].replace('|','')
+			s[0] = s[0].replace('%','')
+			s[0] = s[0].replace('+','')
 			s[0] = s[0].lower()
 			#print(s[0])
 			if '/' in s[0]:
@@ -127,10 +129,10 @@ def get_value(x):
 					return 0
 				else:
 					return s[0]
-			elif s[0] == 'p' or s[0] == 'pos' or s[0] == 'positive':
-				return 'positive'
-			elif s[0] == 'n' or s[0] == 'neg' or s[0] == 'negative':
-				return 'negative'
+			elif s[0] == 'p' or s[0] == 'pos' or 'positive' in s[0]:
+				return 1
+			elif s[0] == 'n' or s[0] == 'neg' or  'negative' in s[0] or s[0] == 'not' or s[0] == 'no' or s[0] == 'notseen':
+				return -1
 			elif s[0].startswith('r='):
 				return s[0].replace('r=','')
 			elif str(s[0]) == '' or str(s[0]) == '%':
@@ -189,7 +191,7 @@ def clean_lab_data():
 				save_file(df,'../../secret/data/lab/clean/'+lab+'.csv')
 		
 
-def onehot_lab_data():
+def tonumeric_lab_data():
 	files = os.listdir('../../secret/data/lab/clean/')
 	for lab in files:
 		p = '../../secret/data/lab/clean/'+lab
@@ -198,9 +200,8 @@ def onehot_lab_data():
 				if c != 'TXN' and c != 'icd10':
 					df[c] = df[c].apply(pd.to_numeric,errors='coerce').fillna(0)
 
-			save_file(df,'../../secret/data/lab/numeric/'+lab):
+			save_file(df,'../../secret/data/lab/numeric/'+lab)
 			print('Saved '+lab)
-
 
 
 
