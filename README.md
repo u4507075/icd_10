@@ -146,7 +146,7 @@ The admission data is the demographic information of patients who admitted to an
 
 ### Laboratory data
 
-
+See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/LAB_METADATA.md).
 
 ### Radiological report data
 ### Drug prescription data
