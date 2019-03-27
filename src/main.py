@@ -12,9 +12,9 @@ from preprocessing.lab import split_lab_data
 from preprocessing.lab import clean_lab_data
 from preprocessing.lab import onehot_lab_data
 
-from preprocessing.demographic import save_demographic_data
-from preprocessing.demographic import clean_demographic_data
-from preprocessing.demographic import onehot_demographic_data
+from preprocessing.admit import save_demographic_data
+from preprocessing.admit import clean_demographic_data
+from preprocessing.admit import onehot_demographic_data
 
 import sys
 import os
