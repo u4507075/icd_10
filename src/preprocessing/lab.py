@@ -203,10 +203,46 @@ def tonumeric_lab_data():
 			save_file(df,'../../secret/data/lab/numeric/'+lab)
 			print('Saved '+lab)
 
+def get_encode_lab():
+	files = os.listdir('../../secret/data/lab/clean/')
+	df_map = pd.DataFrame(columns=['lab','key','code'])
+	
+	for lab in files:
+		p = '../../secret/data/lab/clean/'+lab
 
+		for df in pd.read_csv(p, chunksize=1000000, low_memory=False):
+			rows = []
+			for feature in df:
+				if (lab.replace('.csv','')) in feature  and df[feature].dtype == 'object':
+					v = df[df[feature].str.contains('[a-zA-Z]',regex=True, na=False)][feature].values.tolist()
+					v = list(set(v))
+					for val in v:
+						rows.append([lab.replace('.csv',''),feature,val])
+			df_map = df_map.append(pd.DataFrame(rows, columns=['lab','feature','key']), ignore_index=True, sort=True)
+			df_map = df_map.drop_duplicates()
+			df_map.reset_index(drop=True, inplace=True)
+		print('Create encoder : '+lab)
 
+	df_map['code'] = df_map.index+1
+	df_map = df_map[['lab','feature','key','code']]
+	save_file(df_map,'../../secret/data/lab/encoder/lab_encoder.csv')
 
-
+def encode_lab_data():
+	files = os.listdir('../../secret/data/lab/clean/')
+	encoder = pd.read_csv('../../secret/data/lab/encoder/lab_encoder.csv', index_col=0)
+	f_list = encoder['feature'].values.tolist()
+	map = dict(zip(encoder['key'],encoder['code']))
+	func = lambda x: x if x not in map else map[x]
+	for lab in files:
+		p = '../../secret/data/lab/clean/'+lab
+		for df in pd.read_csv(p, chunksize=1000000, low_memory=False):
+			for feature in df:
+				if feature in f_list:
+					df[feature] = df[feature].apply(func)
+					df[feature] = df[feature].apply(pd.to_numeric,errors='coerce').fillna(0)
+			print('Append data')
+		print(lab)
+		save_file(df_map,'../../secret/data/lab/encode/'+lab)
 
 
 

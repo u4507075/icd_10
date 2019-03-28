@@ -13,6 +13,8 @@ from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
 from preprocessing.lab import clean_lab_data
 from preprocessing.lab import tonumeric_lab_data
+from preprocessing.lab import get_encode_lab
+from preprocessing.lab import encode_lab_data
 
 from preprocessing.admit import save_admit_data
 from preprocessing.admit import clean_admit_data
@@ -37,7 +39,7 @@ feature = 'drug'
 #get_total_feature(feature)
 ##onehot(feature)
 #get_encode_feature('drug')
-encode_feature('drug')
+#encode_feature('drug')
 
 #get_target_class('icd10')
 #train_model(feature)
@@ -47,6 +49,8 @@ encode_feature('drug')
 #split_lab_data()
 #clean_lab_data()
 ##tonumeric_lab_data()
+#get_encode_lab()
+encode_lab_data()
 
 #save_admit_data(config)
 #clean_admit_data()
