@@ -2,6 +2,8 @@ from preprocessing.getdata import getdata
 from preprocessing.getdata import remove_space_data
 from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
+from preprocessing.drug_encode import get_encode_feature
+from preprocessing.drug_encode import encode_feature
 from preprocessing.trainmodel import train_model
 from preprocessing.trainmodel import train_model_onetime
 from preprocessing.trainmodel import get_target_class
@@ -34,6 +36,9 @@ feature = 'drug'
 #remove_space_data(feature)
 #get_total_feature(feature)
 ##onehot(feature)
+#get_encode_feature('drug')
+encode_feature('drug')
+
 #get_target_class('icd10')
 #train_model(feature)
 #train_model_onetime('../../secret/data/admit/admit_onehot.csv')
