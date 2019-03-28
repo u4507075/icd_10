@@ -96,6 +96,9 @@ The admission data is the demographic information of patients who admitted to an
 See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/LAB_METADATA.md).
 
 ### Radiological report data
+
+The radiological report data is the reports that radiologists took notes after they reviewed the imaging. The notes were written in plain text describing the finding within the imaging and the impression of suspected abnormalities and/or provisional diagnosis. We **do not** include any image data in this experiment. The notes are required to preprocessed using natural language process techniques to clean and do feature engineering. This work is contributed in **radio** branch of this project.
+
 ### Drug prescription data
 
 The drug prescription data is the information of type of drugs which were prescribed to the patients. See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/DRUG_METADATA.md).
