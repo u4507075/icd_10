@@ -23,7 +23,7 @@ def encode_feature(feature):
 	p2 = '../../secret/data/'+feature+'/'+feature+'_numeric.csv'
 	encoder = pd.read_csv('../../secret/data/'+feature+'/'+feature+'_encode.csv')
 	feature_encoder = dict(zip(encoder[feature],encoder['code']))
-	for df in  pd.read_csv(p, chunksize=100000):
+	for df in  pd.read_csv(p, chunksize=1000000):
 		df[feature] = df[feature].map(feature_encoder)
 		df[feature] = df[feature].apply(pd.to_numeric,errors='coerce').fillna(0)
 		result = df[['TXN',feature,'icd10']]
