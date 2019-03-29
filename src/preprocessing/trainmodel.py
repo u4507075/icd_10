@@ -50,7 +50,7 @@ def get_target_class(p,name):
 
 
 
-def train_model(p,target):
+def train_model(p):
 
 	#c = MultinomialNB()
 	c = BernoulliNB()
@@ -60,32 +60,41 @@ def train_model(p,target):
 
 	#c = SVC()
 	c = XGBClassifier(max_depth=100)
+	
+	targets = []
+	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
+		v = df['icd10'].unique().tolist()
+		target = target + v
+		target = list(set(target))
+	target.sort()
 
-	data = None
-	chunk = 10000
-	for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
-		df.drop(['TXN'], axis=1, inplace=True)
+	for target in targets:
+		data = None
+		chunk = 10000
+		for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
+			df.drop(['TXN'], axis=1, inplace=True)
 
-		t = df[df['icd10']==target]
-		nt = df[df['icd10']!=target]
-		nt = nt.assign(icd10 = 'not_'+target)
-		if len(nt) > len(t):
-			nt = nt.sample(frac=1).reset_index(drop=True)
-			nt = nt.head(len(t))
-		t = t.append(nt, ignore_index = True)
-		t = t.reset_index(drop=True)
-		if data is None:
-			data = t
-		else:
-			data = data.append(t).reset_index(drop=True)
-		#print(data)
-	X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
-	c.fit(X_train, Y_train)
-	p = c.predict(X_validation)
-	cf = confusion_matrix(Y_validation, p)
-	print(cf)
-	cr = classification_report(Y_validation, p)
-	print(cr)
+			t = df[df['icd10']==target]
+			nt = df[df['icd10']!=target]
+			nt = nt.assign(icd10 = 'not_'+target)
+			if len(nt) > len(t):
+				nt = nt.sample(frac=1).reset_index(drop=True)
+				nt = nt.head(len(t))
+			t = t.append(nt, ignore_index = True)
+			t = t.reset_index(drop=True)
+			if data is None:
+				data = t
+			else:
+				data = data.append(t).reset_index(drop=True)
+			#print(data)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
+		c.fit(X_train, Y_train)
+		p = c.predict(X_validation)
+		print(target)
+		cf = confusion_matrix(Y_validation, p)
+		print(cf)
+		cr = classification_report(Y_validation, p)
+		print(cr)
 
 '''
 def get_small_sample():
