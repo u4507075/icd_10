@@ -2,6 +2,7 @@ import mysql.connector as sql
 import pandas as pd
 from pathlib import Path
 import numpy as np
+import ntpath
 
 def convert(x):
     try:
@@ -56,6 +57,30 @@ def get_txn_test_data(config):
 		else:
 			df.to_csv(p)
 		print('Save txn of testset')
+
+
+def split_set():
+	paths = [	'../../secret/data/admit/admit_onehot.csv',
+				'../../secret/data/drug/drug_numeric.csv',
+				'../../secret/data/registration/registration_onehot.csv']
+	txn_testset = pd.read_csv('../../secret/data/testset/txn_testset.csv',index_col=0)['TXN'].values.tolist()
+	for p in paths:
+		name = ntpath.basename(p)
+		for df in  pd.read_csv(p, chunksize=100000, index_col=0):
+			testset = df[df['TXN'].isin(txt_testset)]
+			trainingset = df[~df['TXN'].isin(txt_testset)]
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

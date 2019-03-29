@@ -25,6 +25,7 @@ from preprocessing.registration import clean_registration_data
 from preprocessing.registration import onehot_registration_data
 
 from preprocessing.split import get_txn_test_data
+from preprocessing.split import split_set
 
 import sys
 import os
@@ -62,7 +63,8 @@ feature = 'drug'
 #clean_registration_data()
 #onehot_registration_data()
 
-get_txn_test_data(config)
+#get_txn_test_data(config)
+split_set()
 
 '''
 import pandas as pd
