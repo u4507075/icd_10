@@ -48,7 +48,7 @@ def get_txn_test_data(config):
 		if len(df) == 0:
 			break
 		df = decode(df)
-		p = '../../secret/data/testset/testset.csv'
+		p = '../../secret/data/testset/txn_testset.csv'
 		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
