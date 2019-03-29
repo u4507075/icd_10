@@ -55,7 +55,6 @@ def get_txn_test_data(config):
 				df.to_csv(f, header=False)
 		else:
 			df.to_csv(p)
-		offset = offset + n
 		print('Save txn of testset')
 
 
