@@ -21,7 +21,7 @@ def decode(df):
 			df[c] = df[c].apply(convert)
 	return df
 
-def getquery(t,n,f):
+def getquery(t):
 	d = 'dru'
 	if t == 'idx':
 		d = 'idru'
