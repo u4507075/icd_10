@@ -69,7 +69,9 @@ def split_set():
 		for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 			testset = df[df['TXN'].isin(txn_testset)]
 			trainingset = df[~df['TXN'].isin(txn_testset)]
-
+			if len(testset) > 0:
+				print(testset)
+			#print(trainingset)
 
 
 
