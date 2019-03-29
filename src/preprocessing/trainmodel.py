@@ -53,7 +53,7 @@ def get_target_class(p,name):
 def train_model(p):
 
 	#c = MultinomialNB()
-	c = BernoulliNB()
+	#c = BernoulliNB()
 	#c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
 	#c = SGDClassifier(loss='log')
 	#c = Perceptron(n_jobs=-1,warm_start=True)
@@ -67,7 +67,7 @@ def train_model(p):
 		targets = targets + v
 		targets = list(set(targets))
 	targets.sort()
-
+	
 	for target in targets:
 		data = None
 		chunk = 10000
@@ -87,14 +87,15 @@ def train_model(p):
 			else:
 				data = data.append(t).reset_index(drop=True)
 			#print(data)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
-		c.fit(X_train, Y_train)
-		p = c.predict(X_validation)
-		print(target)
-		cf = confusion_matrix(Y_validation, p)
-		print(cf)
-		cr = classification_report(Y_validation, p)
-		print(cr)
+		if len(data) >= 100:
+			X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
+			c.fit(X_train, Y_train)
+			pre = c.predict(X_validation)
+			print(target)
+			cf = confusion_matrix(Y_validation, pre)
+			print(cf)
+			cr = classification_report(Y_validation, pre)
+			print(cr)
 
 '''
 def get_small_sample():
