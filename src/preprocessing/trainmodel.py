@@ -14,7 +14,7 @@ from sklearn.linear_model import Perceptron
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import PassiveAggressiveClassifier
-
+from xgboost import XGBClassifier
 
 def get_dataset(trainingset, validation_size):
 	n = len(trainingset.columns)-1
@@ -50,33 +50,42 @@ def get_target_class(p,name):
 
 
 
-def train_model(path,target):
+def train_model(p,target):
 
 	#c = MultinomialNB()
-	#c = BernoulliNB()
-	c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
+	c = BernoulliNB()
+	#c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
 	#c = SGDClassifier(loss='log')
 	#c = Perceptron(n_jobs=-1,warm_start=True)
 
+	#c = SVC()
+	c = XGBClassifier(max_depth=100)
+
 	data = None
 	chunk = 10000
-	for df in  pd.read_csv(p, chunksize=chunk):
+	for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
 		df.drop(['TXN'], axis=1, inplace=True)
+
 		t = df[df['icd10']==target]
-		nt = df[~df['icd10']==target]
-		nt['icd10'] = 'not_'+target
+		nt = df[df['icd10']!=target]
+		nt = nt.assign(icd10 = 'not_'+target)
 		if len(nt) > len(t):
 			nt = nt.sample(frac=1).reset_index(drop=True)
-			nt = head(len(t))
-		t.append(nt, ignore_index = True)
-		if data == None:
+			nt = nt.head(len(t))
+		t = t.append(nt, ignore_index = True)
+		t = t.reset_index(drop=True)
+		if data is None:
 			data = t
 		else:
-			data.append(t)
-		print(data)
-	#X_train, X_validation, Y_train, Y_validation = get_dataset(df.head(chunk-1), 0.0)
-	#c.partial_fit(X_train, Y_train, classes=class_list)
-
+			data = data.append(t).reset_index(drop=True)
+		#print(data)
+	X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
+	c.fit(X_train, Y_train)
+	p = c.predict(X_validation)
+	cf = confusion_matrix(Y_validation, p)
+	print(cf)
+	cr = classification_report(Y_validation, p)
+	print(cr)
 
 '''
 def get_small_sample():

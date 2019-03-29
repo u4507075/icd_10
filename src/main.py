@@ -5,9 +5,6 @@ from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
 from preprocessing.trainmodel import train_model
-from preprocessing.trainmodel import train_model_onetime
-from preprocessing.trainmodel import get_target_class
-from preprocessing.trainmodel import get_small_sample
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -62,7 +59,7 @@ feature = 'drug'
 #get_txn_test_data(config)
 #split_set()
 
-train_model_onetime('../../secret/data/testset/admit_onehot.csv','I10')
+train_model('../../secret/data/testset/admit_onehot.csv','H251')
 
 '''
 import pandas as pd
