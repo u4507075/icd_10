@@ -58,6 +58,14 @@ def get_txn_test_data(config):
 			df.to_csv(p)
 		print('Save txn of testset')
 
+def save_data(df,name):
+	p = '../../secret/data/'+name
+	file = Path(p)
+	if file.is_file():
+		with open(p, 'a') as f:
+			df.to_csv(f, header=False)
+	else:
+		df.to_csv(p)
 
 def split_set():
 	paths = [	'../../secret/data/admit/admit_onehot.csv',
@@ -70,8 +78,10 @@ def split_set():
 			testset = df[df['TXN'].isin(txn_testset)]
 			trainingset = df[~df['TXN'].isin(txn_testset)]
 			if len(testset) > 0:
-				print(testset)
-			#print(trainingset)
+				save_data(testset, 'testset/'+name)
+			if len(trainingset) > 0:
+				save_data(trainingset, 'trainingset/'+name)
+			print('Save '+name)
 
 
 
