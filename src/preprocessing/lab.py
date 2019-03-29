@@ -241,8 +241,8 @@ def encode_lab_data():
 					df[feature] = df[feature].apply(func)
 					df[feature] = df[feature].apply(pd.to_numeric,errors='coerce').fillna(0)
 			print('Append data')
-		print(lab)
-		save_file(df_map,'../../secret/data/lab/encode/'+lab)
+			print(lab)
+			save_file(df,'../../secret/data/lab/encode/'+lab)
 
 
 
