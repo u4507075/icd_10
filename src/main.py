@@ -24,6 +24,8 @@ from preprocessing.registration import save_registration_data
 from preprocessing.registration import clean_registration_data
 from preprocessing.registration import onehot_registration_data
 
+from preprocessing.split import get_txn_test_data
+
 import sys
 import os
 from pathlib import Path
@@ -50,7 +52,7 @@ feature = 'drug'
 #clean_lab_data()
 ##tonumeric_lab_data()
 #get_encode_lab()
-encode_lab_data()
+#encode_lab_data()
 
 #save_admit_data(config)
 #clean_admit_data()
@@ -59,6 +61,8 @@ encode_lab_data()
 #save_registration_data(config)
 #clean_registration_data()
 #onehot_registration_data()
+
+get_txn_test_data(config)
 
 '''
 import pandas as pd
