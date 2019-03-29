@@ -63,6 +63,7 @@ def train_model(p):
 	
 	targets = []
 	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
+		df['icd10'] = df['icd10'].apply(str)
 		v = df['icd10'].unique().tolist()
 		targets = targets + v
 		targets = list(set(targets))

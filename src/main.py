@@ -59,7 +59,7 @@ feature = 'drug'
 #get_txn_test_data(config)
 #split_set()
 
-train_model('../../secret/data/testset/admit_onehot.csv')
+train_model('../../secret/data/testset/drug_numeric.csv')
 
 '''
 import pandas as pd
