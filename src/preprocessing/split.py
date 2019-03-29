@@ -67,8 +67,8 @@ def split_set():
 	for p in paths:
 		name = ntpath.basename(p)
 		for df in  pd.read_csv(p, chunksize=100000, index_col=0):
-			testset = df[df['TXN'].isin(txt_testset)]
-			trainingset = df[~df['TXN'].isin(txt_testset)]
+			testset = df[df['TXN'].isin(txn_testset)]
+			trainingset = df[~df['TXN'].isin(txn_testset)]
 
 
 
