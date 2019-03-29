@@ -26,7 +26,7 @@ def get_dataset(trainingset, validation_size):
 	X_train, Y_train = shuffle(X_train, Y_train, random_state=seed)
 	return X_train, X_validation, Y_train, Y_validation
 
-def eval(testset,model):
+def eval(testset_path,model):
 	X_train, X_validation, Y_train, Y_validation = get_dataset(testset, 0.0)
 	p = model.predict(X_train)
 	cf = confusion_matrix(Y_train, p)
@@ -34,8 +34,8 @@ def eval(testset,model):
 	cr = classification_report(Y_train, p)
 	print(cr)
 
-def get_target_class(feature):
-	p = '../../secret/data/drug/drug_onehot.csv'
+def get_target_class(p,name):
+	p = '../../secret/data/drug/'+name
 	value = []
 	for df in  pd.read_csv(p, chunksize=10000):
 		v = df[feature].unique().tolist()
@@ -45,9 +45,40 @@ def get_target_class(feature):
 		print(len(value))
 
 	df = pd.DataFrame.from_dict({feature:value})
-	df.to_csv('../../secret/data/drug/target_class.csv')
+	df.to_csv('../../secret/data/test/'+name+'_class.csv')
 	print(df)
 
+
+
+def train_model(path,target):
+
+	#c = MultinomialNB()
+	#c = BernoulliNB()
+	c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
+	#c = SGDClassifier(loss='log')
+	#c = Perceptron(n_jobs=-1,warm_start=True)
+
+	data = None
+	chunk = 10000
+	for df in  pd.read_csv(p, chunksize=chunk):
+		df.drop(['TXN'], axis=1, inplace=True)
+		t = df[df['icd10']==target]
+		nt = df[~df['icd10']==target]
+		nt['icd10'] = 'not_'+target
+		if len(nt) > len(t):
+			nt = nt.sample(frac=1).reset_index(drop=True)
+			nt = head(len(t))
+		t.append(nt, ignore_index = True)
+		if data == None:
+			data = t
+		else:
+			data.append(t)
+		print(data)
+	#X_train, X_validation, Y_train, Y_validation = get_dataset(df.head(chunk-1), 0.0)
+	#c.partial_fit(X_train, Y_train, classes=class_list)
+
+
+'''
 def get_small_sample():
 	p = '../../secret/data/drug_onehot.csv'
 	value = []
@@ -65,43 +96,6 @@ def get_small_sample():
 def icd10_head(x):
 	return x[0]
 
-def train_model(feature):
-	p = '../../secret/data/'+feature+'_onehot.csv'
-	df = pd.read_csv('../../secret/data/target_class.csv')
-	df['icd10'] = df['icd10'].apply(icd10_head)
-	class_list = df['icd10'].tolist()
-	#c = MultinomialNB()
-	#c = BernoulliNB()
-	c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
-	#c = SGDClassifier(loss='log')
-	#c = Perceptron(n_jobs=-1,warm_start=True)
-	n = 0
-	testset = None
-	l = None
-	chunk = 100
-	
-	for df in  pd.read_csv(p, chunksize=chunk):
-		if l is None:
-			l = df.columns.tolist()
-			l.remove('TXN')
-			l.remove('icd10')
-			l = l + ['icd10']
-
-		df = df[l]
-		df['icd10'] = df['icd10'].apply(icd10_head)
-		if testset is None:
-			testset = df.tail(1)
-		else:
-			testset = pd.concat([testset,df.tail(1)], ignore_index=True)
-		
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df.head(chunk-1), 0.0)
-		c.partial_fit(X_train, Y_train, classes=class_list)
-		n = n+1
-		print('Batch '+str(n))
-		if n%10 == 0:
-			eval(testset,c)
-	eval(testset,c)
-
 def train_model_onetime(target):
 	df = pd.read_csv(target)
 	X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
@@ -114,4 +108,4 @@ def train_model_onetime(target):
 	print(cf)
 	cr = classification_report(Y_validation, p)
 	print(cr)
-
+'''

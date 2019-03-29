@@ -44,10 +44,6 @@ feature = 'drug'
 #get_encode_feature('drug')
 #encode_feature('drug')
 
-#get_target_class('icd10')
-#train_model(feature)
-#train_model_onetime('../../secret/data/admit/admit_onehot.csv')
-
 #get_lab_data(config)
 #split_lab_data()
 #clean_lab_data()
@@ -64,7 +60,9 @@ feature = 'drug'
 #onehot_registration_data()
 
 #get_txn_test_data(config)
-split_set()
+#split_set()
+
+train_model_onetime('../../secret/data/testset/admit_onehot.csv','I10')
 
 '''
 import pandas as pd
