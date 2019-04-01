@@ -59,9 +59,11 @@ feature = 'drug'
 
 #get_txn_test_data(config)
 #split_set()
-split_lab()
+#split_lab()
 
-#train_model('../../secret/data/testset/drug_numeric.csv')
+files = os.listdir('../../secret/data/trainingset/')
+for f in files:
+	train_model(f.replace('.csv',''))
 
 '''
 import pandas as pd

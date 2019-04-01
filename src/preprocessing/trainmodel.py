@@ -16,6 +16,8 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import PassiveAggressiveClassifier
 from xgboost import XGBClassifier
 
+import os
+
 def get_dataset(trainingset, validation_size):
 	n = len(trainingset.columns)-1
 	array = trainingset.values
@@ -50,7 +52,7 @@ def get_target_class(p,name):
 
 
 
-def train_model(p):
+def train_model(filename):
 
 	#c = MultinomialNB()
 	#c = BernoulliNB()
@@ -59,8 +61,9 @@ def train_model(p):
 	#c = Perceptron(n_jobs=-1,warm_start=True)
 
 	#c = SVC()
-	c = XGBClassifier(max_depth=100)
 	
+	
+	p = '../../secret/data/trainingset/'+filename+'.csv'
 	targets = []
 	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 		df['icd10'] = df['icd10'].apply(str)
@@ -68,11 +71,20 @@ def train_model(p):
 		targets = targets + v
 		targets = list(set(targets))
 	targets.sort()
+
+	if not os.path.exists('../../secret/data/model/')
+		os.makedirs('../../secret/data/model/')
 	
+	if not os.path.exists('../../secret/data/model/'+filename)
+		os.makedirs('../../secret/data/model/'+filename)
+
 	for target in targets:
 		data = None
 		chunk = 10000
+		c = XGBClassifier(max_depth=100)
+
 		for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
+			df.loc[:, ~df.columns.str.contains('^Unnamed')]
 			df.drop(['TXN'], axis=1, inplace=True)
 
 			t = df[df['icd10']==target]
@@ -89,6 +101,8 @@ def train_model(p):
 				data = data.append(t).reset_index(drop=True)
 			#print(data)
 		if len(data) >= 100:
+			print(data)
+			'''
 			X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
 			c.fit(X_train, Y_train)
 			pre = c.predict(X_validation)
@@ -97,35 +111,5 @@ def train_model(p):
 			print(cf)
 			cr = classification_report(Y_validation, pre)
 			print(cr)
+			'''
 
-'''
-def get_small_sample():
-	p = '../../secret/data/drug_onehot.csv'
-	value = []
-	feature = 'icd10'
-	for df in  pd.read_csv(p, chunksize=50000):
-		df.to_csv('../../secret/data/drug_onehot_s.csv')
-		v = df[feature].unique().tolist()
-		value = value + v
-		value = list(set(value))
-		value.sort()
-		df = pd.DataFrame.from_dict({feature:value})
-		df.to_csv('../../secret/data/target_class_s.csv')
-		break
-
-def icd10_head(x):
-	return x[0]
-
-def train_model_onetime(target):
-	df = pd.read_csv(target)
-	X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
-	
-	c = MultinomialNB()
-	c.fit(X_train, Y_train)
-
-	p = model.predict(X_validation)
-	cf = confusion_matrix(Y_validation, p)
-	print(cf)
-	cr = classification_report(Y_validation, p)
-	print(cr)
-'''
