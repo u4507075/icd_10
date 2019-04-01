@@ -20,6 +20,7 @@ from sklearn.metrics import precision_recall_fscore_support
 
 import os
 import re
+import pickle
 
 def get_dataset(trainingset, validation_size):
 	n = len(trainingset.columns)-1
@@ -53,7 +54,13 @@ def get_target_class(p,name):
 	df.to_csv('../../secret/data/test/'+name+'_class.csv')
 	print(df)
 
-
+def save_file(df,p):
+	file = Path(p)
+	if file.is_file():
+		with open(p, 'a') as f:
+			df.to_csv(f, header=False)
+	else:
+		df.to_csv(p)
 
 def train_model(filename):
 
@@ -90,43 +97,44 @@ def train_model(filename):
 	print("Start saving models")
 
 	for target in target_classes:
-		print(target)
-		data = None
-		chunk = 100000
-		c = XGBClassifier(max_depth=100)
-
-		for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
-			df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-			df.drop(['TXN'], axis=1, inplace=True)
-
-			t = df[df['icd10']==target]
-			nt = df[df['icd10']!=target]
-			nt = nt.assign(icd10 = 'not_'+target)
-			if len(nt) > len(t):
-				nt = nt.sample(frac=1).reset_index(drop=True)
-				nt = nt.head(len(t))
-			t = t.append(nt, ignore_index = True)
-			t = t.reset_index(drop=True)
-			if data is None:
-				data = t
-			else:
-				data = data.append(t).reset_index(drop=True)
-			#print(data)
-		if len(data) >= 100:
-
-			X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
-			c.fit(X_train, Y_train)
-			pre = c.predict(X_validation)
+		model_file = '../../secret/data/model/'+filename+'/'+target+'.sav'
+		if not Path(model_file).is_file():
 			print(target)
-			cf = confusion_matrix(Y_validation, pre)
-			print(cf)
-			cr = classification_report(Y_validation, pre)
-			print(cr)
-			v = precision_recall_fscore_support(Y_validation, pre, average='weighted')
-			print(v[0])
-			print(v[1])
-			print(v[2])
-			print(v[3])
-			X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.0)
-			c.fit(X_train, Y_train)
+			data = None
+			chunk = 100000
+			c = XGBClassifier(max_depth=100)
+
+			for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
+				df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+				df.drop(['TXN'], axis=1, inplace=True)
+
+				t = df[df['icd10']==target]
+				nt = df[df['icd10']!=target]
+				nt = nt.assign(icd10 = 'not_'+target)
+				if len(nt) > len(t):
+					nt = nt.sample(frac=1).reset_index(drop=True)
+					nt = nt.head(len(t))
+				t = t.append(nt, ignore_index = True)
+				t = t.reset_index(drop=True)
+				if data is None:
+					data = t
+				else:
+					data = data.append(t).reset_index(drop=True)
+				#print(data)
+			if len(data) >= 100:
+
+				X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
+				c.fit(X_train, Y_train)
+				pre = c.predict(X_validation)
+				print(target)
+				cf = confusion_matrix(Y_validation, pre)
+				print(cf)
+				cr = classification_report(Y_validation, pre)
+				print(cr)
+				v = precision_recall_fscore_support(Y_validation, pre, average='weighted')
+				X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.0)
+				c.fit(X_train, Y_train)
+				pickle.dump(c, open(model_file, 'wb'))
+				dfp = pd.DataFrame([v[0],v[1],v[2],len(data)],columns=['precision','recall','fscore','n'])
+				save_file(dfp,'../../secret/data/model_performance/model_performance.csv')
 
