@@ -16,7 +16,10 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import PassiveAggressiveClassifier
 from xgboost import XGBClassifier
 
+from sklearn.metrics import precision_recall_fscore_support
+
 import os
+import re
 
 def get_dataset(trainingset, validation_size):
 	n = len(trainingset.columns)-1
@@ -61,8 +64,8 @@ def train_model(filename):
 	#c = Perceptron(n_jobs=-1,warm_start=True)
 
 	#c = SVC()
-	
-	
+
+	print(filename)
 	p = '../../secret/data/trainingset/'+filename+'.csv'
 	targets = []
 	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
@@ -72,19 +75,28 @@ def train_model(filename):
 		targets = list(set(targets))
 	targets.sort()
 
-	if not os.path.exists('../../secret/data/model/')
+	if not os.path.exists('../../secret/data/model_performance/'):
+		os.makedirs('../../secret/data/model_performance/')
+
+	if not os.path.exists('../../secret/data/model/'):
 		os.makedirs('../../secret/data/model/')
-	
-	if not os.path.exists('../../secret/data/model/'+filename)
+
+	if not os.path.exists('../../secret/data/model/'+filename):
 		os.makedirs('../../secret/data/model/'+filename)
 
-	for target in targets:
+	regex = re.compile('[A-Z]')
+	target_classes = [i for i in targets if regex.match(i)]
+
+	print("Start saving models")
+
+	for target in target_classes:
+		print(target)
 		data = None
-		chunk = 10000
+		chunk = 100000
 		c = XGBClassifier(max_depth=100)
 
 		for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
-			df.loc[:, ~df.columns.str.contains('^Unnamed')]
+			df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 			df.drop(['TXN'], axis=1, inplace=True)
 
 			t = df[df['icd10']==target]
@@ -101,8 +113,7 @@ def train_model(filename):
 				data = data.append(t).reset_index(drop=True)
 			#print(data)
 		if len(data) >= 100:
-			print(data)
-			'''
+
 			X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
 			c.fit(X_train, Y_train)
 			pre = c.predict(X_validation)
@@ -111,5 +122,11 @@ def train_model(filename):
 			print(cf)
 			cr = classification_report(Y_validation, pre)
 			print(cr)
-			'''
+			v = precision_recall_fscore_support(Y_validation, pre, average='weighted')
+			print(v[0])
+			print(v[1])
+			print(v[2])
+			print(v[3])
+			X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.0)
+			c.fit(X_train, Y_train)
 
