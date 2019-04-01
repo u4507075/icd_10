@@ -23,6 +23,7 @@ from preprocessing.registration import onehot_registration_data
 
 from preprocessing.split import get_txn_test_data
 from preprocessing.split import split_set
+from preprocessing.split import split_lab
 
 import sys
 import os
@@ -58,8 +59,9 @@ feature = 'drug'
 
 #get_txn_test_data(config)
 #split_set()
+split_lab()
 
-train_model('../../secret/data/testset/drug_numeric.csv')
+#train_model('../../secret/data/testset/drug_numeric.csv')
 
 '''
 import pandas as pd
