@@ -135,6 +135,6 @@ def train_model(filename):
 				X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.0)
 				c.fit(X_train, Y_train)
 				pickle.dump(c, open(model_file, 'wb'))
-				dfp = pd.DataFrame([v[0],v[1],v[2],len(data)],columns=['precision','recall','fscore','n'])
+				dfp = pd.DataFrame([filename,target,[v[0],v[1],v[2],len(data)]],columns=['feature','icd10','precision','recall','fscore','n'])
 				save_file(dfp,'../../secret/data/model_performance/model_performance.csv')
 
