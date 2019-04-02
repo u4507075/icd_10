@@ -103,6 +103,14 @@ The radiological report data is the reports that radiologists took notes after t
 
 The drug prescription data is the information of type of drugs which were prescribed to the patients. See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/DRUG_METADATA.md).
 
+## Characteristics of dataset
+
+**TXN** is a unique identification number of patient visit. TXN is a key to join across those five datasets (not always exists in all datasets). At the end of each visit, the diagnoses (ICD-10) relating to the patient had to enterred to the database. You will have to build an approach and develop machine learning models to extract patterns which are able to correctly enter ICD-10. However, you will face some problems with the datasets.
+
+1. Ambiguous association between patient information and ICD-10: We do not know that what prescriptions, laboratory findings, and radiological reports relate to which ICD-10. For example, one visit (one TXN), a patient might have 3 diagnoses and get prescription with 10 drugs. We do not know which drug is prescribed for which diagnosis.
+
+2. Large number of ICD-10 (target class): There are 38,970 types of ICD-10 and approximately 50% of them were used for diagnosis.   
+
 ## How to use
 1. Clone the project and change to dev branch
 ```
