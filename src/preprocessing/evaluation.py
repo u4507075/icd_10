@@ -3,22 +3,26 @@ from pathlib import Path
 import numpy as np
 import ntpath
 import os
+import pickle
 
-def split_lab():
+def predict_testset():
 
 	txn_testset = pd.read_csv('../../secret/data/testset/txn_testset.csv',index_col=0)['TXN'].values.tolist()
-	files = os.listdir('../../secret/data/lab/encode/')
-	for lab in files:
-		p = '../../secret/data/lab/encode/'+lab
-		for df in  pd.read_csv(p, chunksize=100000, index_col=0):
-			testset = df[df['TXN'].isin(txn_testset)]
-			trainingset = df[~df['TXN'].isin(txn_testset)]
-			if len(testset) > 0:
-				save_data(testset, 'testset/'+lab)
-			if len(trainingset) > 0:
-				save_data(trainingset, 'trainingset/'+lab)
-			print('Save '+lab)
-
+	files = os.listdir('../../secret/data/testset/')
+	for txn in txn_testset:
+		for filename in files:
+			if filename != 'txn_testset.csv':
+				for df in  pd.read_csv(p, chunksize=1000000, index_col=0):
+					df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+					df = df[df['icd10']==txn]
+					 if len(df) > 0:
+						for row in df.iterrows():
+							print('Label : '+row['icd10'])
+							if os.path.exists('../../secret/data/model/'+filename.replace('.csv','')):
+								for feature in os.listdir('../../secret/data/model/'+filename.replace('.csv','')):
+									model = pickle.load(open('../../secret/data/model/'+filename.replace('.csv','')+'/'+feature, 'rb'))
+									pre = model.predict(row[:len(row)-1])
+									print(pre)
 
 
 

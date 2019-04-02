@@ -25,6 +25,8 @@ from preprocessing.split import get_txn_test_data
 from preprocessing.split import split_set
 from preprocessing.split import split_lab
 
+from preprocessing.evaluation import predict_testset
+
 import sys
 import os
 from pathlib import Path
@@ -61,9 +63,17 @@ feature = 'drug'
 #split_set()
 #split_lab()
 
+'''
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
 	train_model(f.replace('.csv',''))
+'''
+
+predict_testset()
+
+
+
+
 
 '''
 import pandas as pd
