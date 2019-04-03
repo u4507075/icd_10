@@ -20,7 +20,7 @@
 ## Introduction
 Over one million patient visit Maharaj Nakhon Chiang Mai hospital at the outer patient department (reported in [2018](http://www.med.cmu.ac.th/hospital/medrec/2011/index.php?option=com_content&view=category&id=130&Itemid=589)). Every year, the hospital needs to report data to the government for billing. 
 ### Problem statement
-The amount of budget which can be claimed from the billing depends on the quality and completeness of the document. One major problem is the completeness of diagnosis (representing in ICD-10 code). The current process to complete the diagnosis in the document is a labour intersive work which requires physicians or technical coders to review medical records and manually enter a proper diagnosis code. Therefore, we see a potential benefit of machine learning application to automate this ICD-10 labelling process.
+The amount of budget which can be claimed from the billing depends on the quality and completeness of the document. One major problem is the completeness of diagnosis (using [ICD-10](https://icd.who.int/browse10/2016/en), a classification standard for diagnosis). The current process to complete the diagnosis in the document is a labour intersive work which requires physicians or technical coders to review medical records and manually enter a proper diagnosis code. Therefore, we see a potential benefit of machine learning application to automate this ICD-10 labelling process.
 ### Prior work
 [ICD-10](https://en.wikipedia.org/wiki/ICD-10) is a medical classification list for medical related terms such as diseases, signs and symptoms, abnormal findings, defined by the World Health Organization (WHO). In this case, ICD-10 is used to standardized the diagnosis in the billing report before submitting the report to the government. Prior research showed the success of applying machine learning for auto-mapping ICD-10. 
 
@@ -63,6 +63,43 @@ Our objectives are to develop machine learning model to mapp missing or verify I
 ### Target group
 Clinical records of outer-patient visits from 2006 - 2017 (2006 - 2016 for a training set, and 2017 for a test set) are retrospectively retrieved from the Maharaj Nakhon Chiang Mai electronic health records. Approximately one million records are expected to retrieve per year. Only encoded data (number, string) are included in the experiment (excluded images and scanned document).
 
+### Dataset
+Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were deidentified and preprocessed. All data that could be potentially able to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We used **TXN** (a unique number representing a patient visit) to be a joining key. The dataset was divided into five groups.
+
+1. Registration data
+2. Admission data
+3. Laboratory data
+4. Radiological report data
+5. Drug prescription data
+
+#### Registration data
+
+The registration data is the demographic information of patients who visited (mostly outer patient department (OPD) cases) at Maharaj Nakhon Chiang Mai hospital. See the full detail of registration metadata [here](https://github.com/u4507075/icd_10/blob/master/REGISTRATION_METADATA.md).
+
+#### Admission data
+
+The admission data is the demographic information of patients who admitted to any internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. See the full detail of admission metadata [here](https://github.com/u4507075/icd_10/blob/master/ADMISSION_METADATA.md).
+
+#### Laboratory data
+
+See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/LAB_METADATA.md).
+
+#### Radiological report data
+
+The radiological report data is the reports that radiologists took notes after they reviewed the imaging. The notes were written in plain text describing the finding within the imaging and the impression of suspected abnormalities and/or provisional diagnosis. We **do not** include any image data in this experiment. The notes are required to preprocessed using natural language process techniques to clean and do feature engineering. This work is contributed in **radio** branch of this project.
+
+#### Drug prescription data
+
+The drug prescription data is the information of type of drugs which were prescribed to the patients. See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/DRUG_METADATA.md).
+
+### Characteristics of dataset
+
+**TXN** is a unique identification number of patient visit. TXN is a key to join across those five datasets (not always exists in all datasets). At the end of each visit, the diagnoses (ICD-10) relating to the patient had to enterred to the database. You will have to build an approach and develop machine learning models to extract patterns which are able to correctly enter ICD-10. However, you will face some problems with the datasets.
+
+1. Unidentified specific TXN to ICD-10: We do not know that what prescriptions, laboratory findings, and radiological reports relate to which ICD-10. For example, in one visit (one TXN), a patient might have 3 diagnoses and get prescription with 10 drugs. We do not know which drug is prescribed for which diagnosis.
+
+2. Large number of ICD-10 (target class): The total number of ICD-10 is 38,970 types (always starts with A-Z) and approximately 14,000 of them were used in the records.   
+
 ### Data preprocessing
 All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data of interest include:
   * Demographic data such as date of birth, gender
@@ -73,43 +110,6 @@ All identification data such as name, surname, address, national identification,
   
 ## Data analysis
 Data from 2005 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
-
-## Dataset
-Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were deidentified and preprocessed. All data that could be potentially able to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We used **TXN** (a unique number representing a patient visit) to be a joining key. The dataset was divided into five groups.
-
-1. Registration data
-2. Admission data
-3. Laboratory data
-4. Radiological report data
-5. Drug prescription data
-
-### Registration data
-
-The registration data is the demographic information of patients who visited (mostly outer patient department (OPD) cases) at Maharaj Nakhon Chiang Mai hospital. See the full detail of registration metadata [here](https://github.com/u4507075/icd_10/blob/master/REGISTRATION_METADATA.md).
-
-### Admission data
-
-The admission data is the demographic information of patients who admitted to any internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. See the full detail of admission metadata [here](https://github.com/u4507075/icd_10/blob/master/ADMISSION_METADATA.md).
-
-### Laboratory data
-
-See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/LAB_METADATA.md).
-
-### Radiological report data
-
-The radiological report data is the reports that radiologists took notes after they reviewed the imaging. The notes were written in plain text describing the finding within the imaging and the impression of suspected abnormalities and/or provisional diagnosis. We **do not** include any image data in this experiment. The notes are required to preprocessed using natural language process techniques to clean and do feature engineering. This work is contributed in **radio** branch of this project.
-
-### Drug prescription data
-
-The drug prescription data is the information of type of drugs which were prescribed to the patients. See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/DRUG_METADATA.md).
-
-## Characteristics of dataset
-
-**TXN** is a unique identification number of patient visit. TXN is a key to join across those five datasets (not always exists in all datasets). At the end of each visit, the diagnoses (ICD-10) relating to the patient had to enterred to the database. You will have to build an approach and develop machine learning models to extract patterns which are able to correctly enter ICD-10. However, you will face some problems with the datasets.
-
-1. Ambiguous association between patient information and ICD-10: We do not know that what prescriptions, laboratory findings, and radiological reports relate to which ICD-10. For example, one visit (one TXN), a patient might have 3 diagnoses and get prescription with 10 drugs. We do not know which drug is prescribed for which diagnosis.
-
-2. Large number of ICD-10 (target class): There are 38,970 types of ICD-10 and approximately 50% of them were used for diagnosis.   
 
 ## How to use
 1. Clone the project and change to dev branch
