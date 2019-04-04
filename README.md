@@ -101,12 +101,25 @@ The drug prescription data is the information of type of drugs which were prescr
 2. Large number of ICD-10 (target class): The total number of ICD-10 is 38,970 types (always starts with A-Z) and approximately 14,000 of them were used in the records.   
 
 ### Data preprocessing
-All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data of interest include:
-  * Demographic data such as date of birth, gender
-  * History taking and physical examination (including discharge summary)
-  * Laboratory and investigation reports
-  * Medical prescription (investigation, drug)
-  * ICD-10 (coded by a technical coder)
+All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data from the five resources were pre-processed and transformed to numeric type and stored in several datasets. TXN was used as a key to link between datasets. Each dataset contains TXN, input features, and ICD-10 (as a target label. All data were decoded to **tis-620** in order to read Thai language. Data in Thai were not used as input features but could be used for human validation step.
+
+#### Registration data
+1. save_admit_data(): to read and decode the data including TXN, sex, age, weight, pluse rate, respiratory rate, body temperature, blood pressure, ABO blood group, Rh blood group, room that the patient admitted, and the last room when the patient was discharged, and ICD-10.
+| Features | Mapping criteria |
+| :--- | :--- |
+| TXN | numeric |
+| sex | 'm','f' |
+| age | numeric |
+| weight | numeric |
+| pulse rate | numeric |
+| respiratory rate | numeric |
+| body temperature | numeric |
+| blood pressure | split text by '/' to systolic and diastolic blood pressure |
+| ABO blood group | 'a','b','ab','o' |
+| Rh blood group | 'p','n' |
+| Room | to lowercase, remove * and space |
+| ICD-10 | string |
+2. onehot_admit_data(): Apply onehot encoding to sex, ABO blood group, Rh blood group, and room. Then, convert all values to numeric.  
   
 ## Data analysis
 Data from 2005 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
