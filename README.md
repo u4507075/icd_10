@@ -105,6 +105,7 @@ All identification data such as name, surname, address, national identification,
 
 #### Registration data
 1. save_admit_data(): to read and decode the data including TXN, sex, age, weight, pluse rate, respiratory rate, body temperature, blood pressure, ABO blood group, Rh blood group, room that the patient admitted, and the last room when the patient was discharged, and ICD-10.
+
 | Features | Mapping criteria |
 | :--- | :--- |
 | TXN | numeric |
@@ -119,6 +120,7 @@ All identification data such as name, surname, address, national identification,
 | Rh blood group | 'p','n' |
 | Room | to lowercase, remove * and space |
 | ICD-10 | string |
+
 2. onehot_admit_data(): Apply onehot encoding to sex, ABO blood group, Rh blood group, and room. Then, convert all values to numeric.  
   
 ## Data analysis
