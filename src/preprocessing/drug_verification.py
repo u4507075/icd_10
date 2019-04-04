@@ -40,9 +40,8 @@ def get_drug_verification_lab_data():
 				result = pd.merge(df, dfp, how='inner', on=['TXN'])
 				if len(result) > 0:
 					result = result.drop_duplicates()
-					#save_file(result,name)
-					#print('Append '+name)
-					print(result)
+					save_file(result,lab)
+					print('Append '+lab)
 
 
 
