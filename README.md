@@ -104,7 +104,7 @@ The drug prescription data is the information of type of drugs which were prescr
 All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data from the five resources were pre-processed and transformed to numeric type and stored in several datasets. TXN was used as a key to link between datasets. Each dataset contains TXN, input features, and ICD-10 (as a target label. All data were decoded to **tis-620** in order to read Thai language. Data in Thai were not used as input features but could be used for human validation step.
 
 #### Registration data
-1. save_admit_data(): to read and decode the data including TXN, sex, age, weight, pluse rate, respiratory rate, body temperature, blood pressure, ABO blood group, Rh blood group, room that the patient admitted, and the last room when the patient was discharged, and ICD-10.
+1. save_admit_data(): Read and decode the data including TXN, sex, age, weight, pluse rate, respiratory rate, body temperature, blood pressure, ABO blood group, Rh blood group, room that the patient admitted, and the last room when the patient was discharged, and ICD-10.
 
 | Features | Mapping criteria |
 | :--- | :--- |
@@ -122,9 +122,41 @@ All identification data such as name, surname, address, national identification,
 | ICD-10 | string |
 
 2. onehot_admit_data(): Apply onehot encoding to sex, ABO blood group, Rh blood group, and room. Then, convert all values to numeric.  
-  
-## Data analysis
-Data from 2005 - 2016 are used to train machine learning models and data from 2017 are used to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
+
+#### Admission data
+Apply the same process to registration data.
+
+#### Laboratory data
+1. get_lab_data(config): Read and decode the data including TXN, lab code, and ICD-10. Select only lab code that the number is larger than 500 records.
+2. split_lab_data(): Laboratory results were stored in text separated by ';'. This process split the text by ';' to obtain a single value of laboratory result.
+3. clean_lab_data(): remove all symbols and space, group words indicating negative results to negative and words indicating positive results to positive, and remove all English alphabet from number.
+4. get_encode_lab(): Get a unique list of clean text results and map with unique numbers.
+5. encode_lab_data(): Use the encoding map to transform text result to number.
+
+#### Radiological report data
+ 
+
+#### Drug prescription data
+1. getdata(config,'table_name','drug): Read and decode the data including TXN, drug code, and ICD-10 where 'table_name' is the table of opd and ipd cases.
+2. remove_space_data('drug'): Remove space from drug code.
+3. get_encode_feature('drug'): Get a unique list of clean text results and map with unique numbers.
+4. encode_feature('drug'): Use the encoding map to transform text result to number.
+
+## Split training and test sets and evaluation metrics
+Data from January 2005 - April 2017 are used to train machine learning models and data after April 2017 are used as a test set to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
+
+## Design the approach to predict ICD-10
+### Approach 1: Multi-class classification
+We simply train machine learning models with all ICD-10 as a target class and evaluation result showed that the model accuracy was less than 0.01 %. We discuss that the poor performance of the models causes by the large number of ICD-10 and unidentified specific TXN to ICD-10.
+
+### Approach 2: Binary classification
+Because of those two problems, we change the approach from multi-class to binary classification. We select one ICD-10 at a time as a target class and randomly select the same number of instances labelled with target and non-target class as training and test, respectively. Then, train Xgboost (wiht max-depth 100) to create a model per ICD-10. The accuracy ranges between 50 - 100 % (average 60%).
+
+We test the model with a test instance by:
+1. Enter the input values to all ICD-10 model. 
+2. Return positive result if the probability of model prediction of the target class is larger than 0.9.
+3. Store the positive ICD-10 result in a list sorted by probability deascendingly.
+4. Validate the accuracy by counting how many actual ICD-10 matches with the predicted ICD-10.
 
 ## How to use
 1. Clone the project and change to dev branch
