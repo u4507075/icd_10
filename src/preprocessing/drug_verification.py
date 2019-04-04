@@ -12,10 +12,10 @@ def save_file(df,filename):
 		os.makedirs('../../secret/data/drug_verification/')
 	file = Path('../../secret/data/drug_verification/'+filename)
 	if file.is_file():
-		with open(p, 'a') as f:
+		with open('../../secret/data/drug_verification/'+filename, 'a') as f:
 			df.to_csv(f, header=False)
 	else:
-		df.to_csv(p)
+		df.to_csv('../../secret/data/drug_verification/'+filename)
 
 def get_drug_verification_registration_data(p):
 	name = ntpath.basename(p)
