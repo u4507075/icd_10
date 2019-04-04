@@ -7,8 +7,18 @@ import os
 dp = '../../secret/data/drug/drug_clean.csv'
 chunk = 100000
 
+def save_file(df,filename):
+	if not os.path.exists('../../secret/data/drug_verification/'):
+		os.makedirs('../../secret/data/drug_verification/')
+	file = Path('../../secret/data/drug_verification/'+filename)
+	if file.is_file():
+		with open(p, 'a') as f:
+			df.to_csv(f, header=False)
+	else:
+		df.to_csv(p)
+
 def get_drug_verification_registration_data(p):
-	#p = '../../secret/data/registration/registration_onehot.csv'
+	name = ntpath.basename(p)
 	for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
 		df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 		for dfp in  pd.read_csv(dp, chunksize=chunk, index_col=0):
@@ -16,7 +26,8 @@ def get_drug_verification_registration_data(p):
 			result = pd.merge(df, dfp, how='inner', on=['TXN'])
 			if len(result) > 0:
 				result = result.drop_duplicates()
-				print(result)
+				save_file(result,name)
+				print('Append '+name)
 
 def get_drug_verification_lab_data():
 	print('x')

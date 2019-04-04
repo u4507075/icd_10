@@ -77,8 +77,8 @@ for f in files:
 
 
 ##Drug verification dataset##
-#get_drug_verification_registration_data('../../secret/data/registration/registration_onehot.csv')
-get_drug_verification_registration_data('../../secret/data/admit/admit_onehot.csv')
+get_drug_verification_registration_data('../../secret/data/registration/registration_onehot.csv')
+#get_drug_verification_registration_data('../../secret/data/admit/admit_onehot.csv')
 
 
 
