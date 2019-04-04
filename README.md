@@ -152,7 +152,7 @@ Dataset (training and test set)
 | registration data | registration_onehot.csv |
 | admission data | admit_onehot.csv |
 | laboratory data | B06.csv,B13.1.csv,B13.csv,GMCL001.csv,L01.csv,L022.csv,L024.csv,L025.csv,L0261.csv,L027.csv,L029.csv,L02.csv,L0371.csv,L037.csv,L0414.csv,L0421.csv,L071.csv,L073.csv,L078.csv,L07.csv,L083.csv,L090.csv,L091.csv,L093.csv,L1001.csv,L10041.csv,L10044.csv,L1005.csv,L101763.csv,L1022.csv,L1030.csv,L1031.csv,L1032.csv,L1040.csv,L10501.csv,L10502.csv,L1052.csv,L10561.csv,L105621.csv,L1056221.csv,L10573.csv,L10591.csv,L105932.csv,L105933.csv,L106011.csv,L107011.csv,L107018.csv,L1081.csv,L1084.csv,L10962.csv,L10981.csv,L1901.csv,L1902.csv,L1903.csv,L1904.csv,L1905.csv,L1906.csv,L1907.csv,L1910.csv,L1911.csv,L1914.csv,L202.csv,L2082.csv,L36.csv,L421.csv,L422.csv,L4301.csv,L531.csv,L54.csv,L551.csv,L5712.csv,L581.csv,L58.csv,L61.csv,L84.csv |
-| radiological report data | numeric |
+| radiological report data | TBC |
 | drug prescription datat | drug_numeric.csv |
 
 ## Design the approach to predict ICD-10
