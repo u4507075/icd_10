@@ -30,10 +30,19 @@ def get_drug_verification_registration_data(p):
 				print('Append '+name)
 
 def get_drug_verification_lab_data():
-	print('x')
-
-
-
+	files = os.listdir('../../secret/data/lab/encode/')
+	for lab in files:
+		p = '../../secret/data/lab/encode/'+lab
+		for df in pd.read_csv(p, chunksize=chunk, low_memory=False):
+			df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+			for dfp in  pd.read_csv(dp, chunksize=chunk, index_col=0):
+				dfp = dfp[['TXN','drug']]
+				result = pd.merge(df, dfp, how='inner', on=['TXN'])
+				if len(result) > 0:
+					result = result.drop_duplicates()
+					#save_file(result,name)
+					#print('Append '+name)
+					print(result)
 
 
 

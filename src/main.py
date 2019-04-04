@@ -28,6 +28,8 @@ from preprocessing.split import split_lab
 from preprocessing.evaluation import predict_testset
 
 from preprocessing.drug_verification import get_drug_verification_registration_data
+from preprocessing.drug_verification import get_drug_verification_lab_data
+
 
 import sys
 import os
@@ -77,9 +79,9 @@ for f in files:
 
 
 ##Drug verification dataset##
-get_drug_verification_registration_data('../../secret/data/registration/registration_onehot.csv')
+#get_drug_verification_registration_data('../../secret/data/registration/registration_onehot.csv')
 #get_drug_verification_registration_data('../../secret/data/admit/admit_onehot.csv')
-
+get_drug_verification_lab_data()
 
 
 '''
