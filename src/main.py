@@ -27,6 +27,8 @@ from preprocessing.split import split_lab
 
 from preprocessing.evaluation import predict_testset
 
+from preprocessing.drug_verification import get_drug_verification_registration_data
+
 import sys
 import os
 from pathlib import Path
@@ -69,8 +71,13 @@ for f in files:
 	train_model(f.replace('.csv',''))
 '''
 
-predict_testset()
+#predict_testset()
 
+
+
+
+##Drug verification dataset##
+get_drug_verification_registration_data()
 
 
 
