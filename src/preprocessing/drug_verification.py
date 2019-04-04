@@ -7,7 +7,7 @@ import os
 dp = '../../secret/data/drug/drug_clean.csv'
 chunk = 100000
 
-def get_drug_verification_registration_data():
+def get_drug_verification_registration_data(p):
 	p = '../../secret/data/registration/registration_onehot.csv'
 	for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
 		df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -18,8 +18,6 @@ def get_drug_verification_registration_data():
 				result = result.drop_duplicates()
 				print(result)
 
-def get_drug_verification_admission_data():
-	print('x')
 def get_drug_verification_lab_data():
 	print('x')
 
