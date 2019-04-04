@@ -150,7 +150,7 @@ Data from January 2005 - April 2017 are used to train machine learning models an
 We simply train machine learning models with all ICD-10 as a target class and evaluation result showed that the model accuracy was less than 0.01 %. We discuss that the poor performance of the models causes by the large number of ICD-10 and unidentified specific TXN to ICD-10.
 
 ### Approach 2: Binary classification
-Because of those two problems, we change the approach from multi-class to binary classification. We select one ICD-10 at a time as a target class and randomly select the same number of instances labelled with target and non-target class as training and test, respectively. Then, train Xgboost (wiht max-depth 100) to create a model per ICD-10. The accuracy ranges between 50 - 100 % (average 60%).
+Because of those two problems, we change the approach from multi-class to binary classification. We select one ICD-10 at a time as a target class and randomly select the same number of instances labelled with target and non-target class as training and test, respectively. Then, train Xgboost (wiht max-depth 100) to create a model per ICD-10. The binary classification approach helps to reduce the complexity of the model (approaching a target class one by one instead of all classes in the same time) and provide flexibility to predict more than one ICD-10 per instance. The model evaluation (separate model) showed that the accuracy ranges between 50 - 100 % (average 60%).
 
 We test the model with a test instance by:
 1. Enter the input values to all ICD-10 model. 
