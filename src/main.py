@@ -71,7 +71,7 @@ start = False
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
 	if f.replace('.csv','') == 'L1901':
-		start = True:
+		start = True
 	if start:
 		train_model(f.replace('.csv',''))
 
