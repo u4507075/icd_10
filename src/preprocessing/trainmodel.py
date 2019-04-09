@@ -102,7 +102,7 @@ def train_model(filename):
 
 	for target in target_classes:
 		model_file = '../../secret/data/model/'+filename+'/'+target+'.sav'
-		if not Path(model_file).is_file():
+		if not Path(model_file).is_file() and target == 'A150':
 			print(target)
 			data = None
 			chunk = 100000
