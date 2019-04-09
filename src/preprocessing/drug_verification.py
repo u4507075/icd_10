@@ -5,7 +5,7 @@ import ntpath
 import os
 
 dp = '../../secret/data/drug/drug_clean.csv'
-chunk = 100000
+chunk = 10000
 
 def save_file(df,filename):
 	if not os.path.exists('../../secret/data/drug_verification/'):
