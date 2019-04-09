@@ -23,6 +23,10 @@ import re
 import pickle
 
 def get_dataset(trainingset, validation_size):
+	for name in trainingset.columns:
+		if name != 'icd10' and trainingset[name].dtype == 'object':
+			trainingset[name] = pd.to_numeric(trainingset[name], errors='coerce')
+	trainingset.fillna(0,inplace=True)
 	n = len(trainingset.columns)-1
 	array = trainingset.values
 	X = array[:,0:n]

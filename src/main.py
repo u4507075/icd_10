@@ -67,11 +67,14 @@ feature = 'drug'
 #split_set()
 #split_lab()
 
-'''
+start = False
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
-	train_model(f.replace('.csv',''))
-'''
+	if f.replace('.csv','') == 'L1901':
+		start = True:
+	if start:
+		train_model(f.replace('.csv',''))
+
 
 #predict_testset()
 
@@ -81,7 +84,7 @@ for f in files:
 ##Drug verification dataset##
 #get_drug_verification_registration_data('../../secret/data/registration/registration_onehot.csv')
 #get_drug_verification_registration_data('../../secret/data/admit/admit_onehot.csv')
-get_drug_verification_lab_data()
+#get_drug_verification_lab_data()
 
 
 '''
