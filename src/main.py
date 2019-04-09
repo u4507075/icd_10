@@ -70,8 +70,8 @@ feature = 'drug'
 start = False
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
-	if f.replace('.csv','') == 'L1901':
-		start = True
+	#if f.replace('.csv','') == 'L1901':
+	#	start = True
 	if start:
 		train_model(f.replace('.csv',''))
 
