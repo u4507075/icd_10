@@ -102,7 +102,7 @@ def split_lab():
 def clean_data(path,destination):
 	files = os.listdir('../../secret/data/'+path+'/')
 	for lab in files:
-		p = path+lab
+		p = '../../secret/data/'+path+'/'+lab
 		for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 			for name in df.columns:
 				if name != 'icd10' and name != 'TXN' and str(df[name].dtype) == 'object':
@@ -110,8 +110,8 @@ def clean_data(path,destination):
 			df.fillna(0,inplace=True)
 			if not os.path.exists('../../secret/data/'+destination+'/'):
 				os.makedirs('../../secret/data/'+destination+'/')
-			save_data(df,destination+'/'+name)
-
+			save_data(df,destination+'/'+lab)
+			print(lab)
 
 
 

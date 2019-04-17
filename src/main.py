@@ -68,9 +68,9 @@ feature = 'drug'
 #split_set()
 #split_lab()
 #clean_data('trainingset','trainingset_clean')
-#clean_data('testset','testset_clean')
+clean_data('testset','testset_clean')
 
-
+'''
 start = False
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
@@ -78,7 +78,7 @@ for f in files:
 		start = True
 	if start:
 		train_model(f.replace('.csv',''))
-
+'''
 
 #predict_testset()
 
