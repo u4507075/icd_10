@@ -24,6 +24,7 @@ from preprocessing.registration import onehot_registration_data
 from preprocessing.split import get_txn_test_data
 from preprocessing.split import split_set
 from preprocessing.split import split_lab
+from preprocessing.split import clean_data
 
 from preprocessing.evaluation import predict_testset
 
@@ -66,7 +67,10 @@ feature = 'drug'
 #get_txn_test_data(config)
 #split_set()
 #split_lab()
+clean_data('trainingset','trainingset_clean')
+#clean_data('testset','testset_clean')
 
+'''
 start = False
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
@@ -74,7 +78,7 @@ for f in files:
 	#	start = True
 	if start:
 		train_model(f.replace('.csv',''))
-
+'''
 
 #predict_testset()
 
