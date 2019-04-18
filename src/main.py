@@ -32,6 +32,8 @@ from preprocessing.evaluation import predict_testset
 from preprocessing.drug_verification import get_drug_verification_registration_data
 from preprocessing.drug_verification import get_drug_verification_lab_data
 
+from validation.validation import predict
+
 
 import sys
 import os
@@ -69,7 +71,7 @@ feature = 'drug'
 #split_set()
 #split_lab()
 #clean_data('trainingset','trainingset_clean')
-clean_data('testset','testset_clean')
+#clean_data('testset','testset_clean')
 
 '''
 start = False
@@ -83,6 +85,8 @@ for f in files:
 
 
 #predict_testset()
+
+predict()
 
 
 

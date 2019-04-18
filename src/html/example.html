@@ -1,0 +1,304 @@
+<html lang="en">
+<title>ICD-10 prediction</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<style>
+.left {
+  text-align: right;
+}
+.left .itemActions {
+  display: inline-block;
+  position: absolute;
+  left: 0px;
+  bottom: -6px;
+}
+.left ul .item,
+.left ul .item .underline {
+  border-color: white !important;
+}
+.left ul ul .item,
+.left ul ul .item .underline {
+  border-color: green !important;
+}
+.left ul ul ul .item,
+.left ul ul ul .item .underline {
+  border-color: gray !important;
+}
+.left .item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  border-right: solid 2px #00bbff;
+}
+.left .item > ul {
+  order: -1;
+}
+.left .item .underline {
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 100px;
+  max-width: 800px;
+  line-height: 2em;
+  border-bottom: solid 2px #00bbff;
+}
+.left .item:first-child > .underline {
+  border-right: solid 2px white !important;
+  right: -2px;
+}
+.left .item:nth-last-child(1) {
+  border-right: 0;
+}
+.left .item:nth-last-child(1) > .underline {
+  border-right: solid 2px #00bbff;
+}
+.right {
+  text-align: left;
+}
+.right .itemActions {
+  display: inline-block;
+  position: absolute;
+  right: 0px;
+  bottom: -6px;
+}
+.right ul .item,
+.right ul .item .underline {
+  border-color: red !important;
+}
+.right ul ul .item,
+.right ul ul .item .underline {
+  border-color: green !important;
+}
+.right ul ul ul .item,
+.right ul ul ul .item .underline {
+  border-color: gray !important;
+}
+.right .item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-left: solid 2px #00bbff;
+}
+.right .item .underline {
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 70px;
+  line-height: 2em;
+  border-bottom: solid 2px #00bbff;
+}
+.right .item:first-child > .underline {
+  border-left: solid 2px white !important;
+  left: -2px;
+  border-radius: 0 !important;
+}
+.right .item:nth-last-child(2) {
+  border-left: 0;
+}
+.right .item:nth-last-child(2) > .underline {
+  border-left: solid 2px #00bbff;
+}
+ul.branch {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+.block {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+.block:first-child {
+  text-align: right;
+}
+.block:last-child {
+  text-align: left;
+}
+.flex {
+  display: flex;
+  align-items: flex-start;
+}
+.start {
+  text-align: center;
+  line-height: 2em;
+  border-bottom: solid 2px #00bbff;
+  font-size: 16px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.prototype {
+  display: none !important;
+}
+
+.item-header{
+  border-bottom: solid 2px red;
+}
+.box {
+  float: right;
+  width: 100px;
+  height: 50px;
+  margin: 5px;
+  box-shadow: 2px 2px 2px grey;
+  background-color: whitesmoke;
+  border-left: solid 5px #00bbff;
+}
+
+.box-item {
+  line-height: 25px;
+  text-align: left;
+  padding-left: 5px;
+}
+
+.box-item-text {
+  color: gray;
+}
+
+.after-box {
+  clear: left;
+}
+
+body {
+  padding: 50px;
+  max-width: 1200px;
+  margin: auto;
+}
+h3 {
+  text-align: center;
+}
+h4 {
+  padding: 5px;
+  background-color: whitesmoke;
+  color: slategray;
+}
+</style>
+<body>
+<div>
+	<h3>TXN: 123456</h3>
+	<h4>Correct predicted diagnosis</h4>
+	<div class="flex">
+		<div class="block">
+		<ul class="branch left">
+			<li class="item">
+				<div class="underline">
+					<div>96%</div>
+				</div>
+				<ul class="branch">
+				<li class="item">
+					<div class="underline">
+						<div class="item-header">Registration data</div>
+						<div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				</ul>
+			</li>
+			<li class="item">
+				<div class="underline">
+					<div>85%</div>
+				</div>
+				<ul class="branch">
+				<li class="item">
+					<div class="underline">
+						<div class="item-header">Laboratory data</div>
+						<div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				</ul>
+			</li>
+			<li class="item">
+				<div class="underline">
+					<div>71%</div>
+				</div>
+				<ul class="branch">
+				<li class="item">
+					<div class="underline">
+						<div class="item-header">Drug prescription data</div>
+						<div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+							<div class='box'>
+								<div class='box-item'>item</div>
+								<div class='box-item box-item-text'>value</div>
+							</div>
+						</div>
+					</div>
+				</li>
+				</ul>
+		  </li>
+		</div>
+		<div class="block start">B021 Appendicitis</div>
+		<div class="block"></div>
+	</div>
+</div>
+</div>
+</body>
+</html>

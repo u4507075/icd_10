@@ -1,0 +1,835 @@
+<html lang="en">
+<title>ICD-10 prediction</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<style>
+.left {
+  text-align: right;
+}
+.left .itemActions {
+  display: inline-block;
+  position: absolute;
+  left: 0px;
+  bottom: -6px;
+}
+.left ul .item,
+.left ul .item .underline {
+  border-color: white !important;
+}
+.left ul ul .item,
+.left ul ul .item .underline {
+  border-color: green !important;
+}
+.left ul ul ul .item,
+.left ul ul ul .item .underline {
+  border-color: gray !important;
+}
+.left .item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  border-right: solid 2px #00bbff;
+}
+.left .item > ul {
+  order: -1;
+}
+.left .item .underline {
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 100px;
+  max-width: 800px;
+  line-height: 2em;
+  border-bottom: solid 2px #00bbff;
+}
+.left .item:first-child > .underline {
+  border-right: solid 2px white !important;
+  right: -2px;
+}
+.left .item:nth-last-child(1) {
+  border-right: 0;
+}
+.left .item:nth-last-child(1) > .underline {
+  border-right: solid 2px #00bbff;
+}
+.right {
+  text-align: left;
+}
+.right .itemActions {
+  display: inline-block;
+  position: absolute;
+  right: 0px;
+  bottom: -6px;
+}
+.right ul .item,
+.right ul .item .underline {
+  border-color: red !important;
+}
+.right ul ul .item,
+.right ul ul .item .underline {
+  border-color: green !important;
+}
+.right ul ul ul .item,
+.right ul ul ul .item .underline {
+  border-color: gray !important;
+}
+.right .item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-left: solid 2px #00bbff;
+}
+.right .item .underline {
+  position: relative;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 70px;
+  line-height: 2em;
+  border-bottom: solid 2px #00bbff;
+}
+.right .item:first-child > .underline {
+  border-left: solid 2px white !important;
+  left: -2px;
+  border-radius: 0 !important;
+}
+.right .item:nth-last-child(2) {
+  border-left: 0;
+}
+.right .item:nth-last-child(2) > .underline {
+  border-left: solid 2px #00bbff;
+}
+ul.branch {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+.block {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+.block:first-child {
+  text-align: right;
+}
+.block:last-child {
+  text-align: left;
+}
+.flex {
+  display: flex;
+  align-items: flex-start;
+}
+.start {
+  text-align: center;
+  line-height: 2em;
+  border-bottom: solid 2px #00bbff;
+  font-size: 16px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.prototype {
+  display: none !important;
+}
+
+.item-header{
+  border-bottom: solid 2px red;
+}
+.box {
+  float: right;
+  width: 100px;
+  height: 50px;
+  margin: 5px;
+  box-shadow: 2px 2px 2px grey;
+  background-color: whitesmoke;
+  border-left: solid 5px #00bbff;
+}
+
+.box-item {
+  line-height: 25px;
+  text-align: left;
+  padding-left: 5px;
+}
+
+.box-item-text {
+  color: gray;
+}
+
+.after-box {
+  clear: left;
+}
+
+body {
+  padding: 50px;
+  max-width: 1200px;
+  margin: auto;
+}
+h3 {
+  text-align: center;
+}
+h4 {
+  padding: 5px;
+  background-color: whitesmoke;
+  color: slategray;
+}
+</style>
+<body>
+<div>
+	<h3>TXN: 123456</h3>
+	<h4>Correct predicted diagnosis</h4>
+	<div class="flex">
+		<div class="block">
+		<ul class="branch left">
+			<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>111478</div>
+	<div class='box-item box-item-text'>26</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>107017</div>
+	<div class='box-item box-item-text'>183</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>180779</div>
+	<div class='box-item box-item-text'>61</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>174544</div>
+	<div class='box-item box-item-text'>72</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>51187</div>
+	<div class='box-item box-item-text'>127</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>6062</div>
+	<div class='box-item box-item-text'>40</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>132622</div>
+	<div class='box-item box-item-text'>117</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>56938</div>
+	<div class='box-item box-item-text'>132</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>80580</div>
+	<div class='box-item box-item-text'>33</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>161309</div>
+	<div class='box-item box-item-text'>171</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>131904</div>
+	<div class='box-item box-item-text'>105</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>86226</div>
+	<div class='box-item box-item-text'>56</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>185959</div>
+	<div class='box-item box-item-text'>136</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>108250</div>
+	<div class='box-item box-item-text'>102</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>147980</div>
+	<div class='box-item box-item-text'>80</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>141613</div>
+	<div class='box-item box-item-text'>80</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>44854</div>
+	<div class='box-item box-item-text'>62</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>23548</div>
+	<div class='box-item box-item-text'>79</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>17810</div>
+	<div class='box-item box-item-text'>16</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>183688</div>
+	<div class='box-item box-item-text'>194</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>98729</div>
+	<div class='box-item box-item-text'>172</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>80551</div>
+	<div class='box-item box-item-text'>110</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>115861</div>
+	<div class='box-item box-item-text'>129</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>199576</div>
+	<div class='box-item box-item-text'>121</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>47570</div>
+	<div class='box-item box-item-text'>183</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>97885</div>
+	<div class='box-item box-item-text'>111</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>132612</div>
+	<div class='box-item box-item-text'>70</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>123274</div>
+	<div class='box-item box-item-text'>10</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>4095</div>
+	<div class='box-item box-item-text'>183</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>102189</div>
+	<div class='box-item box-item-text'>99</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>13309</div>
+	<div class='box-item box-item-text'>138</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>87327</div>
+	<div class='box-item box-item-text'>191</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>63067</div>
+	<div class='box-item box-item-text'>128</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>93454</div>
+	<div class='box-item box-item-text'>41</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>112463</div>
+	<div class='box-item box-item-text'>51</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>87339</div>
+	<div class='box-item box-item-text'>191</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>88680</div>
+	<div class='box-item box-item-text'>164</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>127374</div>
+	<div class='box-item box-item-text'>53</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>55121</div>
+	<div class='box-item box-item-text'>126</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>156078</div>
+	<div class='box-item box-item-text'>140</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>154779</div>
+	<div class='box-item box-item-text'>177</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>49410</div>
+	<div class='box-item box-item-text'>144</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>43917</div>
+	<div class='box-item box-item-text'>74</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>80054</div>
+	<div class='box-item box-item-text'>97</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>12896</div>
+	<div class='box-item box-item-text'>141</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>8805</div>
+	<div class='box-item box-item-text'>69</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>21082</div>
+	<div class='box-item box-item-text'>108</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>19570</div>
+	<div class='box-item box-item-text'>9</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>196519</div>
+	<div class='box-item box-item-text'>177</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>150513</div>
+	<div class='box-item box-item-text'>45</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>114905</div>
+	<div class='box-item box-item-text'>9</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>11266</div>
+	<div class='box-item box-item-text'>195</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>107638</div>
+	<div class='box-item box-item-text'>101</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>183679</div>
+	<div class='box-item box-item-text'>84</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>99216</div>
+	<div class='box-item box-item-text'>180</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>179534</div>
+	<div class='box-item box-item-text'>128</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>38087</div>
+	<div class='box-item box-item-text'>145</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>54579</div>
+	<div class='box-item box-item-text'>83</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>41445</div>
+	<div class='box-item box-item-text'>17</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>126658</div>
+	<div class='box-item box-item-text'>123</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>60246</div>
+	<div class='box-item box-item-text'>77</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>119008</div>
+	<div class='box-item box-item-text'>178</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>115715</div>
+	<div class='box-item box-item-text'>162</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>105612</div>
+	<div class='box-item box-item-text'>45</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>87542</div>
+	<div class='box-item box-item-text'>24</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>139036</div>
+	<div class='box-item box-item-text'>29</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>73613</div>
+	<div class='box-item box-item-text'>20</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>170257</div>
+	<div class='box-item box-item-text'>182</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>196771</div>
+	<div class='box-item box-item-text'>150</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>49322</div>
+	<div class='box-item box-item-text'>21</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>111256</div>
+	<div class='box-item box-item-text'>179</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>150021</div>
+	<div class='box-item box-item-text'>162</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>96824</div>
+	<div class='box-item box-item-text'>128</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>91202</div>
+	<div class='box-item box-item-text'>66</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>196479</div>
+	<div class='box-item box-item-text'>172</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>158788</div>
+	<div class='box-item box-item-text'>82</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>18338</div>
+	<div class='box-item box-item-text'>188</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>68342</div>
+	<div class='box-item box-item-text'>96</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>70226</div>
+	<div class='box-item box-item-text'>162</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>183469</div>
+	<div class='box-item box-item-text'>141</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>73862</div>
+	<div class='box-item box-item-text'>120</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>91946</div>
+	<div class='box-item box-item-text'>60</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>28877</div>
+	<div class='box-item box-item-text'>36</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+<li class="item">
+	<div class="underline">
+		<div>%PROP</div>
+	</div>
+	<ul class="branch">
+	<li class="item">
+		<div class="underline">
+			<div class="item-header">%TITLE</div>
+			<div>
+				<div class='box'>
+	<div class='box-item'>181677</div>
+	<div class='box-item box-item-text'>68</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>68697</div>
+	<div class='box-item box-item-text'>180</div>
+</div>
+
+
+<div class='box'>
+	<div class='box-item'>184990</div>
+	<div class='box-item box-item-text'>79</div>
+</div>
+
+
+
+			</div>
+		</div>
+	</li>
+	</ul>
+  </li>
+
+
+		</div>
+		<div class="block start">B021 Appendicitis</div>
+		<div class="block"></div>
+	</div>
+</div>
+</div>
+</body>
+</html>
