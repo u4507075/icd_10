@@ -120,7 +120,9 @@ def clean_data(path,destination):
 				if name != 'icd10' and name != 'TXN' and str(df[name].dtype) == 'object':
 					df[name] = pd.to_numeric(df[name], errors='coerce')
 			df.fillna(0,inplace=True)
-			df_filtered = df[df['icd10'].apply(regex_filter)]
+			df_filtered = df
+			if 'icd10' in list(df):
+				df_filtered = df[df['icd10'].apply(regex_filter)]
 			if not os.path.exists('../../secret/data/'+destination+'/'):
 				os.makedirs('../../secret/data/'+destination+'/')
 			save_data(df_filtered,destination+'/'+lab)

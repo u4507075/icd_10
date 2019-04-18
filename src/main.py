@@ -69,7 +69,7 @@ feature = 'drug'
 #split_set()
 #split_lab()
 #clean_data('trainingset','trainingset_clean')
-#clean_data('testset','testset_clean')
+clean_data('testset','testset_clean')
 
 '''
 start = False
@@ -80,7 +80,7 @@ for f in files:
 	if start:
 		train_model(f.replace('.csv',''))
 '''
-save_history()
+
 
 #predict_testset()
 
