@@ -73,20 +73,16 @@ feature = 'drug'
 #clean_data('trainingset','trainingset_clean')
 #clean_data('testset','testset_clean')
 
-'''
-start = False
+
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
-	if f.replace('.csv','') == 'L1901':
-		start = True
-	if start:
-		train_model(f.replace('.csv',''))
-'''
+	train_model(f.replace('.csv',''))
+
 
 
 #predict_testset()
 
-predict()
+#predict()
 
 
 

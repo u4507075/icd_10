@@ -78,7 +78,7 @@ def train_model(filename):
 
 
 	print(filename)
-	p = '../../secret/data/trainingset/'+filename+'.csv'
+	p = '../../secret/data/trainingset_clean/'+filename+'.csv'
 	targets = []
 	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 		df['icd10'] = df['icd10'].apply(str)
@@ -101,12 +101,12 @@ def train_model(filename):
 
 	if not Path('../../secret/data/model_performance/training_record.csv').is_file():
 		save_file(pd.DataFrame(columns=['feature','icd10']),'../../secret/data/model_performance/training_record.csv')
-	hx = pd.read_csv('../../secret/data/model_performance/training_record.csv', chunksize=chunk, index_col=0)
+	hx = pd.read_csv('../../secret/data/model_performance/training_record.csv', index_col=0)
 
 	print("Start saving models")
 
 	for target in target_classes:
-		if len(hx[(hx['feature'] == filename) and (hx['icd10'] == target)]) == 0:
+		if len(hx[(hx['feature'] == filename) & (hx['icd10'] == target)]) == 0:
 			model_file = '../../secret/data/model/'+filename+'/'+target+'.sav'
 			if not Path(model_file).is_file():
 				print(target)
