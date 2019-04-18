@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import ntpath
 import os
+import re
 
 def convert(x):
     try:
@@ -99,6 +100,17 @@ def split_lab():
 				save_data(trainingset, 'trainingset/'+lab)
 			print('Save '+lab)
 
+def regex_filter(val):
+	regex = re.compile('[A-Z]')
+	if val:
+		mo = re.search(regex,val)
+		if mo:
+			return True
+		else:
+			return False
+	else:
+		return False
+
 def clean_data(path,destination):
 	files = os.listdir('../../secret/data/'+path+'/')
 	for lab in files:
@@ -108,9 +120,10 @@ def clean_data(path,destination):
 				if name != 'icd10' and name != 'TXN' and str(df[name].dtype) == 'object':
 					df[name] = pd.to_numeric(df[name], errors='coerce')
 			df.fillna(0,inplace=True)
+			df_filtered = df[df['icd10'].apply(regex_filter)]
 			if not os.path.exists('../../secret/data/'+destination+'/'):
 				os.makedirs('../../secret/data/'+destination+'/')
-			save_data(df,destination+'/'+lab)
+			save_data(df_filtered,destination+'/'+lab)
 			print(lab)
 
 
