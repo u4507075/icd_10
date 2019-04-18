@@ -34,6 +34,114 @@ def getadm():
 		'''
 
 	return sql
+
+def getreg():
+
+	sql = 	'''
+				(SELECT adm.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
+					,wt,pulse,resp,temp,bp,blood,rh
+					,adm.room
+
+					FROM  icd10.reg adm
+					 	INNER JOIN lis lis
+					ON adm.TXN = lis.TXN
+					WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+				)
+				UNION
+				(SELECT adm.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
+							,wt,pulse,resp,temp,bp,blood,rh
+							,adm.room
+
+					FROM  icd10.reg_2005 adm
+					 	INNER JOIN lis lis
+					ON adm.TXN = lis.TXN
+					WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+				)
+				UNION
+				(SELECT adm.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
+							,wt,pulse,resp,temp,bp,blood,rh
+							,adm.room
+
+					FROM  icd10.reg_2006 adm
+					 	INNER JOIN lis lis
+					ON adm.TXN = lis.TXN
+					WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+				)
+				UNION
+				(SELECT adm.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
+							,wt,pulse,resp,temp,bp,blood,rh
+							,adm.room
+
+					FROM  icd10.reg_2007 adm
+					 	INNER JOIN lis lis
+					ON adm.TXN = lis.TXN
+					WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+				)
+				UNION
+				(SELECT adm.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
+							,wt,pulse,resp,temp,bp,blood,rh
+							,adm.room
+
+					FROM  icd10.reg_2008 adm
+					 	INNER JOIN lis lis
+					ON adm.TXN = lis.TXN
+					WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+				)
+		'''
+
+	return sql
+
+def getdrug():
+
+	sql = 	'''
+			(SELECT dru.TXN, dru.CODE AS drug, dru.NAME AS drug_name
+
+				FROM  icd10.dru dru
+				 	INNER JOIN lis lis
+				ON dru.TXN = lis.TXN
+				WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+			)
+			UNION
+			(SELECT dru.TXN, dru.CODE AS drug, dru.NAME AS drug_name
+
+				FROM  icd10.idru dru
+				 	INNER JOIN lis lis
+				ON dru.TXN = lis.TXN
+				WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+			)
+		'''
+
+	return sql
+
+def getlab():
+
+	sql = 	'''
+			(SELECT lab.TXN, lab.NAME AS lab_name, lab.LST AS name, lab.REP AS value
+
+				FROM  icd10.lab lab
+				 	INNER JOIN lis lis
+				ON lab.TXN = lis.TXN
+				WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+			)
+			UNION
+			(SELECT lab.TXN, lab.NAME AS lab_name, lab.LST AS name, lab.REP AS value
+
+				FROM  icd10.ilab lab
+				 	INNER JOIN lis lis
+				ON lab.TXN = lis.TXN
+				WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
+			)
+		'''
+
+	return sql
+
+def save(db_connection,sql,name):
+	df = pd.read_sql(, con=db_connection)
+	df = decode(df)
+	if not os.path.exists('../../secret/data/validation/'):
+		os.makedirs('../../secret/data/validation/')
+	df.to_csv('../../secret/data/validation/'+name+'.csv')
+	print('Saved '+name)
 	
 
 def get_validation_data(config):
@@ -44,10 +152,10 @@ def get_validation_data(config):
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
 
-	df = pd.read_sql(getadm(), con=db_connection)
-	df = decode(df)
-	print(df)
-
+	save(db_connection,getadm(),'admit_onehot')
+	save(db_connection,getreg(),'registration_onehot')
+	save(db_connection,getdrug(),'drug_numeric')
+	save(db_connection,getlab(),'lab')
 
 
 
