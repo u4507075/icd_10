@@ -135,6 +135,16 @@ def getlab():
 
 	return sql
 
+def geticd():
+
+	sql = 	'''
+		(SELECT code,cdesc FROM icd10.icd10)
+		UNION
+		(SELECT code,cdesc FROM icd10.icd10_2010)
+		'''
+
+	return sql
+
 def save(db_connection,sql,name):
 	df = pd.read_sql(sql, con=db_connection)
 	df = decode(df)
@@ -156,6 +166,7 @@ def get_validation_data(config):
 	save(db_connection,getreg(),'registration_onehot')
 	save(db_connection,getdrug(),'drug_numeric')
 	save(db_connection,getlab(),'lab')
+	save(db_connection,geticd(),'icd')
 
 
 
