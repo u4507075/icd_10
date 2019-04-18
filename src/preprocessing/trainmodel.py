@@ -150,7 +150,7 @@ def train_model(filename):
 
 				save_file(pd.DataFrame([[filename,target]],columns=['feature','icd10']),'../../secret/data/model_performance/training_record.csv')
 		else:
-			print(filename + ' and ' + target + ' ' + 'already exist.'
+			print(filename + ' and ' + target + ' ' + 'already exist.')
 
 
 def save_history():
@@ -159,6 +159,7 @@ def save_history():
 	stop = False
 
 	for filename in files:
+		filename = filename.replace('.csv','')
 		if stop:
 			break
 		print(filename)
