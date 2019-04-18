@@ -5,6 +5,7 @@ from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
 from preprocessing.trainmodel import train_model
+from preprocessing.trainmodel import save_history
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -68,7 +69,7 @@ feature = 'drug'
 #split_set()
 #split_lab()
 #clean_data('trainingset','trainingset_clean')
-clean_data('testset','testset_clean')
+#clean_data('testset','testset_clean')
 
 '''
 start = False
@@ -79,6 +80,7 @@ for f in files:
 	if start:
 		train_model(f.replace('.csv',''))
 '''
+save_history()
 
 #predict_testset()
 
