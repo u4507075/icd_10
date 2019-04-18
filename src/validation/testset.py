@@ -20,21 +20,19 @@ def decode(df):
 			df[c] = df[c].apply(convert)
 	return df
 
-def getadm(t):
+def getadm():
 
 	sql = 	'''
-		SELECT dx.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
+		SELECT adm.TXN,adm.sex,YEAR(CURDATE()) - YEAR(adm.BORN) AS age
 			,wt,pulse,resp,temp,bp,blood,rh
-			,adm.room,adm.room_dc,dx.icd10
+			,adm.room,adm.room_dc
 
-	FROM icd10.%t dx
-	INNER JOIN icd10.adm adm
-	on dx.TXN = adm.TXN
-    INNER JOIN lis lis
-	ON dx.TXN = lis.TXN
+	FROM  icd10.adm adm
+    	INNER JOIN lis lis
+	ON adm.TXN = lis.TXN
 	WHERE YEAR(lis.DATE) > 2017 and MONTH(lis.DATE) > 4
 		'''
-	sql = sql.replace('%t',str(t))
+
 	return sql
 	
 
@@ -46,7 +44,7 @@ def get_validation_data(config):
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
 
-	df = pd.read_sql(getquery('idx'), con=db_connection)
+	df = pd.read_sql(getadm(), con=db_connection)
 	df = decode(df)
 	print(df)
 
