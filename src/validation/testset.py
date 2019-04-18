@@ -162,10 +162,10 @@ def get_validation_data(config):
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
 
-	save(db_connection,getadm(),'admit_onehot')
-	save(db_connection,getreg(),'registration_onehot')
-	save(db_connection,getdrug(),'drug_numeric')
-	save(db_connection,getlab(),'lab')
+	#save(db_connection,getadm(),'admit_onehot')
+	#save(db_connection,getreg(),'registration_onehot')
+	#save(db_connection,getdrug(),'drug_numeric')
+	#save(db_connection,getlab(),'lab')
 	save(db_connection,geticd(),'icd')
 
 
