@@ -27,13 +27,14 @@ from preprocessing.split import split_set
 from preprocessing.split import split_lab
 from preprocessing.split import clean_data
 
-from preprocessing.evaluation import predict_testset
+
 
 from preprocessing.drug_verification import get_drug_verification_registration_data
 from preprocessing.drug_verification import get_drug_verification_lab_data
 
 from validation.validation import predict
-
+from validation.validation import predict_testset
+from validation.testset import get_validation_data
 
 import sys
 import os
@@ -73,16 +74,15 @@ feature = 'drug'
 #clean_data('trainingset','trainingset_clean')
 #clean_data('testset','testset_clean')
 
-
+'''
 files = os.listdir('../../secret/data/trainingset/')
 for f in files:
 	train_model(f.replace('.csv',''))
-
+'''
 
 
 #predict_testset()
-
-#predict()
+get_validation_data(config)
 
 
 
