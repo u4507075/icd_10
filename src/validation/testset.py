@@ -136,7 +136,7 @@ def getlab():
 	return sql
 
 def save(db_connection,sql,name):
-	df = pd.read_sql(, con=db_connection)
+	df = pd.read_sql(sql, con=db_connection)
 	df = decode(df)
 	if not os.path.exists('../../secret/data/validation/'):
 		os.makedirs('../../secret/data/validation/')
