@@ -135,6 +135,23 @@ def getlab():
 
 	return sql
 
+def getlab_code():
+
+	sql =   '''
+                        (SELECT DISTINCT lab.CODE AS code, lab.NAME AS lab_name
+
+                                FROM  icd10.lab lab
+                        )
+                        UNION
+                        (SELECT DISTINCT lab.CODE AS code, lab.NAME AS lab_name
+
+                                FROM  icd10.ilab lab
+                        )
+                '''
+
+	return sql
+
+
 def geticd():
 
 	sql = 	'''
@@ -166,7 +183,8 @@ def get_validation_data(config):
 	#save(db_connection,getreg(),'registration_onehot')
 	#save(db_connection,getdrug(),'drug_numeric')
 	#save(db_connection,getlab(),'lab')
-	save(db_connection,geticd(),'icd')
+	save(db_connection,getlab_code(),'lab_code')
+	#save(db_connection,geticd(),'icd')
 
 
 
