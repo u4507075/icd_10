@@ -32,9 +32,10 @@ from preprocessing.split import clean_data
 from preprocessing.drug_verification import get_drug_verification_registration_data
 from preprocessing.drug_verification import get_drug_verification_lab_data
 
-from validation.validation import predict
 from validation.validation import predict_testset
+
 from validation.testset import get_validation_data
+
 
 import sys
 import os
@@ -80,9 +81,9 @@ for f in files:
 	train_model(f.replace('.csv',''))
 '''
 
+#get_validation_data(config)
+predict_testset()
 
-#predict_testset()
-get_validation_data(config)
 
 
 

@@ -121,12 +121,13 @@ ul.branch {
   align-items: flex-start;
 }
 .start {
-  text-align: center;
-  line-height: 2em;
+  text-align: right;
+  line-height: 25px;
   border-bottom: solid 2px #00bbff;
   font-size: 16px;
   margin-left: 5px;
   margin-right: 5px;
+  max-width: 400px;
 }
 .prototype {
   display: none !important;
@@ -137,18 +138,21 @@ ul.branch {
 }
 .box {
   float: right;
-  width: 100px;
+  width: 150px;
   height: 50px;
   margin: 5px;
   box-shadow: 2px 2px 2px grey;
   background-color: whitesmoke;
   border-left: solid 5px #00bbff;
+  overflow: auto;
+  overflow-x: hidden;
 }
 
 .box-item {
   line-height: 25px;
   text-align: left;
   padding-left: 5px;
+  font-size: 10px;
 }
 
 .box-item-text {
@@ -175,16 +179,13 @@ h4 {
 </style>
 <body>
 <div>
-	<h3>TXN: 123456</h3>
-	<h4>Correct predicted diagnosis</h4>
-	<div class="flex">
-		<div class="block">
-		<ul class="branch left">
-			%ITEM
-		</div>
-		<div class="block start">B021 Appendicitis</div>
-		<div class="block"></div>
-	</div>
+	<h3>TXN %TXN</h3>
+	<h4>Diagnoses with evidence support</h4>
+	%DX
+	<h4>Diagnoses without evidence support</h4>
+	%DXN
+	<h4>Other suggested diagnoses</h4>
+	%DXO
 </div>
 </div>
 </body>

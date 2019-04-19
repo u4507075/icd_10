@@ -16,55 +16,142 @@ def write(path,text):
 	with open(path, "w") as file:
 		file.write(text)
 
-def predict():
-	body = read('html/body.html')
+def get_data(name,txn,dx):
+	df = pd.read_csv('../../secret/data/validation/'+name+'.csv', index_col=0)
+	df = df[(df['TXN']==txn) & (df['icd10']==dx)].drop_duplicates()
+	return df
+'''
+def get_testset(txn):
+	print(get_data('admit_onehot',txn))
+	print(get_data('registration_onehot',txn))
+	print(get_data('lab',txn))
+	print(get_data('drug_numeric',txn))
+'''
+def get_value(item,value):
+	v = read('html/value.html')
+	v = v.replace('%ITEM', str(item))
+	v = v.replace('%VALUE', str(value))
+	return v
+
+def get_reg(title,prop,df):
+	item = read('html/item.html')
+	item = item.replace('%TITLE', title)
+	item = item.replace('%PROP', prop)
+	values = ''
+	for index, row in df.iterrows():
+		for name in list(df):
+			if name != 'TXN':
+				values = values + get_value(name, row[name])
+	item = item.replace('%VALUE', values)
+	return item
+
+def get_lab(df):
 	items = ''
-	for i in range(randint(3,10)):
+	for index, row in df.iterrows():
 		item = read('html/item.html')
+		item = item.replace('%TITLE', row['lab_name'])
+		item = item.replace('%PROP', '78%')
 		values = ''
-		for j in range(randint(3,20)):
-			value = read('html/value.html')
-			value = value.replace('%ITEM', str(randint(3000,200000)))
-			value = value.replace('%VALUE', str(randint(0,200)))
-			values = values + value
+		title = str(row['name']).split(';')
+		v = str(row['value']).split(';')
+		for i in range(len(title)):
+			if title[i] == '':
+				break
+			if len(v)-1 >= i:
+				values = values + get_value(title[i], v[i])
+			else:
+				values = values + get_value(title[i], '')
 		item = item.replace('%VALUE', values)
 		items = items + item
-	body = body.replace('%ITEM', items)
-	write('result/test.html',body)
+	return items
 
+def get_drug(df):
+	items = ''
+	for index, row in df.iterrows():
+		item = read('html/item.html')
+		item = item.replace('%TITLE', row['drug_name'])
+		item = item.replace('%PROP', '78%')
+		item = item.replace('%VALUE', '')
+		items = items + item
+	return items
+
+def get_branch(dx,item):
+	branch = read('html/branch.html')
+	branch = branch.replace('%DX',dx)
+	branch = branch.replace('%ITEM',item)
+	return branch
+
+def get_predict_text(txn,filename,prop,dx):
+	
+	if filename == 'admit_onehot.csv':
+		return get_reg('Admission data', str(prop)+'%', get_data('admit_onehot',txn,dx))
+	elif filename == 'registration_onehot.csv':
+		return get_reg('Registration data','81%',get_data('registration_onehot',txn,dx))
+	elif filename == 'drug_numeric.csv':
+		return get_drug(get_data('drug_numeric',txn,dx))
+	else:
+		return get_lab(get_data('lab',txn,dx))
 
 def predict_testset():
 
 	txn_testset = pd.read_csv('../../secret/data/testset_clean/txn_testset.csv',index_col=0)['TXN'].values.tolist()
+	icd10 = pd.read_csv('../../secret/data/validation/icd.csv',index_col=0)
+	icd10_map = dict(zip(icd10['code'],icd10['cdesc']))
 	files = os.listdir('../../secret/data/testset_clean/')
+	tt = [963366,970099,970257,970774,970578]
 	for txn in txn_testset:
-		print(txn)
-		for filename in files:
-			if filename != 'txn_testset.csv':
-				for df in  pd.read_csv('../../secret/data/testset_clean/'+filename, chunksize=1000000, index_col=0):
+		if txn in tt:
+			print(txn)
+			body = read('html/body.html')
+			body = body.replace('%TXN', str(txn))
+			items = ''
+			branch = ''
+			dxlist = []
+			predicted_dx = pd.DataFrame(columns=['actual_dx','predicted_dx','branch'])
+			for filename in files:
+				if filename != 'txn_testset.csv':
+					df = pd.read_csv('../../secret/data/testset_clean/'+filename, index_col=0)
 					df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 					df = df[df['TXN']==txn]
 					if len(df) > 0:
 						for index,row in df.iterrows():
-							#print('### Label : '+str(row['icd10']))
+							dxlist.append(row['icd10'])
 							if os.path.exists('../../secret/data/model/'+filename.replace('.csv','')):
 								for feature in os.listdir('../../secret/data/model/'+filename.replace('.csv','')):
 									model = pickle.load(open('../../secret/data/model/'+filename.replace('.csv','')+'/'+feature, 'rb'))
 									pre = model.predict(row[1:len(row)-1].tolist())
 									if not pre[0].startswith('not'):
-										print(row)
-										print(filename)
-										print(feature)
-										print(pre)
-										print(model.predict_proba(row[1:len(row)-1].tolist()))
-
+										#print(model.predict_proba(row[1:len(row)-1].tolist()))
+										predicted_dx = predicted_dx.append(pd.DataFrame([[row['icd10'],
+																										pre[0],
+																										get_predict_text(	txn,
+																																filename,
+																																model.predict_proba(row[1:len(row)-1].tolist()),
+																																row['icd10'])
+																										]], 
+																										columns=['actual_dx','predicted_dx','branch']))
+			'''
+			dx = 	''		
+			for d in dxlist:
+				if d in predicted_dx:
+					dx.append(get_branch(d,predicted_dx
+			'''
+			dxlist = list(set(dxlist))
+			dxlist.sort()
+			print(dxlist)
+			print(predicted_dx)
 	
+'''
+						dx = row['icd10']
+						if row['icd10'] in icd10_map:
+							dx = row['icd10'] + ': '+ icd10_map[row['icd10']]
+						if not row['icd10'] in dxlist:
+							branch = branch + get_branch(dx)
+							dxlist.append(row['icd10'])
+				body = body.replace('%DX', branch)
+				write('../../secret/data/result/'+str(txn)+'.html',body)
 
-
-
-
-
-
+'''
 
 
 
