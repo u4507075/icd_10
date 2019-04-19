@@ -16,9 +16,9 @@ def write(path,text):
 	with open(path, "w") as file:
 		file.write(text)
 
-def get_data(name,txn,dx):
+def get_data(name,txn):
 	df = pd.read_csv('../../secret/data/validation/'+name+'.csv', index_col=0)
-	df = df[(df['TXN']==txn) & (df['icd10']==dx)].drop_duplicates()
+	df = df[df['TXN']==txn].drop_duplicates()
 	return df
 '''
 def get_testset(txn):
@@ -81,16 +81,21 @@ def get_branch(dx,item):
 	branch = branch.replace('%ITEM',item)
 	return branch
 
-def get_predict_text(txn,filename,prop,dx):
+def get_predict_text(txn,filename,prop,index):
 	
 	if filename == 'admit_onehot.csv':
-		return get_reg('Admission data', str(prop)+'%', get_data('admit_onehot',txn,dx))
+		return get_reg('Admission data', str(prop)+'%', get_data('admit_onehot',txn))
 	elif filename == 'registration_onehot.csv':
-		return get_reg('Registration data','81%',get_data('registration_onehot',txn,dx))
+		return get_reg('Registration data','81%',get_data('registration_onehot',txn))
 	elif filename == 'drug_numeric.csv':
-		return get_drug(get_data('drug_numeric',txn,dx))
+		return get_drug(get_data('drug_numeric',txn))
 	else:
-		return get_lab(get_data('lab',txn,dx))
+		df = pd.read_csv('../../secret/data/lab/raw/'+filename, index_col=0)
+		df = df[df.index==index].drop_duplicates()
+		print(filename)
+		print(index)
+		print(df)
+		return get_lab(get_data('lab',txn))
 
 def predict_testset():
 
@@ -127,7 +132,7 @@ def predict_testset():
 																										get_predict_text(	txn,
 																																filename,
 																																model.predict_proba(row[1:len(row)-1].tolist()),
-																																row['icd10'])
+																																index)
 																										]], 
 																										columns=['actual_dx','predicted_dx','branch']))
 			'''
