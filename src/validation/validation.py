@@ -120,94 +120,79 @@ def predict_testset():
 	icd10 = pd.read_csv('../../secret/data/validation/icd.csv',index_col=0)
 	icd10_map = dict(zip(icd10['code'],icd10['cdesc']))
 	files = os.listdir('../../secret/data/testset_clean/')
-	tt = [963366,970099,970257,970774,970578]
+
 	for txn in txn_testset:
-		if txn in tt:
-			print(txn)
-			body = read('html/body.html')
-			body = body.replace('%TXN', str(txn))
-			items = ''
-			branch = ''
-			dxlist = []
-			predicted_dx = pd.DataFrame(columns=['predicted_dx','prop','branch'])
-			for filename in files:
-				if filename != 'txn_testset.csv':
-					df = pd.read_csv('../../secret/data/testset_clean/'+filename, index_col=0)
-					df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-					df = df[df['TXN']==txn]
-					dxlist = dxlist + df['icd10'].values.tolist()
-					df = df.drop(columns=['icd10'])
-					df = df.drop_duplicates()
-					print(df)
-					if len(df) > 0:
-						for index,row in df.iterrows():
-							print(row)
-							if os.path.exists('../../secret/data/model/'+filename.replace('.csv','')):
-								for feature in os.listdir('../../secret/data/model/'+filename.replace('.csv','')):
-									model = pickle.load(open('../../secret/data/model/'+filename.replace('.csv','')+'/'+feature, 'rb'))
-									pre = model.predict(row[1:len(row)].tolist())
-									if not pre[0].startswith('not'):
-										print(pre[0])
-										prop = int((model.predict_proba(row[1:len(row)].tolist()))[0][0]*100)
-										#print(model.predict_proba(row[1:len(row)-1].tolist()))
-										predicted_dx = predicted_dx.append(pd.DataFrame([[pre[0],
-																										prop,
-																										get_predict_text(	txn,
-																																filename,
-																																prop,
-																																index,row,drug_map,lab_map)
-																										]], 
-																										columns=['predicted_dx','prop','branch']))
-										#break
-			'''
-			dx = 	''		
-			for d in dxlist:
-				if d in predicted_dx:
-					dx.append(get_branch(d,predicted_dx
-			'''
-			dxt = ''
-			dxn = ''
-			dxo = ''
-			dxlist = list(set(dxlist))
-			dxlist.sort()
-			predicted_dx = predicted_dx.drop_duplicates()
-			predicted_dx = predicted_dx[predicted_dx['branch'] != '']
-			print(dxlist)
-			print(predicted_dx)
-			for d in dxlist:
-				df = predicted_dx[predicted_dx['predicted_dx']== d]
-				dx = d
-				if d in icd10_map:
-					dx = dx + ': '+ icd10_map[d]
-				for index,row in df.iterrows():
-					dxt = dxt + get_branch(dx,row['branch'])
-				if len(df)==0:
-					dxn = dxn + get_branch(dx,'')
-			dfxo = predicted_dx[~predicted_dx['predicted_dx'].isin(dxlist)]
-			for index,row in dfxo.iterrows():
-				dx = row['predicted_dx']
-				if dx in icd10_map:
-					dx = dx + ': '+ icd10_map[dx]
-				dxo = dxo + get_branch(dx,row['branch'])
 
-			body = body.replace('%DXT', dxt)
-			body = body.replace('%DXN', dxn)
-			body = body.replace('%DXO', dxo)
-			if not os.path.exists('../../secret/data/result/'):
-				os.makedirs('../../secret/data/result/')
-			write('../../secret/data/result/'+str(txn)+'.html',body)
+		print(txn)
+		body = read('html/body.html')
+		body = body.replace('%TXN', str(txn))
+		items = ''
+		branch = ''
+		dxlist = []
+		predicted_dx = pd.DataFrame(columns=['predicted_dx','prop','branch'])
+		for filename in files:
+			if filename != 'txn_testset.csv':
+				df = pd.read_csv('../../secret/data/testset_clean/'+filename, index_col=0)
+				df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+				df = df[df['TXN']==txn]
+				dxlist = dxlist + df['icd10'].values.tolist()
+				df = df.drop(columns=['icd10'])
+				df = df.drop_duplicates()
+				print(df)
+				if len(df) > 0:
+					for index,row in df.iterrows():
+						print(row)
+						if os.path.exists('../../secret/data/model/'+filename.replace('.csv','')):
+							for feature in os.listdir('../../secret/data/model/'+filename.replace('.csv','')):
+								model = pickle.load(open('../../secret/data/model/'+filename.replace('.csv','')+'/'+feature, 'rb'))
+								pre = model.predict(row[1:len(row)].tolist())
+								if not pre[0].startswith('not'):
+									print(pre[0])
+									prop = int((model.predict_proba(row[1:len(row)].tolist()))[0][0]*100)
+									#print(model.predict_proba(row[1:len(row)-1].tolist()))
+									predicted_dx = predicted_dx.append(pd.DataFrame([[pre[0],
+																									prop,
+																									get_predict_text(	txn,
+																															filename,
+																															prop,
+																															index,row,drug_map,lab_map)
+																									]], 
+																									columns=['predicted_dx','prop','branch']))
+									#break
 
-'''
-						dx = row['icd10']
-						if row['icd10'] in icd10_map:
-							dx = row['icd10'] + ': '+ icd10_map[row['icd10']]
-						if not row['icd10'] in dxlist:
-							branch = branch + get_branch(dx)
-							dxlist.append(row['icd10'])
-				body = body.replace('%DX', branch)
-				write('../../secret/data/result/'+str(txn)+'.html',body)
+		dxt = ''
+		dxn = ''
+		dxo = ''
+		dxlist = list(set(dxlist))
+		dxlist.sort()
+		predicted_dx = predicted_dx.drop_duplicates()
+		predicted_dx = predicted_dx[predicted_dx['branch'] != '']
+		print(dxlist)
+		print(predicted_dx)
+		for d in dxlist:
+			df = predicted_dx[predicted_dx['predicted_dx']== d]
+			dx = d
+			if d in icd10_map:
+				dx = dx + ': '+ icd10_map[d]
+			for index,row in df.iterrows():
+				dxt = dxt + get_branch(dx,row['branch'])
+			if len(df)==0:
+				dxn = dxn + get_branch(dx,'')
+		dfxo = predicted_dx[~predicted_dx['predicted_dx'].isin(dxlist)]
+		for index,row in dfxo.iterrows():
+			dx = row['predicted_dx']
+			if dx in icd10_map:
+				dx = dx + ': '+ icd10_map[dx]
+			dxo = dxo + get_branch(dx,row['branch'])
 
-'''
+		body = body.replace('%DXT', dxt)
+		body = body.replace('%DXN', dxn)
+		body = body.replace('%DXO', dxo)
+		if not os.path.exists('../../secret/data/result/'):
+			os.makedirs('../../secret/data/result/')
+		write('../../secret/data/result/'+str(txn)+'.html',body)
+
+
 
 
 
