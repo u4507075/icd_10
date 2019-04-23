@@ -48,7 +48,7 @@ import config
 
 feature = 'drug'
 
-#getdata(config)
+getdata(config)
 #getidata(config)
 
 #get_total_feature(feature)
