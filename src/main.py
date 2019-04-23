@@ -46,15 +46,15 @@ sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
 
 import config
 
-feature = 'drug'
-
-getdata(config)
+#getdata(config)
 #getidata(config)
-
-#get_total_feature(feature)
+#get_total_feature('dru')
+#get_total_feature('idru')
 ##onehot(feature)
-#get_encode_feature('drug')
-#encode_feature('drug')
+#get_encode_feature('dru')
+#get_encode_feature('idru')
+#encode_feature('dru')
+#encode_feature('idru')
 
 #get_lab_data(config)
 #split_lab_data()

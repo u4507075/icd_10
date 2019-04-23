@@ -4,26 +4,26 @@ from pathlib import Path
 import numpy as np
 
 
-def get_total_feature(feature):
-	p = '../../secret/data/'+feature+'/'+feature+'_clean.csv'
+def get_total_feature(filename):
+	p = '../../secret/data/drug/'+filename+'.csv'
 	value = []
-	for df in  pd.read_csv(p, chunksize=1000000):
-		df = df[df[feature].notnull()]
-		v = df[feature].unique().tolist()
+	for df in  pd.read_csv(p, chunksize=1000000, index_col=0):
+		df = df[df['drug'].notnull()]
+		v = df['drug'].unique().tolist()
 		value = value + v
 		value = list(set(value))       
 		value.sort()
 		print(len(value))
 	d = { i : value[i] for i in range(0, len(value) ) }
-	df = pd.DataFrame.from_dict({feature:value, 'code': list(range(len(value)))})
-	df.to_csv('../../secret/data/'+feature+'/'+feature+'_code.csv')
+	df = pd.DataFrame.from_dict({'drug':value, 'code': list(range(len(value)))})
+	df.to_csv('../../secret/data/drug/'+filename+'_code.csv')
 
 def onehot(feature):
 	p = '../../secret/data/'+feature+'/'+feature+'_clean.csv'
 	p2 = '../../secret/data/'+feature+'/'+feature+'_onehot.csv'
 	drug_list = pd.read_csv('../../secret/data/'+feature+'/'+feature+'_code.csv')[feature].values.tolist()
 	#drug_list = ['TXN']+drug_list+['DX1']
-	for df in  pd.read_csv(p, chunksize=100000):
+	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 		df = df[['TXN',feature,'icd10']]
 		df2 = pd.get_dummies(df[feature])
 		df2['TXN'] = df['TXN'].copy() 
