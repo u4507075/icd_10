@@ -1,5 +1,5 @@
 from preprocessing.getdata import getdata
-from preprocessing.getdata import remove_space_data
+from preprocessing.getdata import getidata
 from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
@@ -36,6 +36,8 @@ from validation.validation import predict_testset
 
 from validation.testset import get_validation_data
 
+from preprocessing.radio import preprocess_radio_data
+
 
 import sys
 import os
@@ -46,9 +48,9 @@ import config
 
 feature = 'drug'
 
-#getdata(config,'odx',feature)
-#getdata(config,'idx',feature)
-#remove_space_data(feature)
+#getdata(config)
+#getidata(config)
+
 #get_total_feature(feature)
 ##onehot(feature)
 #get_encode_feature('drug')
@@ -82,9 +84,9 @@ for f in files:
 '''
 
 #get_validation_data(config)
-predict_testset()
+#predict_testset()
 
-
+#preprocess_radio_data()
 
 
 
