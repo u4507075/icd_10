@@ -22,7 +22,8 @@ def decode(df):
 def getquery(t1,t2,code,n,f):
 	sql = 	'''
 				SELECT 
-					 dx.TXN,
+					 dx.TXN AS txn,
+					 lab.NAME AS lab_name,
 					 lab.LST AS name,
 					 lab.REP as value,
 					 dx.icd10
@@ -44,7 +45,10 @@ def getquery(t1,t2,code,n,f):
 def save_data(db_connection,t1,t2,code):
 	n = 1000000
 	offset = 0
-	
+	if not os.path.exists('../../secret/data/lab/raw/'):
+			os.makedirs('../../secret/data/lab/raw/')
+	if not os.path.exists('../../secret/data/lab/raw/'+t2):
+			os.makedirs('../../secret/data/lab/raw/'+t2)
 	while True:
 		df = pd.read_sql(getquery(t1,t2,code,n,offset), con=db_connection)
 		print(len(df))
@@ -52,7 +56,7 @@ def save_data(db_connection,t1,t2,code):
 			break
 		df = decode(df)
 		code_name = code.replace(' ','')
-		p = '../../secret/data/lab/raw/'+code_name+'.csv'
+		p = '../../secret/data/lab/raw/'+t2+'/'+code_name+'.csv'
 		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
@@ -69,31 +73,37 @@ def get_lab_data(config):
 											user=config.DATABASE_CONFIG['user'], 
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
-	q = 	'''
-			(SELECT CODE,COUNT(TXN) AS n FROM icd10.lab GROUP BY CODE)
-			UNION
-			(SELECT CODE,COUNT(TXN) AS n FROM icd10.ilab GROUP BY CODE)
-			;
-			'''	
-	df = pd.read_sql(q, con=db_connection)
-	df = df[df['n'] >= 500]
-	for index,row in df.iterrows():	
-		save_data(db_connection,'idx','ilab',row['CODE'])
-		save_data(db_connection,'odx','lab',row['CODE'])
+	tables = ['lab','ilab']
+	for table in tables:
+		q = 	'''
+				SELECT CODE,COUNT(TXN) AS n FROM icd10.%lab GROUP BY CODE;
+				'''	
+		q = q.replace('%lab',table)
+		df = pd.read_sql(q, con=db_connection)
+		df = df[df['n'] >= 500]
+		dx = 'odx'
+		if table == 'ilab':
+			dx = 'idx'
+		for index,row in df.iterrows():	
+			save_data(db_connection,dx,table,row['CODE'])
 
-def split_lab_data():
-	files = os.listdir('../../secret/data/lab/raw/')
+def split_lab_data(filename):
+	files = os.listdir('../../secret/data/lab/raw/'+filename)
 	for lab in files:
-		p = '../../secret/data/lab/raw/'+lab
-		p2 = '../../secret/data/lab/split/'+lab
-		for df in  pd.read_csv(p, chunksize=1000000):
+		if not os.path.exists('../../secret/data/lab/split/'):
+			os.makedirs('../../secret/data/lab/split/')
+		if not os.path.exists('../../secret/data/lab/split/'+filename):
+				os.makedirs('../../secret/data/lab/split/'+filename)
+		p = '../../secret/data/lab/raw/'+filename+'/'+lab
+		p2 = '../../secret/data/lab/split/'+filename+'/'+lab
+		for df in  pd.read_csv(p, chunksize=1000000, index_col=0):
 			d = df['value'].str.split(';',expand=True)
 			c = lab.replace('.csv','')
 			d = d.add_prefix(c+'_')
 			#for col in d.columns:
 			#	d[col] = pd.to_numeric(d[col],errors='coerce')
 			#d.fillna(0, inplace=True)
-			d.insert(0,'TXN',df['TXN'])
+			d.insert(0,'txn',df['txn'])
 			d['icd10'] = df['icd10'].copy()
 			file = Path(p2)
 			if file.is_file():
@@ -158,7 +168,7 @@ def save_file(df,p):
 			df.to_csv(f, header=False)
 	else:
 		df.to_csv(p)
-def clean_lab_data():
+def clean_lab_data(filename):
 
 	#B05, B06, B07, B08 one hot 1 feature
 	#B09, B13.1 one hot 2 feature
@@ -175,40 +185,50 @@ def clean_lab_data():
 				'L077','L1030','L105933','L106011','L2082','L027','L10961',
 				'L0221','L074','L581','L58','L202','L105932','L072',
 				'L1056221','L101763','L10981','B13','L84','L10573','L09011']
+
+	if not os.path.exists('../../secret/data/lab/clean/'):
+			os.makedirs('../../secret/data/lab/clean/')
+	if not os.path.exists('../../secret/data/lab/clean/'+filename):
+			os.makedirs('../../secret/data/lab/clean/'+filename)
+
 	for lab in files:
-		file = Path('../../secret/data/lab/clean/'+lab+'.csv')
+		file = Path('../../secret/data/lab/clean/'+filename+'/'+lab+'.csv')
 		if not file.is_file():
-			p = '../../secret/data/lab/split/'+lab+'.csv'
-			for df in  pd.read_csv(p, chunksize=100000):
+			p = '../../secret/data/lab/split/'+filename+'/'+lab+'.csv'
+			for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 				for col in df.columns:
-					if col != 'TXN' and col != 'icd10':
+					if col != 'txn' and col != 'icd10':
 						df[col] = df[col].apply(get_value)
 						df[col] = pd.to_numeric(df[col],errors='ignore')
 						if col.startswith('L1081'):
 							df[col] = df[col].apply(split_num_from_text)
 				#df = df.loc[:, (df != 0).any(axis=0)]
 				print('Save clean data: '+str(lab))
-				save_file(df,'../../secret/data/lab/clean/'+lab+'.csv')
+				save_file(df,'../../secret/data/lab/clean/'+filename+'/'+lab+'.csv')
 		
 
-def tonumeric_lab_data():
-	files = os.listdir('../../secret/data/lab/clean/')
+def tonumeric_lab_data(filename):
+	files = os.listdir('../../secret/data/lab/clean/'+filename)
+	if not os.path.exists('../../secret/data/lab/numeric/'):
+			os.makedirs('../../secret/data/lab/numeric/')
+	if not os.path.exists('../../secret/data/lab/numeric/'+filename):
+			os.makedirs('../../secret/data/lab/numeric/'+filename)
 	for lab in files:
-		p = '../../secret/data/lab/clean/'+lab
-		for df in  pd.read_csv(p, chunksize=1000000):
+		p = '../../secret/data/lab/clean/'+filename+'/'+lab
+		for df in  pd.read_csv(p, chunksize=1000000, index_col=0):
 			for c in df.columns:
-				if c != 'TXN' and c != 'icd10':
+				if c != 'txn' and c != 'icd10':
 					df[c] = df[c].apply(pd.to_numeric,errors='coerce').fillna(0)
 
-			save_file(df,'../../secret/data/lab/numeric/'+lab)
+			save_file(df,'../../secret/data/lab/numeric/'+filename+'/'+lab)
 			print('Saved '+lab)
 
-def get_encode_lab():
-	files = os.listdir('../../secret/data/lab/clean/')
+def get_encode_lab(filename):
+	files = os.listdir('../../secret/data/lab/clean/'+filename)
 	df_map = pd.DataFrame(columns=['lab','key','code'])
 	
 	for lab in files:
-		p = '../../secret/data/lab/clean/'+lab
+		p = '../../secret/data/lab/clean/'+filename+'/'+lab
 
 		for df in pd.read_csv(p, chunksize=1000000, low_memory=False):
 			rows = []
@@ -225,24 +245,30 @@ def get_encode_lab():
 
 	df_map['code'] = df_map.index+1
 	df_map = df_map[['lab','feature','key','code']]
-	save_file(df_map,'../../secret/data/lab/encoder/lab_encoder.csv')
+	if not os.path.exists('../../secret/data/lab/encoder/'):
+			os.makedirs('../../secret/data/lab/encoder/')
+	save_file(df_map,'../../secret/data/lab/encoder/lab_encoder_'+filename+'.csv')
 
-def encode_lab_data():
-	files = os.listdir('../../secret/data/lab/clean/')
-	encoder = pd.read_csv('../../secret/data/lab/encoder/lab_encoder.csv', index_col=0)
+def encode_lab_data(filename):
+	files = os.listdir('../../secret/data/lab/clean/'+filename)
+	encoder = pd.read_csv('../../secret/data/lab/encoder/lab_encoder_'+filename+'.csv', index_col=0)
 	f_list = encoder['feature'].values.tolist()
 	map = dict(zip(encoder['key'],encoder['code']))
 	func = lambda x: x if x not in map else map[x]
 	for lab in files:
-		p = '../../secret/data/lab/clean/'+lab
-		for df in pd.read_csv(p, chunksize=1000000, low_memory=False):
+		p = '../../secret/data/lab/clean/'+filename+'/'+lab
+		for df in pd.read_csv(p, chunksize=1000000, low_memory=False, index_col=0):
 			for feature in df:
 				if feature in f_list:
 					df[feature] = df[feature].apply(func)
 					df[feature] = df[feature].apply(pd.to_numeric,errors='coerce').fillna(0)
 			print('Append data')
 			print(lab)
-			save_file(df,'../../secret/data/lab/encode/'+lab)
+			if not os.path.exists('../../secret/data/lab/encode/'):
+				os.makedirs('../../secret/data/lab/encode/')
+			if not os.path.exists('../../secret/data/lab/encode/'+filename):
+					os.makedirs('../../secret/data/lab/encode/'+filename)
+			save_file(df,'../../secret/data/lab/encode/'+filename+'/'+lab)
 
 
 

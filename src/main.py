@@ -46,6 +46,7 @@ sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
 
 import config
 
+### Drug ###
 #getdata(config)
 #getidata(config)
 #get_total_feature('dru')
@@ -55,12 +56,16 @@ import config
 #encode_feature('dru')
 #encode_feature('idru')
 
+### Lab ###
 #get_lab_data(config)
-#split_lab_data()
-#clean_lab_data()
-##tonumeric_lab_data()
-#get_encode_lab()
-#encode_lab_data()
+#split_lab_data('lab')
+#split_lab_data('ilab')
+#clean_lab_data('lab')
+#clean_lab_data('ilab')
+#get_encode_lab('lab')
+#get_encode_lab('ilab')
+#encode_lab_data('lab')
+#encode_lab_data('ilab')
 
 #save_admit_data(config)
 #clean_admit_data()
