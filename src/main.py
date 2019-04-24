@@ -63,11 +63,11 @@ import config
 ##clean_lab_data('lab')
 ##clean_lab_data('ilab')
 ##get_encode_lab('lab')
-get_encode_lab('ilab')
+##get_encode_lab('ilab')
 ##encode_lab_data('lab')
 #encode_lab_data('ilab')
 
-#save_admit_data(config)
+save_admit_data(config)
 #clean_admit_data()
 #onehot_admit_data()
 
