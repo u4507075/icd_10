@@ -195,16 +195,18 @@ def clean_lab_data(filename):
 		file = Path('../../secret/data/lab/clean/'+filename+'/'+lab+'.csv')
 		if not file.is_file():
 			p = '../../secret/data/lab/split/'+filename+'/'+lab+'.csv'
-			for df in  pd.read_csv(p, chunksize=100000, index_col=0):
-				for col in df.columns:
-					if col != 'txn' and col != 'icd10':
-						df[col] = df[col].apply(get_value)
-						df[col] = pd.to_numeric(df[col],errors='ignore')
-						if col.startswith('L1081'):
-							df[col] = df[col].apply(split_num_from_text)
-				#df = df.loc[:, (df != 0).any(axis=0)]
-				print('Save clean data: '+str(lab))
-				save_file(df,'../../secret/data/lab/clean/'+filename+'/'+lab+'.csv')
+			f = Path(p)
+			if f.is_file():
+				for df in  pd.read_csv(p, chunksize=100000, index_col=0):
+					for col in df.columns:
+						if col != 'txn' and col != 'icd10':
+							df[col] = df[col].apply(get_value)
+							df[col] = pd.to_numeric(df[col],errors='ignore')
+							if col.startswith('L1081'):
+								df[col] = df[col].apply(split_num_from_text)
+					#df = df.loc[:, (df != 0).any(axis=0)]
+					print('Save clean data: '+str(lab))
+					save_file(df,'../../secret/data/lab/clean/'+filename+'/'+lab+'.csv')
 		
 
 def tonumeric_lab_data(filename):

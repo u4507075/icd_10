@@ -5,7 +5,7 @@ import numpy as np
 
 
 def get_encode_feature(filename):
-	p = '../../secret/data/drug/'+filename+'_clean.csv'
+	p = '../../secret/data/drug/'+filename+'.csv'
 	value = []
 	for df in  pd.read_csv(p, chunksize=1000000, index_col=0):
 		v = df[df['drug'].str.contains('[a-zA-Z]',regex=True, na=False)]['drug'].values.tolist()
@@ -19,7 +19,7 @@ def get_encode_feature(filename):
 	df.to_csv('../../secret/data/drug/'+filename+'_encode.csv')
 
 def encode_feature(filename):
-	p = '../../secret/data/drug/'+filename+'_clean.csv'
+	p = '../../secret/data/drug/'+filename+'.csv'
 	p2 = '../../secret/data/drug/'+filename+'_numeric.csv'
 	encoder = pd.read_csv('../../secret/data/drug/'+filename+'_encode.csv')
 	feature_encoder = dict(zip(encoder['drug'],encoder['code']))
