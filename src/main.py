@@ -65,13 +65,13 @@ import config
 ##get_encode_lab('lab')
 ##get_encode_lab('ilab')
 ##encode_lab_data('lab')
-#encode_lab_data('ilab')
+#!encode_lab_data('ilab')
 
-save_admit_data(config)
-#clean_admit_data()
-#onehot_admit_data()
+##save_admit_data(config)
+##clean_admit_data()
+##onehot_admit_data()
 
-#save_registration_data(config)
+save_registration_data(config)
 #clean_registration_data()
 #onehot_registration_data()
 

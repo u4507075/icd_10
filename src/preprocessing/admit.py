@@ -60,7 +60,7 @@ def save_admit_data(config):
 											user=config.DATABASE_CONFIG['user'], 
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
-	save_data(db_connection,'odx')
+
 	save_data(db_connection,'idx')
 
 def clean_sex(x):

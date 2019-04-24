@@ -61,7 +61,7 @@ def save_registration_data(config):
 											user=config.DATABASE_CONFIG['user'], 
 											password=config.DATABASE_CONFIG['password'], 
 											port=config.DATABASE_CONFIG['port'])
-	dx = ['odx','idx']
+	dx = ['odx']
 	reg = ['reg','reg_2005','reg_2006','reg_2007','reg_2008']
 	for t1 in dx:
 		for t2 in reg:
