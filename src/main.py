@@ -46,7 +46,7 @@ from preprocessing.text import get_reg_data
 from preprocessing.text import get_drug_data
 from preprocessing.text import get_lab_data
 
-
+from preprocessing.vec import word_to_vec
 
 import sys
 import os
@@ -60,8 +60,9 @@ import config
 #get_adm_data(config)
 #get_reg_data(config)
 #get_drug_data(config)
-get_lab_data(config)
+#get_lab_data(config)
 
+word_to_vec()
 
 
 
