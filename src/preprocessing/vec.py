@@ -15,10 +15,10 @@ def save_file(df,name):
 		os.makedirs(p)
 	file = Path(p+name+'.csv')
 	if file.is_file():
-		with open(p, 'a') as f:
+		with open(p+name+'.csv', 'a') as f:
 			df.to_csv(f, header=False)
 	else:
-		df.to_csv(p)
+		df.to_csv(p+name+'.csv')
 
 def to_vec(x):
 	value = sum(nlp(str(x)).vector)
@@ -28,10 +28,14 @@ def to_vec(x):
 		return value
 
 def word_to_vec(name):
-	for df in  pd.read_csv(path+name+'.csv', chunksize=10000, index_col=0):
+	icd10 =  pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0)
+	icd10_map = dict(zip(icd10['code'],icd10.index))
+	for df in  pd.read_csv(path+name+'.csv', chunksize=1000, index_col=0):
 		for c in df.columns:
 			if c != 'txn' and c != 'icd10':
 				df[c] = df[c].apply(to_vec)
+		df['icd10'] = df['icd10'].map(icd10_map)
+		#print(df)
 		save_file(df,name)
 		print(name)
 
