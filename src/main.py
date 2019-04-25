@@ -39,12 +39,43 @@ from validation.testset import get_validation_data
 from preprocessing.radio import preprocess_radio_data
 
 
+
+from preprocessing.text import get_icd10_data
+from preprocessing.text import get_adm_data
+from preprocessing.text import get_reg_data
+from preprocessing.text import get_drug_data
+from preprocessing.text import get_lab_data
+
+
+
 import sys
 import os
 from pathlib import Path
 sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
 
 import config
+
+
+get_icd10_data(config)
+get_adm_data(config)
+get_reg_data(config)
+get_drug_data(config)
+get_lab_data(config)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Drug ###
 ##getdata(config)
