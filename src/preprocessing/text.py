@@ -2,6 +2,8 @@ import mysql.connector as sql
 import pandas as pd
 from pathlib import Path
 import numpy as np
+import os
+import re
 
 path = '../../secret/data/raw/'
 
@@ -201,6 +203,16 @@ def clean_rh(x):
 		return 'n'
 	else:
 		return 0
+def regex_filter(val):
+	regex = re.compile('[A-Z]')
+	if val:
+		mo = re.search(regex,val)
+		if mo:
+			return True
+		else:
+			return False
+	else:
+		return False
 
 def getquery(sql,n,f):
 
@@ -249,20 +261,32 @@ def getdata(config, sql, filename):
 			df.drop(columns=['bp','icd10'], inplace=True)
 			df['sbp'] = d['sbp']
 			df['dbp'] = d['dbp']
+			df['icd10'] = icd10
 
 		if 'drug' in df:
 			df['drug'] = df['drug'].apply(remove_space)
 
 		if 'name' in df and 'value' in df:
-			for index,row in df.iterrows():
-				d = pd.concat([Series(row['txn']), 
-									Series(row['lab_name']), 
-									row['name'].split(';')) for _, row in a.iterrows(),
-									row['value'].split(';')) for _, row in a.iterrows()
-								  ]).reset_index()
-				print(d)
+			d1 = df['name'].str.split(';',expand=True)
+			d1 = d1.merge(df, right_index = True, left_index = True)
+			d1 = d1.melt(id_vars = ['txn','lab_name','value','icd10'], value_name = 'name')
+			d1 = d1.drop('value', axis=1)
+			d1 = d1[d1['variable'] != 'name']
+			d2 = df['value'].str.split(';',expand=True)
+			d2 = d2.merge(df, right_index = True, left_index = True)
+			d2 = d2.melt(id_vars = ['txn','lab_name','name','icd10'], value_name = 'value')
+			d2 = d2.drop('name', axis=1)
+			d2 = d2[d2['variable'] != 'name']
+			df = pd.merge(d1,d2,on=['txn','lab_name','icd10','variable'])
+			df = df[['txn','lab_name','name','value','icd10']]
 
-		file = Path(path+filename+'.csv')
+		if 'icd10' in df:
+			df = df[df['icd10'].apply(regex_filter)]
+
+		df = df.drop_duplicates()
+
+		p = path+filename+'.csv'
+		file = Path(p)
 		if file.is_file():
 			with open(p, 'a') as f:
 				df.to_csv(f, header=False)

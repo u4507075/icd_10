@@ -56,10 +56,10 @@ sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
 import config
 
 
-get_icd10_data(config)
-get_adm_data(config)
-get_reg_data(config)
-get_drug_data(config)
+#get_icd10_data(config)
+#get_adm_data(config)
+#get_reg_data(config)
+#get_drug_data(config)
 get_lab_data(config)
 
 
