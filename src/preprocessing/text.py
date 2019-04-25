@@ -309,11 +309,11 @@ def get_reg_data(config):
 	getdata(config, reg_2008_sql, 'reg')
 
 def get_drug_data(config):
-	getdata(config, dru_sql, 'dru')
+	#getdata(config, dru_sql, 'dru')
 	getdata(config, idru_sql, 'idru')
 
 def get_lab_data(config):
-	getdata(config, lab_sql, 'lab')
+	#getdata(config, lab_sql, 'lab')
 	getdata(config, ilab_sql, 'ilab')
 	getdata(config, lis_sql, 'lis')
 	getdata(config, ilis_sql, 'ilis')
