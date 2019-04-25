@@ -15,10 +15,10 @@ def save_file(df,name):
 		os.makedirs(p)
 	file = Path(p+name+'.csv')
 	if file.is_file():
-		with open(p, 'a') as f:
+		with open(p+name+'.csv', 'a') as f:
 			df.to_csv(f, header=False)
 	else:
-		df.to_csv(p)
+		df.to_csv(p+name+'.csv')
 
 def to_vec(x):
 	value = sum(nlp(str(x)).vector)
