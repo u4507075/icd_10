@@ -71,9 +71,9 @@ import config
 ##clean_admit_data()
 ##onehot_admit_data()
 
-save_registration_data(config)
-#clean_registration_data()
-#onehot_registration_data()
+##save_registration_data(config)
+##clean_registration_data()
+##onehot_registration_data()
 
 #get_txn_test_data(config)
 #split_set()
