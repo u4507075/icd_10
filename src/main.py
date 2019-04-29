@@ -60,7 +60,7 @@ import config
 #get_adm_data(config)
 #get_reg_data(config)
 #get_drug_data(config)
-##get_lab_data(config)
+get_lab_data(config)
 
 word_to_vec('adm')
 #word_to_vec('reg')
