@@ -276,10 +276,11 @@ def getdata(config, sql, filename):
 	offset = 0
 	while True:
 		df = pd.read_sql(getquery(sql,n,offset), con=db_connection)
+
 		if len(df) == 0:
 			break
 		df = decode(df)
-		
+
 		if 'sex' in df:
 			df['sex'] = df['sex'].apply(clean_sex)	
 		if 'age' in df:	
@@ -319,7 +320,7 @@ def getdata(config, sql, filename):
 			df = df[['txn','lab_name','name','value','icd10']]
 
 		if 'report' in df:
-			df = df['report'].apply(remove_junk)
+			df['report'] = df['report'].apply(remove_junk)
 
 		if 'icd10' in df:
 			df = df[df['icd10'].apply(regex_filter)]
