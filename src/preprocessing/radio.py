@@ -5,6 +5,7 @@ import re
 import os
 import spacy
 
+
 def getdata(path):
 
 	return pd.read_csv(path, index_col=0)

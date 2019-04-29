@@ -156,6 +156,34 @@ ilis_sql = '''
 				LIMIT %n OFFSET %f;
 			'''
 
+rad_sql = '''
+				SELECT 
+					 rad.TXN AS txn,
+					 LOWER(rad.NAME) AS location,
+					 LOWER(rad.LST) AS position,
+					 lis.REP as report,
+					 dx.icd10
+				 
+				FROM icd10.odx dx
+				INNER JOIN icd10.rad rad
+				ON dx.TXN = rad.TXN
+				WHERE rad.REP IS NOT NULL AND rad.REP != "" AND dx.icd10 IS NOT NULL
+				LIMIT %n OFFSET %f;
+			'''
+irad_sql = '''
+				SELECT 
+					 rad.TXN AS txn,
+					 LOWER(rad.NAME) AS location,
+					 LOWER(rad.LST) AS position,
+					 lis.REP as report,
+					 dx.icd10
+				 
+				FROM icd10.idx dx
+				INNER JOIN icd10.irad rad
+				ON dx.TXN = rad.TXN
+				WHERE rad.REP IS NOT NULL AND rad.REP != "" AND dx.icd10 IS NOT NULL
+				LIMIT %n OFFSET %f;
+			'''
 
 def convert(x):
     try:
@@ -315,4 +343,8 @@ def get_drug_data(config):
 def get_lab_data(config):
 	getdata(config, lab_sql, 'lab')
 	getdata(config, ilab_sql, 'ilab')
+
+def get_rad_data(config):
+	getdata(config, rad_sql, 'rad')
+	getdata(config, rad_sql, 'irad')
 
