@@ -44,6 +44,6 @@ def word_to_vec(name):
 		df['icd10'] = df['icd10'].map(icd10_map)
 		n = n + chunk
 		print("Converted "+name+' '+str(n))
-		#save_file(df,name)
+		save_file(df,name)
 		#print(name)
 
