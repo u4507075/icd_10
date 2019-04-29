@@ -197,6 +197,16 @@ def remove_space(x):
 	except AttributeError:
 		return x
 
+def remove_junk(x):
+	x = x.lower()
+	x = re.sub('{.*}', '', x)
+	x = x.replace('\\', ' \\')
+	x = re.sub(r"\\.*? ",'',x)
+	x = x.replace('\r\n', '')
+	x = re.sub(r"[^a-z ]",'',x)
+	x = re.sub(r" +",' ',x)
+	return x
+
 def decode(df):
 	for c in df.columns:
 		if df[c].dtype == 'object':
@@ -307,6 +317,9 @@ def getdata(config, sql, filename):
 			d2 = d2[d2['variable'] != 'name']
 			df = pd.merge(d1,d2,on=['txn','lab_name','icd10','variable'])
 			df = df[['txn','lab_name','name','value','icd10']]
+
+		if 'report' in df:
+			df = df['report'].apply(remove_junk)
 
 		if 'icd10' in df:
 			df = df[df['icd10'].apply(regex_filter)]
