@@ -151,7 +151,7 @@ ilis_sql = '''
 				 
 				FROM icd10.idx dx
 				INNER JOIN icd10.lis lis
-				ON dx.TXN = lab.TXN
+				ON dx.TXN = lis.TXN
 				WHERE lis.REP IS NOT NULL AND lis.REP != "" AND dx.icd10 IS NOT NULL AND lis.USER = "Department"
 				LIMIT %n OFFSET %f;
 			'''
@@ -314,8 +314,8 @@ def get_drug_data(config):
 
 def get_lab_data(config):
 	#getdata(config, lab_sql, 'lab')
-	getdata(config, ilab_sql, 'ilab')
-	getdata(config, lis_sql, 'lis')
-	getdata(config, ilis_sql, 'ilis')
+	##getdata(config, ilab_sql, 'ilab')
+	#getdata(config, lis_sql, 'lis')
+	#getdata(config, ilis_sql, 'ilis')
 
 
