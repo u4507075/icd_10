@@ -161,7 +161,7 @@ rad_sql = '''
 					 rad.TXN AS txn,
 					 LOWER(rad.NAME) AS location,
 					 LOWER(rad.LST) AS position,
-					 lis.REP as report,
+					 rad.REP as report,
 					 dx.icd10
 				 
 				FROM icd10.odx dx
@@ -175,7 +175,7 @@ irad_sql = '''
 					 rad.TXN AS txn,
 					 LOWER(rad.NAME) AS location,
 					 LOWER(rad.LST) AS position,
-					 lis.REP as report,
+					 rad.REP as report,
 					 dx.icd10
 				 
 				FROM icd10.idx dx
