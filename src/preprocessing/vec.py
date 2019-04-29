@@ -6,7 +6,7 @@ import os
 import re
 import spacy
 
-nlp = spacy.load('en_core_web_md')
+nlp = spacy.load('en_core_web_md', disable=["tagger","parser", "ner"])
 path = '../../secret/data/raw/'
 
 def save_file(df,name):
@@ -21,21 +21,29 @@ def save_file(df,name):
 		df.to_csv(p+name+'.csv')
 
 def to_vec(x):
-	value = sum(nlp(str(x)).vector)
-	if value == 0:
-		return sum(sum([nlp(v).vector for v in str(x)]))
+	if x == 0 or x == '':
+		return 0
 	else:
-		return value
+		value = sum(nlp(str(x)).vector)
+		if value == 0:
+			return sum(sum([nlp(v).vector for v in str(x)]))
+		else:
+			return value
 
 def word_to_vec(name):
+	print("Read icd10 mapping")
 	icd10 =  pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0)
 	icd10_map = dict(zip(icd10['code'],icd10.index))
-	for df in  pd.read_csv(path+name+'.csv', chunksize=1000, index_col=0):
+	print("Read raw data")
+	n = 0
+	chunk = 10000
+	for df in  pd.read_csv(path+name+'.csv', chunksize=10000, index_col=0, low_memory=False):
 		for c in df.columns:
 			if c != 'txn' and c != 'icd10':
 				df[c] = df[c].apply(to_vec)
 		df['icd10'] = df['icd10'].map(icd10_map)
-		print(df)
-		save_file(df,name)
-		print(name)
+		n = n + chunk
+		print("Converted "+name+' '+str(n))
+		#save_file(df,name)
+		#print(name)
 
