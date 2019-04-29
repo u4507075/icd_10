@@ -36,7 +36,6 @@ from validation.validation import predict_testset
 
 from validation.testset import get_validation_data
 
-from preprocessing.radio import preprocess_radio_data
 
 
 
@@ -48,6 +47,7 @@ from preprocessing.text import get_lab_data
 from preprocessing.text import get_rad_data
 
 from preprocessing.vec import word_to_vec
+from preprocessing.vec import radio_to_vec
 
 import sys
 import os
@@ -62,7 +62,7 @@ import config
 #get_reg_data(config)
 #get_drug_data(config)
 ##get_lab_data(config)
-get_rad_data(config)
+#get_rad_data(config)
 
 #word_to_vec('adm')
 #word_to_vec('reg')
@@ -72,7 +72,7 @@ get_rad_data(config)
 #word_to_vec('ilab')
 #word_to_vec('lis')
 #word_to_vec('ilis')
-
+radio_to_vec('rad')
 
 
 
