@@ -35,7 +35,7 @@ def word_to_vec(name):
 			if c != 'txn' and c != 'icd10':
 				df[c] = df[c].apply(to_vec)
 		df['icd10'] = df['icd10'].map(icd10_map)
-		#print(df)
+		print(df)
 		save_file(df,name)
 		print(name)
 

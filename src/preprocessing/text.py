@@ -234,8 +234,8 @@ def get_connection(config):
 def getdata(config, sql, filename):
 	checkpath()
 	db_connection = get_connection(config)
-	n = 1000000
-	offset = 0
+	n = 100000
+	offset = 12380000
 	while True:
 		df = pd.read_sql(getquery(sql,n,offset), con=db_connection)
 		if len(df) == 0:
