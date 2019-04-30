@@ -61,7 +61,7 @@ def radio_to_vec(name):
 	icd10_map = dict(zip(icd10['code'],icd10.index))
 	print("Read raw data")
 	n = 0
-	chunk = 5
+	chunk = 10000
 	for df in  pd.read_csv(path+name+'.csv', chunksize=chunk, index_col=0, low_memory=False):
 
 		d1 = df['report'].str.split(' ',expand=True)
@@ -82,8 +82,9 @@ def radio_to_vec(name):
 		df.drop(columns=['report'], inplace=True)
 		df = df[['txn','location','position','report_gram_1','report_gram_2','report_gram_3','report_gram_4','report_gram_5','icd10']]
 		df = df.fillna(0)
-		print(df)
-		break
+		n = n + chunk
+		print("Converted "+name+' '+str(n))
+		save_file(df,name)
 
 
 
