@@ -309,11 +309,13 @@ def getdata(config, sql, filename):
 			d1 = df['name'].str.split(';',expand=True)
 			d1 = d1.merge(df, right_index = True, left_index = True)
 			d1 = d1.melt(id_vars = ['txn','lab_name','value','icd10'], value_name = 'name')
+			d1 = d1.sort_values(['txn', 'icd10', 'variable'], ascending=True)
 			d1 = d1.drop('value', axis=1)
 			d1 = d1[d1['variable'] != 'name']
 			d2 = df['value'].str.split(';',expand=True)
 			d2 = d2.merge(df, right_index = True, left_index = True)
 			d2 = d2.melt(id_vars = ['txn','lab_name','name','icd10'], value_name = 'value')
+			d2 = d2.sort_values(['txn', 'icd10', 'variable'], ascending=True)
 			d2 = d2.drop('name', axis=1)
 			d2 = d2[d2['variable'] != 'name']
 			df = pd.merge(d1,d2,on=['txn','lab_name','icd10','variable'])
