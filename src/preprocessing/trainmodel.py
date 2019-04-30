@@ -21,6 +21,14 @@ from sklearn.metrics import precision_recall_fscore_support
 import os
 import re
 import pickle
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import MinMaxScaler
+sc = MinMaxScaler(feature_range = (0, 1))
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers import Dropout
 
 def get_dataset(trainingset, validation_size):
 	for name in trainingset.columns:
@@ -195,13 +203,50 @@ def save_history():
 			if filename == 'L1901' and target == 'M8445':
 				stop = True
 
+
+
+def train_model2():
+	c = XGBClassifier(max_depth=100)
+	chunk = 10000
+	for df in  pd.read_csv('../../secret/data/vec/adm.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		#X_train = sc.fit_transform(X_train)
+		X_train = X_train.reshape(len(X_train),len(df.columns)-1,1)
+		X_validation = X_validation.reshape(len(X_validation),len(df.columns)-1,1)
+
+		regressor = Sequential()
+
+		regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 1)))
+		regressor.add(Dropout(0.2))
+
+		regressor.add(LSTM(units = 50, return_sequences = True))
+		regressor.add(Dropout(0.2))
+
+		regressor.add(LSTM(units = 50, return_sequences = True))
+		regressor.add(Dropout(0.2))
+
+		regressor.add(LSTM(units = 50))
+		regressor.add(Dropout(0.2))
+
+		regressor.add(Dense(units = 1))
+
+		regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
+
+		regressor.fit(X_train, Y_train, epochs = 100, batch_size = 32)
+
+		pre = regressor.predict(X_validation)
+		print(pre)
+		#pre = sc.inverse_transform(pre)
 		
+		plt.plot(Y_validation, color = 'black', label = 'Actual icd10')
+		plt.plot(pre, color = 'green', label = 'Predicted icd10')
+		plt.title('Actual vs Predicted icd10')
+		plt.xlabel('feature')
+		plt.ylabel('value')
+		plt.legend()
+		plt.show()
 
-
-
-
-
-
-
+		break
 
 
