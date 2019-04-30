@@ -64,25 +64,73 @@ Our objectives are to develop machine learning model to mapp missing or verify I
 Clinical records of outer-patient visits from 2006 - 2017 (2006 - 2016 for a training set, and 2017 for a test set) are retrospectively retrieved from the Maharaj Nakhon Chiang Mai electronic health records. Approximately one million records are expected to retrieve per year. Only encoded data (number, string) are included in the experiment (excluded images and scanned document).
 
 ### Dataset
-Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were deidentified and preprocessed. All data that could be potentially able to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We used **TXN** (a unique number representing a patient visit) to be a joining key. The dataset was divided into five groups.
+Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were deidentified and preprocessed. All data that could be potentially able to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We use **TXN** (a unique number representing a patient visit) to be a joining key between five groups of datasets (total size 82G).
 
-1. Registration data
-2. Admission data
-3. Laboratory data
-4. Radiological report data
-5. Drug prescription data
+#### Raw dataset
+1. Registration data (reg.csv (176M))
+2. Admission data (adm.csv (147M))
+3. Laboratory data (lab.csv (3.1G), ilab.csv(74G))
+4. Radiological report data (rad.csv (107M), irad (107M))
+5. Drug prescription data (dru.csv (189M), idru (3.9G))
+
+TXN is a joining key for reg.csv, lab.csv, rad.csv, and dru.csv.
+TXN is a joining key for adm.csv, ilab.csv, irad.csv, and idru.csv.
+**DO NOT** use TXN to join across groups.
+The file "icd10.csv" (9.5M) is a for mapping ICD-10 code (using in the datasets) to ICD-10 description.
+
+
+
 
 #### Registration data
 
-The registration data is the demographic information of patients who visited (mostly outer patient department (OPD) cases) at Maharaj Nakhon Chiang Mai hospital. See the full detail of registration metadata [here](https://github.com/u4507075/icd_10/blob/master/REGISTRATION_METADATA.md).
+The registration data is the demographic information of patients who visited (mostly outer patient department (OPD) cases) at Maharaj Nakhon Chiang Mai hospital. 
+
+| Features | Types | Description |
+| :--- | :--- | :--- |
+| txn | numeric | key identification for a patient visit |
+| sex | categorical | m = male, f = female |
+| age | numeric | age (year) |
+| wt | numeric | weight (kg) |
+| pulse | numeric | pulse rate (times/min) |
+| resp | numeric | respiratory rate (times/min) |
+| temp | numeric | body temperature (celcius) |
+| sbp | numeric | systolic blood pressure (mmHg) |
+| dbp | numeric | diastolic blood pressure (mmHg) |
+| blood | categorical | a = blood group A b = blood group B, o = blood group O, ab = blood group AB 
+| rh | categorical | n = blood group Rh negative, p = blood group Rh positive |
+| room | string | Room codes that patients visited |
+| icd10 | string | ICD-10 code (diagnosis) |
 
 #### Admission data
 
-The admission data is the demographic information of patients who admitted to any internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. See the full detail of admission metadata [here](https://github.com/u4507075/icd_10/blob/master/ADMISSION_METADATA.md).
+The admission data is the demographic information of patients who admitted to any internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. 
+
+| Features | Types | Description |
+| :--- | :--- | :--- |
+| txn | numeric | key identification for a patient visit |
+| sex | categorical | m = male, f = female |
+| age | numeric | age (year) |
+| wt | numeric | weight (kg) |
+| pulse | numeric | pulse rate (times/min) |
+| resp | numeric | respiratory rate (times/min) |
+| temp | numeric | body temperature (celcius) |
+| sbp | numeric | systolic blood pressure (mmHg) |
+| dbp | numeric | diastolic blood pressure (mmHg) |
+| blood | categorical | a = blood group A b = blood group B, o = blood group O, ab = blood group AB 
+| rh | categorical | n = blood group Rh negative, p = blood group Rh positive |
+| room | string | Room codes that patients admitted |
+| room_dc | string | Room codes that patients discharged |
+| icd10 | string | ICD-10 code (diagnosis) |
 
 #### Laboratory data
 
-See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/LAB_METADATA.md).
+| Features | Types | Description |
+| :--- | :--- | :--- |
+| txn | numeric | key identification for a patient visit |
+| lab_name | string | Lab code |
+| name | string | Lab items within the lab code |
+| value | object | value of lab items (can be numeric (only value) or string (value with unit)) |
+| icd10 | string | ICD-10 code (diagnosis) |
 
 #### Radiological report data
 
@@ -90,7 +138,14 @@ The radiological report data is the reports that radiologists took notes after t
 
 #### Drug prescription data
 
-The drug prescription data is the information of type of drugs which were prescribed to the patients. See the full detail of laboratory metadata [here](https://github.com/u4507075/icd_10/blob/master/DRUG_METADATA.md).
+The drug prescription data is the information of type of drugs which were prescribed to the patients. 
+
+| Features | Types | Description |
+| :--- | :--- | :--- |
+| TXN | numeric | key identification for a patient visit |
+| drug | string | Drug code |
+| drug_name | string | Drug name with or without description |
+| icd10 | string | ICD-10 code (diagnosis) |
 
 ### Characteristics of dataset
 
@@ -144,16 +199,6 @@ Apply the same process to registration data.
 
 ## Split training and test set and evaluation metrics
 Data from January 2005 - April 2017 are used to train machine learning models and data after April 2017 are used as a test set to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
-
-Dataset (training and test set)
-
-| Dataset | csv files |
-| :--- | :--- |
-| registration data | registration_onehot.csv |
-| admission data | admit_onehot.csv |
-| laboratory data | B06.csv,B13.1.csv,B13.csv,GMCL001.csv,L01.csv,L022.csv,L024.csv,L025.csv,L0261.csv,L027.csv,L029.csv,L02.csv,L0371.csv,L037.csv,L0414.csv,L0421.csv,L071.csv,L073.csv,L078.csv,L07.csv,L083.csv,L090.csv,L091.csv,L093.csv,L1001.csv,L10041.csv,L10044.csv,L1005.csv,L101763.csv,L1022.csv,L1030.csv,L1031.csv,L1032.csv,L1040.csv,L10501.csv,L10502.csv,L1052.csv,L10561.csv,L105621.csv,L1056221.csv,L10573.csv,L10591.csv,L105932.csv,L105933.csv,L106011.csv,L107011.csv,L107018.csv,L1081.csv,L1084.csv,L10962.csv,L10981.csv,L1901.csv,L1902.csv,L1903.csv,L1904.csv,L1905.csv,L1906.csv,L1907.csv,L1910.csv,L1911.csv,L1914.csv,L202.csv,L2082.csv,L36.csv,L421.csv,L422.csv,L4301.csv,L531.csv,L54.csv,L551.csv,L5712.csv,L581.csv,L58.csv,L61.csv,L84.csv |
-| radiological report data | TBC |
-| drug prescription datat | drug_numeric.csv |
 
 ## Aim
 To develop machine learning models to predict ICD-10. The target model performance is 80% accuracy and f-measure.
