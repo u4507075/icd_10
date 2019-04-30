@@ -155,6 +155,9 @@ Dataset (training and test set)
 | radiological report data | TBC |
 | drug prescription datat | drug_numeric.csv |
 
+## Aim
+To develop machine learning models to predict ICD-10. The target model performance is 80% accuracy and f-measure.
+
 ## Design the approach to predict ICD-10
 ### Approach 1: Multi-class classification
 We simply train machine learning models with all ICD-10 as a target class and evaluation result showed that the model accuracy was less than 0.01 %. We discuss that the poor performance of the models causes by the large number of ICD-10 and unidentified specific TXN to ICD-10.
