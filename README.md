@@ -41,22 +41,22 @@ Our objectives are to develop machine learning model to mapp missing or verify I
 2. Use machine learning models to verify ICD-10 labelled by human.
 
 ## Aims
-1. The performance of machine learning model shows precision, recall, and F-measure greater than 80%.
+1. The performance of machine learning model (accuracy, precision, recall, and f-measure) is greater than 80%.
 2. Present one year cost-benefit analysis compared between before and after using machine learning models to fill ICD-10.
 
 ## Time line
-### March 2019
+### March - April 2019
   * Write and submit a research proposal and ethic.
   * Setup a new server.
   * Duplicate clinical data to the server.
   * Map and label column name and description.
   * Join the table data and create a single dataset.
-### April 2019
+### May - June 2019
   * Apply NLP and standard medical terminologies to preprocess input features.
-  * Design and evaluate machine learning model.
-### May 2019
-  * Close the project either, the model performance is greater than 80% or it is the last week of May.
-### June - August 2019
+  * Develop and evaluate machine learning model.
+### June 2019
+  * Close the project either, the model performance is greater than 80% or it is the end of June.
+### July - August 2019
   * Write and submit a paper.
   
 ## Materials and methods
@@ -78,12 +78,9 @@ TXN is a joining key for adm.csv, ilab.csv, irad.csv, and idru.csv.
 **DO NOT** use TXN to join across groups.
 The file "icd10.csv" (9.5M) is a for mapping ICD-10 code (using in the datasets) to ICD-10 description.
 
-
-
-
 #### Registration data
 
-The registration data is the demographic information of patients who visited (mostly outer patient department (OPD) cases) at Maharaj Nakhon Chiang Mai hospital. 
+The registration data is the demographic information of patients who visited at the outer patient department (OPD) at Maharaj Nakhon Chiang Mai hospital. 
 
 | Features | Types | Description |
 | :--- | :--- | :--- |
@@ -103,7 +100,7 @@ The registration data is the demographic information of patients who visited (mo
 
 #### Admission data
 
-The admission data is the demographic information of patients who admitted to any internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. 
+The admission data is the demographic information of patients who admitted to the internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. 
 
 | Features | Types | Description |
 | :--- | :--- | :--- |
@@ -123,6 +120,7 @@ The admission data is the demographic information of patients who admitted to an
 | icd10 | string | ICD-10 code (diagnosis) |
 
 #### Laboratory data
+The laboratory data is Laboratory findings investigated in OPD (lab.csv) and IPD (ilab.csv) cases.
 
 | Features | Types | Description |
 | :--- | :--- | :--- |
@@ -134,7 +132,15 @@ The admission data is the demographic information of patients who admitted to an
 
 #### Radiological report data
 
-The radiological report data is the reports that radiologists took notes after they reviewed the imaging. The notes were written in plain text describing the finding within the imaging and the impression of suspected abnormalities and/or provisional diagnosis. We **do not** include any image data in this experiment. The notes are required to preprocessed using natural language process techniques to clean and do feature engineering. This work is contributed in **radio** branch of this project.
+The radiological report data is the reports that radiologists took notes after they reviewed the imaging. The notes were written in plain text describing the finding within the imaging and the impression of suspected abnormalities and/or provisional diagnosis. We **do not** include any image data in this experiment. The notes are required to preprocessed using natural language process techniques to clean and do feature engineering. Radiological report of OPD and IPD cases were stored in the rad.csv and irad.csv, respectively.
+
+| Features | Types | Description |
+| :--- | :--- | :--- |
+| txn | numeric | key identification for a patient visit |
+| location | string | location of examination such as cest, hand, abdomen |
+| position | string | position of examination such as plain film, posteroanterior (pa), lateral |
+| report | string | radiological report |
+| icd10 | string | ICD-10 code (diagnosis) |
 
 #### Drug prescription data
 
@@ -147,61 +153,20 @@ The drug prescription data is the information of type of drugs which were prescr
 | drug_name | string | Drug name with or without description |
 | icd10 | string | ICD-10 code (diagnosis) |
 
-### Characteristics of dataset
+### Limitations of the dataset
 
-**TXN** is a unique identification number of patient visit. TXN is a key to join across those five datasets (not always exists in all datasets). At the end of each visit, the diagnoses (ICD-10) relating to the patient had to enterred to the database. You will have to build an approach and develop machine learning models to extract patterns which are able to correctly enter ICD-10. However, you will face some problems with the datasets.
+**TXN** is a unique identification number of patient visit. TXN is a key to join across those opd and ipd datasets (not always exists in all datasets). At the end of visit, the diagnoses (ICD-10) relating to the patient were enterred to the database which linked to one TXN. 
 
-1. Unidentified specific TXN to ICD-10: We do not know that what prescriptions, laboratory findings, and radiological reports relate to which ICD-10. For example, in one visit (one TXN), a patient might have 3 diagnoses and get prescription with 10 drugs. We do not know which drug is prescribed for which diagnosis.
+1. No individual information mapped to specific ICD-10: As one TXN can contain several ICD-10, we do not know which prescriptions, laboratory findings, and radiological reports relate to which ICD-10. For example, in one visit (one TXN), a patient might have 3 diagnoses and get prescription with 10 drugs. We do not know which drug is prescribed for which diagnosis.
 
 2. Large number of ICD-10 (target class): The total number of ICD-10 is 38,970 types (always starts with A-Z) and approximately 14,000 of them were used in the records.   
 
 ### Data preprocessing
-All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data from the five resources were pre-processed and transformed to numeric type and stored in several datasets. TXN was used as a key to link between datasets. Each dataset contains TXN, input features, and ICD-10 (as a target label. All data were decoded to **tis-620** in order to read Thai language. Data in Thai were not used as input features but could be used for human validation step.
-
-#### Registration data
-1. save_admit_data(): Read and decode the data including TXN, sex, age, weight, pluse rate, respiratory rate, body temperature, blood pressure, ABO blood group, Rh blood group, room that the patient admitted, and the last room when the patient was discharged, and ICD-10.
-
-| Features | Mapping criteria |
-| :--- | :--- |
-| TXN | numeric |
-| sex | 'm','f' |
-| age | numeric |
-| weight | numeric |
-| pulse rate | numeric |
-| respiratory rate | numeric |
-| body temperature | numeric |
-| blood pressure | split text by '/' to systolic and diastolic blood pressure |
-| ABO blood group | 'a','b','ab','o' |
-| Rh blood group | 'p','n' |
-| Room | to lowercase, remove * and space |
-| ICD-10 | string |
-
-2. onehot_admit_data(): Apply onehot encoding to sex, ABO blood group, Rh blood group, and room. Then, convert all values to numeric.  
-
-#### Admission data
-Apply the same process to registration data.
-
-#### Laboratory data
-1. get_lab_data(config): Read and decode the data including TXN, lab code, and ICD-10. Select only lab code that the number is larger than 500 records.
-2. split_lab_data(): Laboratory results were stored in text separated by ';'. This process split the text by ';' to obtain a single value of laboratory result.
-3. clean_lab_data(): remove all symbols and space, group words indicating negative results to negative and words indicating positive results to positive, and remove all English alphabet from number.
-4. get_encode_lab(): Get a unique list of clean text results and map with unique numbers.
-5. encode_lab_data(): Use the encoding map to transform text result to number.
-
-#### Radiological report data
- 
-
-#### Drug prescription data
-1. getdata(config,'table_name','drug): Read and decode the data including TXN, drug code, and ICD-10 where 'table_name' is the table of opd and ipd cases.
-2. remove_space_data('drug'): Remove space from drug code.
-3. get_encode_feature('drug'): Get a unique list of clean text results and map with unique numbers.
-4. encode_feature('drug'): Use the encoding map to transform text result to number.
+All identification data such as name, surname, address, national identification, hospital number will be removed according to patient privacy. Data from the five resources were pre-processed and transformed to numeric type and stored in several datasets. TXN was used as a key to link between datasets. Each dataset contains TXN, input features, and ICD-10 (as a target label. All data were decoded to **tis-620** in order to read Thai language. Data in Thai were not used as input features but could be used for human validation step. Data were preprocessed (see more details in [copy.py](https://github.com/u4507075/icd_10/blob/dev/src/preprocessing/text.py)) including removing space, stop words, outliers, filterring relevant data, embedding words. Then use [spacy](https://spacy.io/) to transform words to vector. 
 
 ## Split training and test set and evaluation metrics
 Data from January 2005 - April 2017 are used to train machine learning models and data after April 2017 are used as a test set to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
 
-## Aim
-To develop machine learning models to predict ICD-10. The target model performance is 80% accuracy and f-measure.
 
 ## Design the approach to predict ICD-10
 ### Approach 1: Multi-class classification
