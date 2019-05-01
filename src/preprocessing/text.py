@@ -106,7 +106,6 @@ lab_sql = '''
 					 lab.LST AS name,
 					 lab.REP as value,
 					 dx.icd10
-				 
 				FROM icd10.odx dx
 				INNER JOIN icd10.lab lab
 				ON dx.TXN = lab.TXN
@@ -188,7 +187,7 @@ test_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.odx dx
 			INNER JOIN icd10.reg reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4		
+			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4
 			LIMIT %n OFFSET %f;
 			'''
 itest_txn_sql = '''

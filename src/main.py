@@ -4,8 +4,8 @@ from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
-from preprocessing.trainmodel import train_model2
-from preprocessing.trainmodel import save_history
+#from preprocessing.trainmodel import train_model2
+#from preprocessing.trainmodel import save_history
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
