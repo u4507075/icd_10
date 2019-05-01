@@ -4,8 +4,8 @@ from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
-from preprocessing.trainmodel import train_model2
-from preprocessing.trainmodel import save_history
+#from preprocessing.trainmodel import train_model2
+#from preprocessing.trainmodel import save_history
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -73,10 +73,10 @@ get_txn_test_data(config)
 ##word_to_vec('lab')
 ##word_to_vec('ilab')
 #radio_to_vec('rad')
-#radio_to_vec('irad')
+##radio_to_vec('irad')
 
 
-train_model2()
+#train_model2()
 
 
 

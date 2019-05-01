@@ -106,7 +106,6 @@ lab_sql = '''
 					 lab.LST AS name,
 					 lab.REP as value,
 					 dx.icd10
-				 
 				FROM icd10.odx dx
 				INNER JOIN icd10.lab lab
 				ON dx.TXN = lab.TXN
@@ -188,13 +187,15 @@ test_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.odx dx
 			INNER JOIN icd10.reg reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4;
+			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4
+			LIMIT %n OFFSET %f;
 			'''
 itest_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.idx dx
 			INNER JOIN icd10.adm reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.ADM) > 2017 and MONTH(reg.ADM) > 4;
+			WHERE YEAR(reg.ADM) > 2017 and MONTH(reg.ADM) > 4
+			LIMIT %n OFFSET %f;
 			'''
 def convert(x):
     try:
@@ -373,7 +374,7 @@ def get_lab_data(config):
 
 def get_rad_data(config):
 	getdata(config, rad_sql, 'rad')
-	getdata(config, rad_sql, 'irad')
+	getdata(config, irad_sql, 'irad')
 
 def get_txn_test_data(config):
 	getdata(config, test_txn_sql, 'test')
