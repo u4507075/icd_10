@@ -188,13 +188,15 @@ test_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.odx dx
 			INNER JOIN icd10.reg reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4;
+			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4		
+			LIMIT %n OFFSET %f;
 			'''
 itest_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.idx dx
 			INNER JOIN icd10.adm reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.ADM) > 2017 and MONTH(reg.ADM) > 4;
+			WHERE YEAR(reg.ADM) > 2017 and MONTH(reg.ADM) > 4
+			LIMIT %n OFFSET %f;
 			'''
 def convert(x):
     try:
@@ -350,6 +352,17 @@ def getdata(config, sql, filename):
 		offset = offset + n
 		print('Save data chunk: '+str(offset))
 
+def save_data(df,path,name):
+	p = path+name
+	if not os.path.exists(path):
+			os.makedirs(path)
+	file = Path(p)
+	if file.is_file():
+		with open(p, 'a') as f:
+			df.to_csv(f, header=False)
+	else:
+		df.to_csv(p)
+
 def get_icd10_data(config):
 	getdata(config, icd_sql, 'icd10')
 
@@ -373,15 +386,32 @@ def get_lab_data(config):
 
 def get_rad_data(config):
 	getdata(config, rad_sql, 'rad')
-	getdata(config, rad_sql, 'irad')
+	getdata(config, irad_sql, 'irad')
 
 def get_txn_test_data(config):
 	getdata(config, test_txn_sql, 'test')
 	getdata(config, itest_txn_sql, 'itest')
 
-
-
-
+def split(filename,txn,folder):
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
+		testset = df[df['txn'].isin(txn)]
+		trainingset = df[~df['txn'].isin(txn)]
+		if len(testset) > 0:
+			save_data(testset, '../../secret/data/testset/'+folder, filename+'.csv')
+		if len(trainingset) > 0:
+			save_data(trainingset, '../../secret/data/trainingset/'+folder, filename+'.csv')
+		print('Save '+name)
+def split_data(folder):
+	#folder = 'raw' or 'vec'
+	opds = ['reg','lab','drug','rad']
+	ipds = ['adm','ilab','idrug','irad']
+	test = pd.read_csv('../../secret/data/raw/test.csv',index_col=0)['txn'].values.tolist()
+	itest = pd.read_csv('../../secret/data/raw/itest.csv',index_col=0)['txn'].values.tolist()
+	for f in opds:
+		split(f,test,folder)
+	for f in ipds:
+		split(f,itest,folder)
+	
 
 
 
