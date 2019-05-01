@@ -184,7 +184,18 @@ irad_sql = '''
 				WHERE rad.REP IS NOT NULL AND rad.REP != "" AND dx.icd10 IS NOT NULL
 				LIMIT %n OFFSET %f;
 			'''
-
+test_txn_sql = '''
+			SELECT DISTINCT dx.TXN AS txn FROM icd10.odx dx
+			INNER JOIN icd10.reg reg
+			ON dx.TXN = reg.TXN
+			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4;
+			'''
+itest_txn_sql = '''
+			SELECT DISTINCT dx.TXN AS txn FROM icd10.idx dx
+			INNER JOIN icd10.adm reg
+			ON dx.TXN = reg.TXN
+			WHERE YEAR(reg.ADM) > 2017 and MONTH(reg.ADM) > 4;
+			'''
 def convert(x):
     try:
         return x.encode('latin-1','replace').decode('tis-620','replace')
@@ -363,4 +374,37 @@ def get_lab_data(config):
 def get_rad_data(config):
 	getdata(config, rad_sql, 'rad')
 	getdata(config, rad_sql, 'irad')
+
+def get_txn_test_data(config):
+	getdata(config, test_txn_sql, 'test')
+	getdata(config, itest_txn_sql, 'itest')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

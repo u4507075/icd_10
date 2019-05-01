@@ -45,6 +45,7 @@ from preprocessing.text import get_reg_data
 from preprocessing.text import get_drug_data
 from preprocessing.text import get_lab_data
 from preprocessing.text import get_rad_data
+from preprocessing.text import get_txn_test_data
 
 from preprocessing.vec import word_to_vec
 from preprocessing.vec import radio_to_vec
@@ -63,12 +64,13 @@ import config
 #get_drug_data(config)
 #get_lab_data(config)
 #get_rad_data(config)
+get_txn_test_data(config)
 
 #word_to_vec('adm')
 #word_to_vec('reg')
 #word_to_vec('dru')
 ##word_to_vec('idru')
-word_to_vec('lab')
+##word_to_vec('lab')
 ##word_to_vec('ilab')
 #radio_to_vec('rad')
 #radio_to_vec('irad')
