@@ -4,7 +4,7 @@ from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
-#from preprocessing.trainmodel import train_model2
+from preprocessing.trainmodel import train_model2
 #from preprocessing.trainmodel import save_history
 
 from preprocessing.lab import get_lab_data
@@ -79,7 +79,7 @@ import config
 ##split_data('raw')
 ##split_data('vec')
 
-##train_model2()
+train_model2()
 
 
 
