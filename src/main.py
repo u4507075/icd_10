@@ -4,6 +4,7 @@ from preprocessing.onehot import get_total_feature
 from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
+from preprocessing.trainmodel import scale_data
 from preprocessing.trainmodel import train_model2
 #from preprocessing.trainmodel import save_history
 
@@ -79,8 +80,12 @@ import config
 ##split_data('raw')
 ##split_data('vec')
 
-train_model2()
-
+#scale_data('../../secret/data/vec/','rad')
+#scale_data('../../secret/data/vec/','adm')
+#scale_data('../../secret/data/vec/','idru')
+#train_model2('rad',7)
+train_model2('adm',12)
+#train_model2('idru',2)
 
 
 
