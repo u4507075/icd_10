@@ -167,10 +167,23 @@ All identification data such as name, surname, address, national identification,
 ## Split training and test set and evaluation metrics
 Data from January 2005 - April 2017 are used to train machine learning models and data after April 2017 are used as a test set to evaluate the models. We use overall accuracy, precision, recall, F-measure, and area under ROC curve to evaluate and compare predictive performance between models.
 
+## Scale dataset
+Because machine learning algorithms work better when features are on a relatively similar scale and close to normally distributed ([refer to this article](https://towardsdatascience.com/scale-standardize-or-normalize-with-scikit-learn-6ccc7d176a02), we applied two keras preprocessing scalers (MinMaxScaler and StandardScaler) to normalise the dataset. We could not use other scaler methods because those methods requires to read the entire datset at the same time whereas MinMaxScaler and StandardScaler allow us to do partial fit. MinMaxScaler scale raw data to preferred range (in this case between 0 - 1) and still preserve the same distribution of the dataset. Thus, the scaler does not reduce the effect of outliers but it helps to scale all features to be in the same proprotion range. 
+
+### MinMaxScaler
+```
+new_value = (x - min(feature))/(max(feature)-min(feature))
+```
+StandardScaler standardise dataset using mean and standard deviation of the feature. The result of StandardScaler scale changes the distribution of data to normal with a standard deviation equal to 1. Thus, StandardScaler changes the distribution of the dataset and reduces the effect of outliers but the data range is bigger than MinMaxScaler. Deep learning learn better when the data is normal distributed. So, we more likely to choose StandardScaler to normalise the data when we approach with LSTM.
+
+### StandardScaler
+```
+new_value = (x - avg(feature))/(sdev(feature))
+```
 
 ## Design the approach to predict ICD-10
-### Approach 1: Multi-class classification
-We simply train machine learning models with all ICD-10 as a target class and evaluation result showed that the model accuracy was less than 0.01 %. We discuss that the poor performance of the models causes by the large number of ICD-10 and unidentified specific TXN to ICD-10.
+### Approach 1: LSTM with Multi-class classification
+We use spacy to transform entire string data to numeric data, scale the input features using StandardScaler encode ICD-10. Then, we feed data to train LSTM with all ICD-10 as a target class and initially evaluation the training loss again evaluation loss. The loss shows that .......(still training the model).
 
 ### Approach 2: Binary classification
 Because of those two problems, we change the approach from multi-class to binary classification. We select one ICD-10 at a time as a target class and randomly select the same number of instances labelled with target and non-target class as training and test, respectively. Then, train Xgboost (wiht max-depth 100) to create a model per ICD-10. The binary classification approach helps to reduce the complexity of the model (approaching a target class one by one instead of all classes in the same time) and provide flexibility to predict more than one ICD-10 per instance. The model evaluation (separate model) showed that the accuracy ranges between 50 - 100 % (average 60%).
