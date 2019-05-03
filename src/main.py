@@ -69,7 +69,7 @@ import config
 #word_to_vec('adm')
 #word_to_vec('reg')
 #word_to_vec('dru')
-##word_to_vec('idru')
+#word_to_vec('idru')
 #word_to_vec('lab')
 ##word_to_vec('ilab')
 #radio_to_vec('rad')
