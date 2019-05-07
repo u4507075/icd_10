@@ -311,8 +311,8 @@ def train_model2(name,f):
 				        optimizer='adam',
 				        metrics=['accuracy'])
 
-	#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save') 
-	ssc = joblib.load('../../secret/data/vec/'+name+'_minmaxscaler.save') 
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save') 
+	#ssc = joblib.load('../../secret/data/vec/'+name+'_minmaxscaler.save') 
 
 	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
