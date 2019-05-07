@@ -38,23 +38,26 @@ def word_to_vec(name):
 	n = 0
 	chunk = 10000
 	for df in  pd.read_csv(path+name+'.csv', chunksize=chunk, index_col=0, low_memory=False):
-		for c in df.columns:
-			if c != 'txn' and c != 'icd10':
-				df = pd.concat([df.drop(c, axis=1), df[c].apply(to_vec)], axis=1)
-		if 'report' in df:
-			d1 = df['report'].str.split(' ',expand=True)
-			d1 = d1.merge(df, right_index = True, left_index = True)
-			d1 = d1.melt(id_vars = ['txn','location','position','icd10'], value_name = 'report')
-			d1 = d1.sort_values(['txn', 'icd10', 'variable'], ascending=True)
-			d1 = d1[d1['variable'] != 'report']
-			df = df[['txn','location','position','report','icd10']]
+		if n >= 0:
+			for c in df.columns:
+				if c != 'txn' and c != 'icd10':
+					df = pd.concat([df.drop(c, axis=1), df[c].apply(to_vec)], axis=1)
+			if 'report' in df:
+				d1 = df['report'].str.split(' ',expand=True)
+				d1 = d1.merge(df, right_index = True, left_index = True)
+				d1 = d1.melt(id_vars = ['txn','location','position','icd10'], value_name = 'report')
+				d1 = d1.sort_values(['txn', 'icd10', 'variable'], ascending=True)
+				d1 = d1[d1['variable'] != 'report']
+				df = df[['txn','location','position','report','icd10']]
 
-		df = pd.concat([df.drop('icd10', axis=1), df['icd10'].map(icd10_map)], axis=1)
-		n = n + chunk
-		print("Converted "+name+' '+str(n))
-		save_file(df,name)
-		#print(name)
-
+			df = pd.concat([df.drop('icd10', axis=1), df['icd10'].map(icd10_map)], axis=1)
+			n = n + chunk
+			print("Converted "+name+' '+str(n))
+			save_file(df,name)
+			#print(name)
+		else:
+			print('Skip '+str(n))
+			n = n + chunk
 def radio_to_vec(name):
 	print("Read icd10 mapping")
 	icd10 =  pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0)

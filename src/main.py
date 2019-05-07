@@ -83,8 +83,8 @@ import config
 #scale_data('../../secret/data/vec/','rad')
 #scale_data('../../secret/data/vec/','adm')
 #scale_data('../../secret/data/vec/','idru')
-#train_model2('rad',7)
-train_model2('adm',12)
+train_model2('rad',7)
+#train_model2('adm',12)
 #train_model2('idru',2)
 
 
