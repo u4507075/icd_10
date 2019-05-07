@@ -182,8 +182,13 @@ new_value = (x - avg(feature))/(sdev(feature))
 ```
 
 ## Design the approach to predict ICD-10
-### Approach 1: LSTM with Multi-class classification
+### Approach 1: Multi-class classification
+#### LSTM
 We use spacy to transform entire string data to numeric data, scale the input features using StandardScaler encode ICD-10. Then, we feed data to train LSTM with all ICD-10 as a target class and initially evaluation the training loss again evaluation loss. The loss shows that .......(still training the model).
+#### SGDClassifier
+We use [dask-ml](https://examples.dask.org/machine-learning/incremental.html#Model-training) (SGDClassifier) to do incrementally training large dataset.
+#### creame-ml
+We use [creme-ml](https://github.com/creme-ml/creme) (Linear regression and Decision tree models) to do incrementally training large dataset.
 
 ### Approach 2: Binary classification
 Because of those two problems, we change the approach from multi-class to binary classification. We select one ICD-10 at a time as a target class and randomly select the same number of instances labelled with target and non-target class as training and test, respectively. Then, train Xgboost (wiht max-depth 100) to create a model per ICD-10. The binary classification approach helps to reduce the complexity of the model (approaching a target class one by one instead of all classes in the same time) and provide flexibility to predict more than one ICD-10 per instance. The model evaluation (separate model) showed that the accuracy ranges between 50 - 100 % (average 60%).
