@@ -14,6 +14,8 @@ from sklearn.linear_model import Perceptron
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.linear_model import SGDRegressor
+from sklearn.linear_model import PassiveAggressiveRegressor
 from xgboost import XGBClassifier
 
 from sklearn.metrics import precision_recall_fscore_support
@@ -30,9 +32,19 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.optimizers import SGD
+from dask_ml.wrappers import Incremental
 
 from sklearn.externals import joblib
 from keras.models import model_from_json
+'''
+from creme import linear_model
+from creme import naive_bayes
+from creme import metrics
+from creme import optim
+from creme import tree
+'''
+import math
+from sklearn.metrics import accuracy_score
 
 def get_dataset(trainingset, validation_size):
 	for name in trainingset.columns:
@@ -78,93 +90,87 @@ def save_file(df,p):
 	else:
 		df.to_csv(p)
 
-def train_model(filename):
+def train(models, X_train, Y_train, classes):
+	for m in models:
+		if str(m.estimator).startswith('SGDRegressor') or str(m.estimator).startswith('PassiveAggressiveRegressor'):
+			m.partial_fit(X_train, Y_train)
+		else:
+			m.partial_fit(X_train, Y_train, classes=classes)
+	return models
 
+def test(models, X_validation, Y_validation):
+	print('predict')
+	for m in models:
+		p = m.predict(X_validation)
+		print(p)
+	
+def dask_model(name):
+	#Good for discrete feature
 	#c = MultinomialNB()
+	#Good for binary feature
 	#c = BernoulliNB()
 	#c = PassiveAggressiveClassifier(n_jobs=-1, warm_start=True)
-	#c = SGDClassifier(loss='log')
+	#c = SGDClassifier(loss='log', penalty='l2', tol=1e-3)
 	#c = Perceptron(n_jobs=-1,warm_start=True)
+	models = [	#Incremental(MultinomialNB(), scoring='accuracy'),
+					Incremental(PassiveAggressiveClassifier(n_jobs=-1, warm_start=True), scoring='accuracy'),
+					Incremental(SGDClassifier(loss='log', penalty='l2', tol=1e-3), scoring='accuracy'),
+					Incremental(Perceptron(n_jobs=-1,warm_start=True), scoring='accuracy'),
+					Incremental(SGDRegressor(warm_start=True), scoring='accuracy'),
+					Incremental(PassiveAggressiveRegressor(warm_start=True), scoring='accuracy')]
+	model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-classifier']
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	chunk = 10000
+	#inc = Incremental(c, scoring='accuracy')
+	classes = pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0).index.values
+	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		X_train = ssc.transform(X_train)
+		X_validation = ssc.transform(X_validation)
+		models = train(models, X_train, Y_train, classes)
+		print('Train models')
 
-	#c = SVC()
-
-
-	print(filename)
-	p = '../../secret/data/trainingset_clean/'+filename+'.csv'
-	targets = []
-	for df in  pd.read_csv(p, chunksize=100000, index_col=0):
-		df['icd10'] = df['icd10'].apply(str)
-		v = df['icd10'].unique().tolist()
-		targets = targets + v
-		targets = list(set(targets))
-	targets.sort()
-
-	if not os.path.exists('../../secret/data/model_performance/'):
-		os.makedirs('../../secret/data/model_performance/')
-
-	if not os.path.exists('../../secret/data/model/'):
-		os.makedirs('../../secret/data/model/')
-
-	if not os.path.exists('../../secret/data/model/'+filename):
-		os.makedirs('../../secret/data/model/'+filename)
-
-	regex = re.compile('[A-Z]')
-	target_classes = [i for i in targets if regex.match(i)]
-
-	if not Path('../../secret/data/model_performance/training_record.csv').is_file():
-		save_file(pd.DataFrame(columns=['feature','icd10']),'../../secret/data/model_performance/training_record.csv')
-	hx = pd.read_csv('../../secret/data/model_performance/training_record.csv', index_col=0)
-
-	print("Start saving models")
-
-	for target in target_classes:
-		if len(hx[(hx['feature'] == filename) & (hx['icd10'] == target)]) == 0:
-			model_file = '../../secret/data/model/'+filename+'/'+target+'.sav'
-			if not Path(model_file).is_file():
-				print(target)
-				data = None
-				chunk = 100000
-				c = XGBClassifier(max_depth=100)
-
-				for df in  pd.read_csv(p, chunksize=chunk, index_col=0):
-					df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-					df.drop(['TXN'], axis=1, inplace=True)
-
-					t = df[df['icd10']==target]
-					nt = df[df['icd10']!=target]
-					nt = nt.assign(icd10 = 'not_'+target)
-					if len(nt) > len(t):
-						nt = nt.sample(frac=1).reset_index(drop=True)
-						nt = nt.head(len(t))
-					t = t.append(nt, ignore_index = True)
-					t = t.reset_index(drop=True)
-					if data is None:
-						data = t
-					else:
-						data = data.append(t).reset_index(drop=True)
-					#print(data)
-				if len(data) >= 100:
-
-					X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.1)
-					c.fit(X_train, Y_train)
-					pre = c.predict(X_validation)
-					print(target)
-					cf = confusion_matrix(Y_validation, pre)
-					print(cf)
-					cr = classification_report(Y_validation, pre)
-					print(cr)
-					v = precision_recall_fscore_support(Y_validation, pre, average='weighted')
-					X_train, X_validation, Y_train, Y_validation = get_dataset(data, 0.0)
-					c.fit(X_train, Y_train)
-					pickle.dump(c, open(model_file, 'wb'))
-					dfp = pd.DataFrame([[filename,target,v[0],v[1],v[2],len(data)]],columns=['feature','icd10','precision','recall','fscore','n'])
-					save_file(dfp,'../../secret/data/model_performance/model_performance.csv')
-
-				save_file(pd.DataFrame([[filename,target]],columns=['feature','icd10']),'../../secret/data/model_performance/training_record.csv')
-		else:
-			print(filename + ' and ' + target + ' ' + 'already exist.')
+	for i in range(len(models)):
+		save_model(models[i],name+'_'+model_names[i])
+		#test(models, X_validation, Y_validation)
+		#inc.partial_fit(X_train, Y_train, classes=classes)
+		#print(inc.predict(X_validation)[:len(X_validation)])
+		#print('Score: ',inc.score(X_validation, Y_validation))
+'''
+def creme_model(name):
+	#Need python >= 3.6
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	chunk = 10000
+	optimizer = optim.VanillaSGD(lr=0.01)
+	#model = linear_model.LinearRegression(optimizer)
+	model = naive_bayes.GaussianNB()
+	#model = tree.MondrianTreeClassifier(lifetime=1, max_depth=100, min_samples_split=1, random_state=16)
+	#model = tree.MondrianTreeRegressor(lifetime=1, max_depth=100, min_samples_split=1, random_state=16)
 
 
+	y_true = []
+	y_pred = []
+	metric = metrics.Accuracy()
+
+	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		X_train = ssc.transform(X_train)
+		X_validation = ssc.transform(X_validation)
+		for i in range(len(X_train.tolist())):
+			# Fit the linear regression
+			X = dict(zip(df.columns,X_train[i])) 
+			model.fit_one(X, Y_train[i])
+		for i in range(len(X_validation.tolist())):
+			X = dict(zip(df.columns,X_validation[i])) 
+			yi_pred = model.predict_one(X)
+			# Store the truth and the prediction
+			y_true.append(Y_validation[i])
+			y_pred.append(round(yi_pred[True].item(0)))
+		acc = accuracy_score(y_true, y_pred)
+		print(acc)
+'''
 def save_history():
 	files = os.listdir('../../secret/data/trainingset/')
 
@@ -226,7 +232,7 @@ def scale_data(path,filename):
 def predict(testset,testvalue,ssc,regressor):
 	pre = regressor.predict(testset)
 	print(pre)
-	pre = ssc.inverse_transform(pre)
+	#pre = ssc.inverse_transform(pre)
 	plt.plot(testvalue, color = 'black', label = 'Actual icd10')
 	plt.plot(pre, color = 'green', label = 'Predicted icd10')
 	plt.title('Actual vs Predicted icd10')
@@ -245,6 +251,12 @@ def history_loss(loss,val_loss):
 	plt.show()
 
 def save_model(model,filename):
+	pkl_filename = '../../secret/data/model/'+filename+".pkl"  
+	with open(pkl_filename, 'wb') as file:  
+		 pickle.dump(model, file)
+	print("save model")
+
+def save_lstm_model(model,filename):
 	if not os.path.exists('../../secret/data/model/'):
 		os.makedirs('../../secret/data/model/')
 	# serialize model to JSON
@@ -266,7 +278,7 @@ def load_model(filename):
 	print("Loaded model from disk")
 	return loaded_model
 
-def train_model2(name,f):
+def lstm_model(name,f):
 	c = XGBClassifier(max_depth=100)
 	chunk = 10000
 	r = 1
@@ -341,11 +353,39 @@ def train_model2(name,f):
 					'../../secret/data/model/'+name+'_history.csv')
 
 
-		save_model(regressor,name)
+		save_lstm_model(regressor,name+'_lstm')
 		if Path('../../secret/data/model/'+name+'_history.csv').is_file():
 			total_history = pd.read_csv('../../secret/data/model/'+name+'_history.csv', index_col=0)
 			history_loss(total_history['loss'].values.tolist(), total_history['val_loss'].values.tolist())
 		#break
+
+def evaluate_lstm_model(name):
+	file = Path('../../secret/data/model/'+name+'.h5')
+	regressor = load_model(name)
+	regressor.compile(loss='mean_squared_error',
+				        optimizer='adam',
+				        metrics=['accuracy'])
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save') 
+	chunk = 10000
+
+	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		X_validation = ssc.fit_transform(X_validation)
+		X_validation = X_validation.reshape(len(X_validation),len(df.columns)-1,1)
+		predict(X_validation,Y_validation,ssc,regressor)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

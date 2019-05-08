@@ -5,3 +5,5 @@ spacy
 mathplotlib
 keras
 tensorflow
+dask-ml
+creme
