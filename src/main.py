@@ -86,16 +86,19 @@ import config
 #scale_data('../../secret/data/vec/','rad')
 #scale_data('../../secret/data/vec/','adm')
 #scale_data('../../secret/data/vec/','idru')
-#lstm_model('rad',7)
-#evaluate_lstm_model('rad')
-#
-dask_model('idru')
-#creme_model('adm')
-#creme_model('rad')
-#creme_model('idru')
-#train_model2('adm',12)
-#train_model2('idru',2)
 
+
+#
+#dask_model('adm')
+#dask_model('rad')
+dask_model('idru')
+
+#lstm_model('rad',7)
+#lstm_model('adm',12)
+#lstm_model('idru',2)
+#evaluate_lstm_model('rad')
+#evaluate_lstm_model('adm')
+#evaluate_lstm_model('idru')
 
 
 
