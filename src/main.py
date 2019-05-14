@@ -80,18 +80,23 @@ import config
 #radio_to_vec('rad')
 ##radio_to_vec('irad')
 
-##split_data('raw')
-##split_data('vec')
+#split_data('raw')
+#split_data('vec')
 
 #scale_data('../../secret/data/vec/','rad')
 #scale_data('../../secret/data/vec/','adm')
 #scale_data('../../secret/data/vec/','idru')
 
-
-#
 #dask_model('adm')
 #dask_model('rad')
-dask_model('idru')
+#dask_model('idru')
+
+#lstm_model('rad',7)
+#lstm_model('adm',12)
+#lstm_model('idru',2)
+#evaluate_lstm_model('rad')
+#evaluate_lstm_model('adm')
+#evaluate_lstm_model('idru')
 
 #lstm_model('rad',7)
 #lstm_model('adm',12)
