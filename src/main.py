@@ -5,7 +5,10 @@ from preprocessing.onehot import onehot
 from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
 from preprocessing.trainmodel import scale_data
-from preprocessing.trainmodel import train_model2
+from preprocessing.trainmodel import dask_model
+from preprocessing.trainmodel import lstm_model
+#from preprocessing.trainmodel import creme_model
+from preprocessing.trainmodel import evaluate_lstm_model
 #from preprocessing.trainmodel import save_history
 
 from preprocessing.lab import get_lab_data
@@ -49,8 +52,8 @@ from preprocessing.text import get_rad_data
 from preprocessing.text import get_txn_test_data
 from preprocessing.text import split_data
 
-from preprocessing.vec import word_to_vec
-from preprocessing.vec import radio_to_vec
+#from preprocessing.vec import word_to_vec
+#from preprocessing.vec import radio_to_vec
 
 import sys
 import os
@@ -77,15 +80,23 @@ import config
 #radio_to_vec('rad')
 ##radio_to_vec('irad')
 
-split_data('raw')
+#split_data('raw')
 #split_data('vec')
 
 #scale_data('../../secret/data/vec/','rad')
 #scale_data('../../secret/data/vec/','adm')
 #scale_data('../../secret/data/vec/','idru')
-#train_model2('rad',7)
-#train_model2('adm',12)
-#train_model2('idru',2)
+
+#dask_model('adm')
+#dask_model('rad')
+#dask_model('idru')
+
+#lstm_model('rad',7)
+#lstm_model('adm',12)
+#lstm_model('idru',2)
+#evaluate_lstm_model('rad')
+#evaluate_lstm_model('adm')
+#evaluate_lstm_model('idru')
 
 
 

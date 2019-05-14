@@ -1,3 +1,9 @@
 pandas
 mysql-connector-python
 scikit-learn
+spacy
+mathplotlib
+keras
+tensorflow
+dask-ml
+creme
