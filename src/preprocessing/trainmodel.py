@@ -98,11 +98,14 @@ def train(models, X_train, Y_train, classes):
 			m.partial_fit(X_train, Y_train, classes=classes)
 	return models
 
-def test(models, X_validation, Y_validation):
-	print('predict')
-	for m in models:
-		p = m.predict(X_validation)
-		print(p)
+def test(m, X_validation, Y_validation):
+	if str(m.estimator).startswith('SGDRegressor') or str(m.estimator).startswith('PassiveAggressiveRegressor'):
+		m.partial_fit(X_train, Y_train)
+	else:
+		m.partial_fit(X_train, Y_train, classes=classes)
+
+	print(m.predict(X_validation)[:len(X_validation)])
+	print('Score: ',m.score(X_validation, Y_validation))
 	
 def dask_model(name):
 	#Good for discrete feature
@@ -137,6 +140,24 @@ def dask_model(name):
 		#inc.partial_fit(X_train, Y_train, classes=classes)
 		#print(inc.predict(X_validation)[:len(X_validation)])
 		#print('Score: ',inc.score(X_validation, Y_validation))
+
+def eval_model(name):
+	inc = Incremental(PassiveAggressiveClassifier(n_jobs=-1, warm_start=True), scoring='accuracy')
+	#inc = Incremental(SGDClassifier(loss='log', penalty='l2', tol=1e-3), scoring='accuracy')
+	#inc = Incremental(Perceptron(n_jobs=-1,warm_start=True), scoring='accuracy')
+	#inc = Incremental(SGDRegressor(warm_start=True), scoring='accuracy')
+	#inc = Incremental(PassiveAggressiveRegressor(warm_start=True), scoring='accuracy')
+
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	chunk = 10000
+	classes = pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0).index.values
+	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		X_train = ssc.transform(X_train)
+		X_validation = ssc.transform(X_validation)
+		test(m, X_validation, Y_validation)
+
 '''
 def creme_model(name):
 	#Need python >= 3.6

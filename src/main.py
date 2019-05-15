@@ -6,8 +6,8 @@ from preprocessing.drug_encode import get_encode_feature
 from preprocessing.drug_encode import encode_feature
 from preprocessing.trainmodel import scale_data
 from preprocessing.trainmodel import dask_model
+from preprocessing.trainmodel import eval_model
 from preprocessing.trainmodel import lstm_model
-#from preprocessing.trainmodel import creme_model
 from preprocessing.trainmodel import evaluate_lstm_model
 #from preprocessing.trainmodel import save_history
 
@@ -90,13 +90,8 @@ import config
 #dask_model('adm')
 #dask_model('rad')
 #dask_model('idru')
+eval_model('adm')
 
-#lstm_model('rad',7)
-#lstm_model('adm',12)
-#lstm_model('idru',2)
-#evaluate_lstm_model('rad')
-#evaluate_lstm_model('adm')
-#evaluate_lstm_model('idru')
 
 #lstm_model('rad',7)
 #lstm_model('adm',12)
