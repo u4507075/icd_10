@@ -51,6 +51,7 @@ from preprocessing.text import get_lab_data
 from preprocessing.text import get_rad_data
 from preprocessing.text import get_txn_test_data
 from preprocessing.text import split_data
+from preprocessing.text import csv_to_sqldb
 
 #from preprocessing.vec import word_to_vec
 #from preprocessing.vec import radio_to_vec
@@ -81,7 +82,7 @@ import config
 ##radio_to_vec('irad')
 
 #split_data('raw')
-split_data('vec')
+#split_data('vec')
 
 #scale_data('../../secret/data/vec/','rad')
 #scale_data('../../secret/data/vec/','adm')
@@ -90,7 +91,7 @@ split_data('vec')
 #dask_model('adm')
 #dask_model('rad')
 #dask_model('idru')
-eval_model('adm')
+#eval_model('adm')
 
 
 #lstm_model('rad',7)
@@ -100,7 +101,12 @@ eval_model('adm')
 #evaluate_lstm_model('adm')
 #evaluate_lstm_model('idru')
 
-
+#Save csv file to sql
+folders = ['raw','vec']
+filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
+for folder in folders:
+	for filename in filenames:
+		csv_to_sqldb(config,folder,filename)
 
 
 

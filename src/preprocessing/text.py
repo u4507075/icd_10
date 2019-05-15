@@ -195,6 +195,7 @@ itest_txn_sql = '''
 			ON dx.TXN = reg.TXN
 			LIMIT %n OFFSET %f;
 			'''
+
 def convert(x):
     try:
         return x.encode('latin-1','replace').decode('tis-620','replace')
@@ -400,6 +401,7 @@ def split(filename,txn,folder):
 		if len(trainingset) > 0:
 			save_data(trainingset, '../../secret/data/trainingset/'+folder, filename+'.csv')
 		print('Save '+filename+' in '+folder)
+
 def split_data(folder):
 	#folder = 'raw' or 'vec'
 	opds = ['reg','lab','dru','rad']
@@ -411,13 +413,16 @@ def split_data(folder):
 	for f in ipds:
 		split(f,itest,folder)
 
+def csv_to_sqldb(config,folder,filename):
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
+		df.to_sql(	folder+'_'+name,
+						get_connection(config),
+						if_exists='append',
+						index=False,
+						method='multi'				
+					)
 
-
-
-
-
-
-
+		print('Append table '+folder+'_'+name)
 
 
 
