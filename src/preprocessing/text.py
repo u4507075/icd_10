@@ -187,14 +187,12 @@ test_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.odx dx
 			INNER JOIN icd10.reg reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.DATE) > 2017 and MONTH(reg.DATE) > 4
 			LIMIT %n OFFSET %f;
 			'''
 itest_txn_sql = '''
 			SELECT DISTINCT dx.TXN AS txn FROM icd10.idx dx
 			INNER JOIN icd10.adm reg
 			ON dx.TXN = reg.TXN
-			WHERE YEAR(reg.ADM) > 2017 and MONTH(reg.ADM) > 4
 			LIMIT %n OFFSET %f;
 			'''
 def convert(x):
@@ -341,6 +339,8 @@ def getdata(config, sql, filename):
 
 		df = df.drop_duplicates()
 
+		if filename == 'test' or filename == 'itest':
+			df = df.sample(frac=0.1).reset_index(drop=True)
 		p = path+filename+'.csv'
 		file = Path(p)
 		if file.is_file():

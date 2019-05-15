@@ -118,18 +118,20 @@ def dask_model(name):
 					Incremental(Perceptron(n_jobs=-1,warm_start=True), scoring='accuracy'),
 					Incremental(SGDRegressor(warm_start=True), scoring='accuracy'),
 					Incremental(PassiveAggressiveRegressor(warm_start=True), scoring='accuracy')]
-	model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-classifier']
+	model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-regressor']
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 	chunk = 10000
+	n = 0
 	#inc = Incremental(c, scoring='accuracy')
 	classes = pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0).index.values
-	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
 		X_train = ssc.transform(X_train)
-		X_validation = ssc.transform(X_validation)
+		#X_validation = ssc.transform(X_validation)
 		models = train(models, X_train, Y_train, classes)
-		print('Train models')
+		n = n + chunk
+		print('Train models '+str(n))
 
 	for i in range(len(models)):
 		save_model(models[i],name+'_'+model_names[i])
