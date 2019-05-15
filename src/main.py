@@ -76,12 +76,12 @@ import config
 #word_to_vec('dru')
 #word_to_vec('idru')
 #word_to_vec('lab')
-##word_to_vec('ilab')
+#word_to_vec('ilab')
 #radio_to_vec('rad')
 ##radio_to_vec('irad')
 
 #split_data('raw')
-#split_data('vec')
+split_data('vec')
 
 #scale_data('../../secret/data/vec/','rad')
 #scale_data('../../secret/data/vec/','adm')
