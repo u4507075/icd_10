@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import os
 import re
+import sqlite3
 
 path = '../../secret/data/raw/'
 
@@ -414,16 +415,19 @@ def split_data(folder):
 		split(f,itest,folder)
 
 def csv_to_sqldb(config,folder,filename):
+	connection = sqlite3.connect('mysql://'+config.DATABASE_CONFIG['user']+':'+config.DATABASE_CONFIG['password']+'@localhost:'+str(config.DATABASE_CONFIG['port'])+'/icd10')
+
 	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
-		df.to_sql(	folder+'_'+name,
-						get_connection(config),
-						if_exists='append',
-						index=False,
-						method='multi'				
+		df.to_sql(	folder+'_'+filename,
+				connection,
+				if_exists='append',
+				index=False,
+				method='multi'
 					)
 
-		print('Append table '+folder+'_'+name)
+		print('Append table '+folder+'_'+filename)
 
+	connection.close()
 
 
 
