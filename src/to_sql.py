@@ -1,7 +1,7 @@
 #Installation guide
 #https://www.pythoncentral.io/how-to-install-sqlalchemy/
 
-from preprocessing.to_sql import csv_to_sqldb
+from preprocessing.csv_to_sql import csv_to_sqldb
 import sys
 import os
 from pathlib import Path
