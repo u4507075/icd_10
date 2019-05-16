@@ -411,29 +411,54 @@ def split_data(folder):
 		split(f,test,folder)
 	for f in ipds:
 		split(f,itest,folder)
-
+def backslash(x):
+	if isinstance(x,str):
+		x = re.sub(r"[^a-zA-Z0-9]",'',x)
+	return x
 
 def csv_to_sqldb(config,folder,filename):
+	dtype = {'int64':'INT', 'float64': 'FLOAT', 'object':'TEXT'}
 	connection = get_connection(config)
 	sql = 'DROP TABLE IF EXISTS %name;'.replace('%name',folder+'_'+filename)
 	cursor = connection.cursor()
 	cursor.execute(sql)
 	cols = []
 	types = []
-	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=1, index_col=0):
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
 		cols = df.columns.tolist()
 		types = df.dtypes
 		break
 	sql_col = 'CREATE TABLE '+folder+'_'+filename+' ('
+	sql_insert_1 = 'INSERT INTO '+folder+'_'+filename+'('
+	sql_insert_2 = ' VALUES ('
 	for i in range(len(cols)):
-		sql_col = sql_col + cols[i]+' '+types[i]
+		t = 'TEXT'
+		if str(types[i]) in dtype:
+			t = dtype[str(types[i])]
+		sql_col = sql_col + cols[i]+' '+t
+		sql_insert_1 = sql_insert_1 + cols[i]
+		sql_insert_2 = sql_insert_2 + '%s'
 		if i < len(cols)-1:
 			sql_col = sql_col + ','
-	sql_col = sql_col + ')'
-	print(sql_col)
-	#for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
-	#	print('Append table '+folder+'_'+filename)
- 
+			sql_insert_1 = sql_insert_1 + ','
+			sql_insert_2 = sql_insert_2 + ','
+	sql_col = sql_col + ');'
+	sql_insert_1 = sql_insert_1 + ')'
+	sql_insert_2 = sql_insert_2 + ');'
+	sql_insert = sql_insert_1 + sql_insert_2
+	cursor.execute(sql_col)
+	#print(sql_insert)
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
+		df = df.fillna(0)
+		for c in df:
+			df[c] = df[c].apply(backslash)
+		val = list(df.itertuples(index=False,name=None))
+		#print(val)
+		cursor.executemany(sql_insert, val)
+		connection.commit()
+
+		print('Append table '+folder+'_'+filename)
+
 	connection.close()
 
 
