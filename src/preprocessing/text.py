@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import os
 import re
-import sqlite3
 
 path = '../../secret/data/raw/'
 
@@ -196,7 +195,6 @@ itest_txn_sql = '''
 			ON dx.TXN = reg.TXN
 			LIMIT %n OFFSET %f;
 			'''
-
 def convert(x):
     try:
         return x.encode('latin-1','replace').decode('tis-620','replace')
@@ -415,7 +413,28 @@ def split_data(folder):
 		split(f,itest,folder)
 
 
-
+def csv_to_sqldb(config,folder,filename):
+	connection = get_connection(config)
+	sql = 'DROP TABLE IF EXISTS %name;'.replace('%name',folder+'_'+filename)
+	cursor = connection.cursor()
+	cursor.execute(sql)
+	cols = []
+	types = []
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=1, index_col=0):
+		cols = df.columns.tolist()
+		types = df.dtypes
+		break
+	sql_col = 'CREATE TABLE '+folder+'_'+filename+' ('
+	for i in range(len(cols)):
+		sql_col = sql_col + cols[i]+' '+types[i]
+		if i < len(cols)-1:
+			sql_col = sql_col + ','
+	sql_col = sql_col + ')'
+	print(sql_col)
+	#for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
+	#	print('Append table '+folder+'_'+filename)
+ 
+	connection.close()
 
 
 
