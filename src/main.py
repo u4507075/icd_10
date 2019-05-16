@@ -102,15 +102,6 @@ import config
 #evaluate_lstm_model('idru')
 
 
-#Save csv file to sql
-folders = ['raw','vec']
-filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
-for folder in folders:
-	for filename in filenames:
-		csv_to_sqldb(config,folder,filename)
-
-
-
 
 
 
