@@ -101,6 +101,7 @@ import config
 #evaluate_lstm_model('adm')
 #evaluate_lstm_model('idru')
 
+
 #Save csv file to sql
 folders = ['raw','vec']
 filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
