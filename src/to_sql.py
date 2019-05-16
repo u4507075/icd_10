@@ -1,3 +1,11 @@
+#Installation guide
+#https://www.pythoncentral.io/how-to-install-sqlalchemy/
+
+import sys
+import os
+from pathlib import Path
+sys.path.append(str(Path(os.path.abspath('..')).parent)+'/secret')
+import config
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -16,22 +24,11 @@ def csv_to_sqldb(config,folder,filename):
 
 	connection.close()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#Save csv file to sql
+folders = ['raw','vec']
+filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
+for folder in folders:
+	for filename in filenames:
+		csv_to_sqldb(config,folder,filename)
 
 
