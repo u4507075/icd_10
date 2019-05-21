@@ -455,11 +455,10 @@ def csv_to_sqldb(config,folder,filename):
 		val = list(df.itertuples(index=False,name=None))
 		#print(val)
 		cursor.executemany(sql_insert, val)
-		connection.commit()
-
 		print('Append table '+folder+'_'+filename)
-
+	connection.commit()
 	connection.close()
+	print('Insert data to table '+folder+'_'+filename)
 
 
 
