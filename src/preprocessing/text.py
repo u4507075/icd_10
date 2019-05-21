@@ -448,7 +448,7 @@ def csv_to_sqldb(config,folder,filename):
 	sql_insert = sql_insert_1 + sql_insert_2
 	cursor.execute(sql_col)
 	#print(sql_insert)
-	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=10000, index_col=0):
 		df = df.fillna(0)
 		for c in df:
 			df[c] = df[c].apply(backslash)
