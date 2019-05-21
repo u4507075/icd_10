@@ -106,8 +106,8 @@ import config
 folders = ['raw','vec']
 filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
 for folder in folders:
-  for filename in filenames:
-    csv_to_sqldb(config,folder,filename)
+	for filename in filenames:
+		csv_to_sqldb(config,folder,filename)
 
 
 
