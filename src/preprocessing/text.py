@@ -1,4 +1,4 @@
-import mysql.connector as sql
+import mysql.connector as mysql
 import pandas as pd
 from pathlib import Path
 import numpy as np
@@ -273,7 +273,7 @@ def checkpath():
 			os.makedirs(path)
 
 def get_connection(config):
-	return sql.connect(	host=config.DATABASE_CONFIG['host'], 
+	return mysql.connect(	host=config.DATABASE_CONFIG['host'], 
 											database=config.DATABASE_CONFIG['dbname'], 
 											user=config.DATABASE_CONFIG['user'], 
 											password=config.DATABASE_CONFIG['password'], 
@@ -418,7 +418,13 @@ def backslash(x):
 
 def csv_to_sqldb(config,folder,filename):
 	dtype = {'int64':'INT', 'float64': 'FLOAT', 'object':'TEXT'}
-	connection = get_connection(config)
+	connection = mysql.connect(     host=config.DATABASE_CONFIG['host'], 
+                                                                                        database=config.DATABASE_CONFIG['dbname'], 
+                                                                                        user=config.DATABASE_CONFIG['user'], 
+                                                                                        password=config.DATABASE_CONFIG['password'], 
+                                                                                        port=config.DATABASE_CONFIG['port'],
+											use_pure=True)
+
 	sql = 'DROP TABLE IF EXISTS %name;'.replace('%name',folder+'_'+filename)
 	cursor = connection.cursor()
 	cursor.execute(sql)
@@ -447,8 +453,10 @@ def csv_to_sqldb(config,folder,filename):
 	sql_insert_2 = sql_insert_2 + ');'
 	sql_insert = sql_insert_1 + sql_insert_2
 	cursor.execute(sql_col)
+	cursor.close()
+	cursor = connection.cursor(prepared=True)
 	#print(sql_insert)
-	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=10000, index_col=0):
+	for df in  pd.read_csv('../../secret/data/'+folder+'/'+filename+'.csv', chunksize=100000, index_col=0):
 		df = df.fillna(0)
 		for c in df:
 			df[c] = df[c].apply(backslash)
@@ -456,7 +464,8 @@ def csv_to_sqldb(config,folder,filename):
 		#print(val)
 		cursor.executemany(sql_insert, val)
 		print('Append table '+folder+'_'+filename)
-	connection.commit()
+		connection.commit()
+	cursor.close()
 	connection.close()
 	print('Insert data to table '+folder+'_'+filename)
 
