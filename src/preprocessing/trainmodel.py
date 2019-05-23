@@ -144,21 +144,17 @@ def dask_model(name):
 		#print('Score: ',inc.score(X_validation, Y_validation))
 
 def eval_model(name):
-	inc = Incremental(PassiveAggressiveClassifier(n_jobs=-1, warm_start=True), scoring='accuracy')
-	#inc = Incremental(SGDClassifier(loss='log', penalty='l2', tol=1e-3), scoring='accuracy')
-	#inc = Incremental(Perceptron(n_jobs=-1,warm_start=True), scoring='accuracy')
-	#inc = Incremental(SGDRegressor(warm_start=True), scoring='accuracy')
-	#inc = Incremental(PassiveAggressiveRegressor(warm_start=True), scoring='accuracy')
-
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 	chunk = 10000
-	classes = pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0).index.values
-	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-regressor']
+	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):	
 		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.transform(X_train)
-		X_validation = ssc.transform(X_validation)
-		test(m, X_validation, Y_validation)
+		for modelname in model_names:
+			loaded_model = pickle.load(open('../../secret/data/model/'+name+'_'+modelname, 'rb'))
+			result = loaded_model.score(X_train, Y_train)
+			print(result)
 
 '''
 def creme_model(name):

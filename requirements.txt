@@ -6,4 +6,4 @@ mathplotlib
 keras
 tensorflow
 dask-ml
-SQLAlchemy
+joblib
