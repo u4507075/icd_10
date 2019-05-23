@@ -84,13 +84,26 @@ import config
 #split_data('raw')
 #split_data('vec')
 
-#scale_data('../../secret/data/vec/','rad')
-#scale_data('../../secret/data/vec/','adm')
-#scale_data('../../secret/data/vec/','idru')
+'''
+scale_data('../../secret/data/vec/','reg')
+scale_data('../../secret/data/vec/','adm')
+scale_data('../../secret/data/vec/','rad')
+scale_data('../../secret/data/vec/','irad')
+scale_data('../../secret/data/vec/','dru')
+scale_data('../../secret/data/vec/','idru')
+scale_data('../../secret/data/vec/','lab')
+scale_data('../../secret/data/vec/','ilab')
+'''
 
+#dask_model('reg')
 #dask_model('adm')
 #dask_model('rad')
+dask_model('irad')
+#dask_model('dru')
 #dask_model('idru')
+#dask_model('lab')
+#dask_model('ilab')
+
 #eval_model('adm')
 
 
@@ -101,14 +114,14 @@ import config
 #evaluate_lstm_model('adm')
 #evaluate_lstm_model('idru')
 
-
+'''
 #Save csv file to sql
 folders = ['raw','vec']
 filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
 for folder in folders:
 	for filename in filenames:
 		csv_to_sqldb(config,folder,filename)
-
+'''
 
 
 

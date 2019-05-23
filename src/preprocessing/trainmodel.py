@@ -129,12 +129,12 @@ def dask_model(name):
 	classes = pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0).index.values
 	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.transform(X_train)
 		#X_validation = ssc.transform(X_validation)
 		models = train(models, X_train, Y_train, classes)
 		n = n + chunk
-		print('Train models '+str(n))
+		print('Train models '+name+' '+str(n))
 
 	for i in range(len(models)):
 		save_model(models[i],name+'_'+model_names[i])
@@ -244,10 +244,10 @@ def scale_data(path,filename):
 	chunk = 100000
 	for df in  pd.read_csv(path+filename+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		ssc.partial_fit(X_train)
 		mmsc.partial_fit(X_train)
-		print('fit scaler')
+	print('fit scaler '+filename)
 
 	joblib.dump(mmsc, path+filename+'_minmaxscaler.save') 
 	joblib.dump(ssc, path+filename+'_standardscaler.save') 
