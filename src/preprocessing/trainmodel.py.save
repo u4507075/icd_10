@@ -56,30 +56,9 @@ def get_dataset(trainingset, validation_size):
 	X = array[:,0:n]
 	Y = array[:,n]
 	seed = 7
-	shuffle = True
-	X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed, shuffle=shuffle)
-	if validation_size == None:
-		X_train = np.concatenate((X_train, X_validation))
-		Y_train = np.concatenate((Y_train, Y_validation))
+	X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
 	X_train, Y_train = shuffle(X_train, Y_train, random_state=seed)
 	return X_train, X_validation, Y_train, Y_validation
-
-def get_testset(trainingset):
-	for name in trainingset.columns:
-		if name != 'icd10' and str(trainingset[name].dtype) == 'object':
-			trainingset[name] = pd.to_numeric(trainingset[name], errors='coerce')
-	trainingset.fillna(0,inplace=True)
-	n = len(trainingset.columns)-1
-	array = trainingset.values
-	X = array[:,0:n]
-	Y = array[:,n]
-
-	X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, shuffle=False)
-	X_train = np.concatenate((X_train, X_validation))
-	Y_train = np.concatenate((Y_train, Y_validation))
-
-	return X_train, X_validation, Y_train, Y_validation
-
 
 def eval(testset_path,model):
 	X_train, X_validation, Y_train, Y_validation = get_dataset(testset, 0.0)
@@ -168,21 +147,16 @@ def eval_model(name):
 	chunk = 10000
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 	model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-regressor']
-	if not os.path.exists('../../secret/data/model_prediction/'):
-		os.makedirs('../../secret/data/model_prediction/')
-	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-		dftest = df.copy()
-		dftest.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
-		X_train = ssc.transform(X_train)
-		#print(len(X_train))
+	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):	
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+		X_train = ssc.
+transform(X_train)
+		print(Y_train)
 		for modelname in model_names:
 			loaded_model = pickle.load(open('../../secret/data/model/'+name+'_'+modelname+'.pkl', 'rb'))
-			#result = loaded_model.score(X_train, Y_train)
-			#print(result)
-			df[modelname] = loaded_model.predict(X_train)[:len(X_train)]
-		save_file(df,'../../secret/data/model_prediction/'+name+'.csv')
-		print('Predict '+name)
+			result = loaded_model.score(X_train, Y_train)
+			print(result)
 
 '''
 def creme_model(name):
