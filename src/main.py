@@ -104,9 +104,9 @@ scale_data('../../secret/data/vec/','ilab')
 #dask_model('lab')
 #dask_model('ilab')
 
-eval_model('reg')
+#eval_model('reg')
 
-
+lstm_model('reg',11)
 #lstm_model('rad',7)
 #lstm_model('adm',12)
 #lstm_model('idru',2)

@@ -337,28 +337,11 @@ def lstm_model(name,f):
 	
 	regressor = Sequential()
 
-	file = Path('../../secret/data/model/'+name+'.h5')
+	file = Path('../../secret/data/model/'+name+'_lstm.h5')
 	total_history = None
 	if file.is_file():
 		regressor = load_model(name)
 	else:
-		'''
-		regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (f, 1)))
-		regressor.add(Dropout(0.2))
-
-		regressor.add(LSTM(units = 50, return_sequences = True))
-		regressor.add(Dropout(0.2))
-
-		regressor.add(LSTM(units = 50, return_sequences = True))
-		regressor.add(Dropout(0.2))
-
-		regressor.add(LSTM(units = 50))
-		regressor.add(Dropout(0.2))
-
-		regressor.add(Dense(units = 1))
-
-		regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
-		'''
 
 		regressor.add(LSTM(512, return_sequences=True,
 		            input_shape=(f, 1)))  # returns a sequence of vectors of dimension 32
@@ -373,22 +356,12 @@ def lstm_model(name,f):
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save') 
 	#ssc = joblib.load('../../secret/data/vec/'+name+'_minmaxscaler.save') 
 
-	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.0)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.fit_transform(X_train)
 		X_train = X_train.reshape(len(X_train),len(df.columns)-1,1)
-		'''
-		X_validation = ssc.fit_transform(X_validation)
-		X_validation = X_validation.reshape(len(X_validation),len(df.columns)-1,1)
 
-		if testset is None:
-			testset = np.append(testset,X_validation)
-			testvalue = np.append(testvalue,Y_validation)
-		else:
-			testset = X_validation
-			testvalue = Y_validation
-		'''
 		print('Chunk '+str(r))
 		history = regressor.fit(X_train, Y_train, epochs = 100, batch_size = 32, validation_split=0.1)
 		#regressor.reset_states()
