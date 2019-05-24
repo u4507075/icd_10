@@ -56,8 +56,7 @@ def get_dataset(trainingset, validation_size):
 	X = array[:,0:n]
 	Y = array[:,n]
 	seed = 7
-	shuffle = True
-	X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed, shuffle=shuffle)
+	X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
 	if validation_size == None:
 		X_train = np.concatenate((X_train, X_validation))
 		Y_train = np.concatenate((Y_train, Y_validation))
