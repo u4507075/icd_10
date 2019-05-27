@@ -362,7 +362,7 @@ def lstm_model(name,f):
 		X_train = X_train.reshape(len(X_train),len(df.columns)-1,1)
 
 		print('Chunk '+str(r))
-		history = regressor.fit(X_train, Y_train, epochs = 100, batch_size = 32, validation_split=0.1)
+		history = regressor.fit(X_train, Y_train, epochs = 10, batch_size = 32, validation_split=0.1)
 		#regressor.reset_states()
 		r = r+1
 		#if r == 10:
