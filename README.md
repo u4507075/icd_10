@@ -66,14 +66,21 @@ Our objectives are to develop machine learning model to mapp missing or verify I
 Clinical records of out-patient visits from 2006 - 2017 (2006 - 2016 for a training set, and 2017 for a test set) are retrospectively retrieved from the Maharaj Nakhon Chiang Mai electronic health records according to the approval of ethical exemption. Approximately one million records are expected to be retrieved per year. Only encoded data (number, string) are included in the experiment (excluding images and scanned documents).
 
 ### Dataset
-Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were de-identified and preprocessed. All data that could potentially be used to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We use **TXN** (a unique number representing a patient visit) to be a joining key between five groups of datasets (total size 82G).
+Data recorded between 2006 - 2019 from the electronic health records of Maharaj Nakhon Chiang Mai were de-identified and preprocessed. All data that could potentially be used to track back to an individual patient such as patients' name, surname, address, national identification number, address, phone number, hospital number were removed. We use **TXN** (a unique number representing a patient visit) to be a joining key between five groups of datasets (total size 82G). Raw dataset is the dataset that contain orignal data (numeric and string format). Vec dataset is the dataset that were converted to numeric format using wordtovec.
 
 #### Raw dataset
-1. Registration data (reg.csv (176M))
-2. Admission data (adm.csv (147M))
-3. Laboratory data (lab.csv (3.1G), ilab.csv(74G))
-4. Radiological report data (rad.csv (107M), irad (107M))
-5. Drug prescription data (dru.csv (189M), idru (3.9G))
+1. Registration data (reg.csv (161M))
+2. Admission data (adm.csv (133M))
+3. Laboratory data (lab.csv (2.9G), ilab.csv(67G))
+4. Radiological report data (rad.csv (99M), irad (653M))
+5. Drug prescription data (dru.csv (172M), idru (3.5G))
+
+#### Vec dataset
+1. Registration data (reg.csv (378M))
+2. Admission data (adm.csv (324M))
+3. Laboratory data (lab.csv (2.6G), ilab.csv(57G))
+4. Radiological report data (rad.csv (2.3G), irad (15G))
+5. Drug prescription data (dru.csv (169M), idru (3.2G))
 
 TXN is a joining key for reg.csv, lab.csv, rad.csv, and dru.csv.
 TXN is a joining key for adm.csv, ilab.csv, irad.csv, and idru.csv.
