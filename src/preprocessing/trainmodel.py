@@ -396,6 +396,7 @@ def evaluate_lstm_model(name):
 
 
 def kmean(name):
+	chunk = 10000
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
