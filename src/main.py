@@ -9,7 +9,7 @@ from preprocessing.trainmodel import dask_model
 from preprocessing.trainmodel import eval_model
 from preprocessing.trainmodel import lstm_model
 from preprocessing.trainmodel import evaluate_lstm_model
-#from preprocessing.trainmodel import save_history
+from preprocessing.trainmodel import kmean
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -95,6 +95,8 @@ scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
 
+kmean('reg')
+
 #dask_model('reg')
 #dask_model('adm')
 #dask_model('rad')
@@ -105,7 +107,7 @@ scale_data('../../secret/data/vec/','ilab')
 #dask_model('ilab')
 
 #eval_model('reg')
-eval_model('adm')
+#eval_model('adm')
 #eval_model('dru')
 
 #lstm_model('reg',11)
