@@ -399,14 +399,23 @@ def evaluate_lstm_model(name):
 def kmean(name):
 	chunk = 10000
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	kmeans = MiniBatchKMeans(n_clusters=2, random_state=0, batch_size=6)
 	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.transform(X_train)
-		kmeans = MiniBatchKMeans(n_clusters=2, random_state=0, batch_size=6)
 		kmeans = kmeans.partial_fit(X_train)
+		break
 
-
+	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+		X_train = ssc.transform(X_train)
+		y_pred = kmeans.predict(X_train)  
+		cf = confusion_matrix(X_train, y_pred)
+		print(cf)
+		cr = classification_report(X_train, y_pred)
+		print(cr)
 
 
 
