@@ -17,6 +17,7 @@ from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import PassiveAggressiveRegressor
 from xgboost import XGBClassifier
+from sklearn.cluster import MiniBatchKMeans
 
 from sklearn.metrics import precision_recall_fscore_support
 
