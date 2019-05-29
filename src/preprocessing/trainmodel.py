@@ -479,11 +479,11 @@ def get_neighbour(train,modelname,n):
 			results.append(result)
 			#result['kmean_'+str(n)] = result['kmean_'+str(n)].apply(top)
 			print('append result')
-			if len(results) == 2:
-				break
+			#if len(results) == 2:
+			#	break
 	total = pd.concat(results)
 	total = total.groupby(['kmean_'+str(n),'icd10']).sum()
 	total.reset_index(inplace=True)
 	total = total.sort_values(by=['kmean_'+str(n),'icd10_count'], ascending=[True,False])
 	total = total.groupby(['kmean_'+str(n)]).head(5)
-	print(total)
+	save_file(total,'../../secret/data/model_prediction'+name+'_kmean_neighbour.csv')
