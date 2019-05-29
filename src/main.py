@@ -10,6 +10,8 @@ from preprocessing.trainmodel import eval_model
 from preprocessing.trainmodel import lstm_model
 from preprocessing.trainmodel import evaluate_lstm_model
 from preprocessing.trainmodel import kmean
+from preprocessing.trainmodel import predict_kmean
+from preprocessing.trainmodel import get_neighbour
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -95,7 +97,11 @@ scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
 
-kmean('reg')
+#kmean('reg')
+#predict_kmean('reg')
+#kmean(['dru','idru'],'drug')
+#predict_kmean('dru','drug')
+get_neighbour(['dru'],'drug',100)
 
 #dask_model('reg')
 #dask_model('adm')

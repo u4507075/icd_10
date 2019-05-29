@@ -396,28 +396,94 @@ def evaluate_lstm_model(name):
 		predict(X_validation,Y_validation,ssc,regressor)
 
 
-def kmean(name):
+def kmean(train,modelname):
+	chunk = 100000
+	'''
+	reg
+	100: err 1695
+	200: err 1141
+	300: err 878
+	400: err 935
+	500: err 887
+	600: err 660
+	700: err 602
+	800: err 477
+	900: err 637
+	1000:err 585
+
+	dru
+	100:   err 822
+       	1000:  err 163
+	5000:  err 50
+	10000: err 
+	15000: err 
+	20000: err 
+	25000: err 
+	30000: err 
+	'''
+	#n = [100,1000,5000,10000,15000,20000,25000,30000]
+	n = [10000]
+	for i in n:
+		print('Number of Cluster :'+str(i))
+		kmeans = MiniBatchKMeans(n_clusters=i, random_state=0, batch_size=6)
+		for name in train:
+			ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+
+			for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+				df.drop(['txn'], axis=1, inplace=True)
+				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+				X_train = ssc.transform(X_train)
+				kmeans = kmeans.partial_fit(X_train)
+				#break
+		save_model(kmeans,modelname+'_kmean_'+str(i))
+		print(kmeans.inertia_)
+def predict_kmean(name,modelname):
 	chunk = 10000
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
-	kmeans = MiniBatchKMeans(n_clusters=2, random_state=0, batch_size=6)
-	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-		X_train = ssc.transform(X_train)
-		kmeans = kmeans.partial_fit(X_train)
-		break
-
+	if not os.path.exists('../../secret/data/model_prediction/'):
+		os.makedirs('../../secret/data/model_prediction/')
+	#n = [100,1000,5000,10000,15000,20000,25000,30000]
+	n = [100]
 	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+		dftest = df.copy()
+		dftest.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(dftest, None)
 		X_train = ssc.transform(X_train)
-		y_pred = kmeans.predict(X_train)  
-		cf = confusion_matrix(X_train, y_pred)
-		print(cf)
-		cr = classification_report(X_train, y_pred)
-		print(cr)
+		for i in n:
+			kmeans = pickle.load(open('../../secret/data/model/'+modelname+'_kmean_'+str(i)+'.pkl', 'rb'))
+			df['kmean_'+str(i)] = kmeans.predict(X_train)[:len(X_train)]
+		save_file(df,'../../secret/data/model_prediction/'+name+'_kmean.csv')
+		print('save result')
 
+def top(x):
+	return x.value_counts().head(5)
 
+def topsum(x):
+	return x.sum().head(5)
 
-
-
+def get_neighbour(train,modelname,n):
+	chunk = 100000
+	results = []
+	kmeans = pickle.load(open('../../secret/data/model/'+modelname+'_kmean_'+str(n)+'.pkl', 'rb'))
+	for name in train:
+		ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			X_train = ssc.transform(X_train)
+			df['kmean_'+str(n)] = kmeans.predict(X_train)[:len(X_train)]
+			result = df['icd10'].groupby(df['kmean_'+str(n)]).apply(top).to_frame()
+			result = result.rename(columns={'icd10':'icd10_count'})
+			result.reset_index(inplace=True)
+			result = result.rename(columns={'level_1':'icd10'})
+			results.append(result)
+			#result['kmean_'+str(n)] = result['kmean_'+str(n)].apply(top)
+			print('append result')
+			if len(results) == 2:
+				break
+	total = pd.concat(results)
+	total = total.groupby(['kmean_'+str(n),'icd10']).sum()
+	total.reset_index(inplace=True)
+	total = total.sort_values(by=['kmean_'+str(n),'icd10_count'], ascending=[True,False])
+	total = total.groupby(['kmean_'+str(n)]).head(5)
+	print(total)
