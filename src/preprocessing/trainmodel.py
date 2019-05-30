@@ -397,7 +397,7 @@ def evaluate_lstm_model(name):
 
 
 def kmean(train,modelname):
-	chunk = 100000
+	chunk = 20000
 	'''
 	reg
 	100: err 1695
@@ -434,6 +434,7 @@ def kmean(train,modelname):
 				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 				X_train = ssc.transform(X_train)
 				kmeans = kmeans.partial_fit(X_train)
+				print('train')
 				#break
 		save_model(kmeans,modelname+'_kmean_'+str(i))
 		print(kmeans.inertia_)
@@ -443,7 +444,7 @@ def predict_kmean(name,modelname):
 	if not os.path.exists('../../secret/data/model_prediction/'):
 		os.makedirs('../../secret/data/model_prediction/')
 	#n = [100,1000,5000,10000,15000,20000,25000,30000]
-	n = [100]
+	n = [100,1000]
 	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest.drop(['txn'], axis=1, inplace=True)
@@ -486,4 +487,4 @@ def get_neighbour(train,modelname,n):
 	total.reset_index(inplace=True)
 	total = total.sort_values(by=['kmean_'+str(n),'icd10_count'], ascending=[True,False])
 	total = total.groupby(['kmean_'+str(n)]).head(5)
-	save_file(total,'../../secret/data/model_prediction'+name+'_kmean_neighbour.csv')
+	save_file(total,'../../secret/data/model_prediction/'+name+'_kmean_neighbour.csv')

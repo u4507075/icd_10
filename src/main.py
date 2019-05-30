@@ -98,10 +98,11 @@ scale_data('../../secret/data/vec/','ilab')
 '''
 
 #kmean('reg')
+kmean(['dru','idru'],'drug')
 #predict_kmean('reg')
 #kmean(['dru','idru'],'drug')
 #predict_kmean('dru','drug')
-get_neighbour(['dru'],'drug',100)
+#get_neighbour(['dru'],'drug',1000)
 
 #dask_model('reg')
 #dask_model('adm')
