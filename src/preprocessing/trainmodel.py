@@ -499,7 +499,7 @@ def batch_training(name):
 			df['dummy'] = 0
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			X_train = ssc.transform(X_train)
+			#X_train = ssc.transform(X_train)
 			kmeans = kmeans.partial_fit(X_train)
 			print(kmeans.inertia_)
 
