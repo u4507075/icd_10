@@ -494,7 +494,7 @@ def batch_training(name):
 	chunk = 1000
 	model = MiniBatchDictionaryLearning()
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
-	kmeans = MiniBatchKMeans(n_clusters=i, random_state=0, batch_size=6)
+	kmeans = MiniBatchKMeans(n_clusters=10, random_state=0, batch_size=6)
 	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df['dummy'] = 0
 			df.drop(['txn'], axis=1, inplace=True)
