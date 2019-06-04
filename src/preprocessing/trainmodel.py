@@ -491,16 +491,17 @@ def get_neighbour(train,modelname,n):
 	save_file(total,'../../secret/data/model_prediction/'+name+'_kmean_neighbour.csv')
 
 def batch_training(name):
-	chunk = 100000
+	chunk = 1000
 	model = MiniBatchDictionaryLearning()
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	kmeans = MiniBatchKMeans(n_clusters=i, random_state=0, batch_size=6)
 	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-		df = df.sample(frac=0.1)
-		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-		X_train = ssc.transform(X_train)
-		model = model.partial_fit(X_train)
-		print(model)
+			df['dummy'] = 0
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			X_train = ssc.transform(X_train)
+			kmeans = kmeans.partial_fit(X_train)
+			print(kmeans.inertia_)
 
 
 
