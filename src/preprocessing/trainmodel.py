@@ -397,7 +397,7 @@ def evaluate_lstm_model(name):
 
 
 def kmean(train,modelname):
-	chunk = 20000
+	chunk = 30000
 	'''
 	reg
 	100: err 1695
@@ -422,7 +422,7 @@ def kmean(train,modelname):
 	30000: err 
 	'''
 	#n = [100,1000,5000,10000,15000,20000,25000,30000]
-	n = [10000]
+	n = [20000]
 	for i in n:
 		print('Number of Cluster :'+str(i))
 		kmeans = MiniBatchKMeans(n_clusters=i, random_state=0, batch_size=6)
@@ -444,7 +444,7 @@ def predict_kmean(name,modelname):
 	if not os.path.exists('../../secret/data/model_prediction/'):
 		os.makedirs('../../secret/data/model_prediction/')
 	#n = [100,1000,5000,10000,15000,20000,25000,30000]
-	n = [100,1000]
+	n = [100,1000,10000]
 	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest.drop(['txn'], axis=1, inplace=True)
