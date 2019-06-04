@@ -496,6 +496,7 @@ def batch_training(name):
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df = df.sample(frac=0.1)
+		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.transform(X_train)
 		model.partial_fit(0)
