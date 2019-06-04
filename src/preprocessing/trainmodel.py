@@ -18,6 +18,7 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import PassiveAggressiveRegressor
 from xgboost import XGBClassifier
 from sklearn.cluster import MiniBatchKMeans
+from sklearn.decomposition import MiniBatchDictionaryLearning
 
 from sklearn.metrics import precision_recall_fscore_support
 
@@ -488,3 +489,30 @@ def get_neighbour(train,modelname,n):
 	total = total.sort_values(by=['kmean_'+str(n),'icd10_count'], ascending=[True,False])
 	total = total.groupby(['kmean_'+str(n)]).head(5)
 	save_file(total,'../../secret/data/model_prediction/'+name+'_kmean_neighbour.csv')
+
+def batch_training(name):
+	chunk = 100000
+	model = MiniBatchDictionaryLearning()
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df = df.sample(frac=0.1)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+		X_train = ssc.transform(X_train)
+		model.partial_fit(0)
+		print(model)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
