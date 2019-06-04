@@ -499,7 +499,7 @@ def batch_training(name):
 		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.transform(X_train)
-		model.partial_fit(0)
+		model = model.partial_fit(X_train)
 		print(model)
 
 
