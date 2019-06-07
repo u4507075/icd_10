@@ -18,6 +18,8 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import PassiveAggressiveRegressor
 from xgboost import XGBClassifier
 from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import KMeans
+from sklearn.cluster import Birch
 from sklearn.decomposition import MiniBatchDictionaryLearning
 
 from sklearn.metrics import precision_recall_fscore_support
@@ -38,6 +40,7 @@ from dask_ml.wrappers import Incremental
 
 from sklearn.externals import joblib
 from keras.models import model_from_json
+import joblib as jl
 '''
 from creme import linear_model
 from creme import naive_bayes
@@ -490,20 +493,26 @@ def get_neighbour(train,modelname,n):
 	total = total.groupby(['kmean_'+str(n)]).head(5)
 	save_file(total,'../../secret/data/model_prediction/'+name+'_kmean_neighbour.csv')
 
-def batch_training(name):
-	chunk = 1000
-	model = MiniBatchDictionaryLearning()
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
-	kmeans = MiniBatchKMeans(n_clusters=10, random_state=0, batch_size=6)
-	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df['dummy'] = 0
+def batch_training(train):
+	chunk = 10000
+	b = Birch(n_clusters=None,threshold=0.00001)
+	for name in train:
+		ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
+
+		for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 			#X_train = ssc.transform(X_train)
-			kmeans = kmeans.partial_fit(X_train)
-			print(kmeans.inertia_)
+			b = b.partial_fit(X_train)
+			print('Number of cluster: '+str(len(b.subcluster_centers_)))
+			#break
 
-
+	for df in pd.read_csv('../../secret/data/testset/vec/dru.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_testset(df)
+		#X_train = ssc.transform(X_train)
+		df['cluster'] = b.predict(X_train)[:len(X_train)]
+		save_file(df,'../../secret/data/birch.csv')
 
 
 

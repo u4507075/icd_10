@@ -105,7 +105,7 @@ scale_data('../../secret/data/vec/','ilab')
 #predict_kmean('dru','drug')
 #get_neighbour(['dru'],'drug',10000)
 
-batch_training('dru')
+batch_training(['dru','idru'])
 
 #dask_model('reg')
 #dask_model('adm')
