@@ -196,6 +196,48 @@ new_value = (x - avg(feature))/(sdev(feature))
 We use spacy to transform entire string data to numeric data, scale the input features using StandardScaler encode ICD-10, and map ICD-10 to number.
 #### Incremental models
 We use the models which support partial fit because the training set is too big to fit in one time. The models include multiclass classifiers (PassiveAggressiveClassifier, SGDClassifier, and Perceptron) and regression classifiers (PassiveAggressiveRegressor and SGDRegressor) using [dask-ml](https://examples.dask.org/machine-learning/incremental.html#Model-training) library. The models are trained with the training set and saved as .pkl file. Then, load the models to validate with the testset.
+#### Clustering
+[Birch clustering algorithm](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.Birch.html#sklearn.cluster.Birch)
+
+As we know, there are too large number of target classes (icd10) which the common supervised ml model might not be very fit to solve the problem. Also, the data do not provide a clear cut where which drug, investigation pairs with a single diagnosis.
+
+Thus, clustering might be a good option to start with because it groups similar things together without the need that you have to separate the instance into a single grain level.
+
+There are so many kinds of clustering algorithms. Which one should I choose?
+
+Have a look at the comparison of the clustering algorithms in [scikit-learn] (https://scikit-learn.org/stable/modules/clustering.html#spectral-clustering)
+
+The preferred algorithm should be able to:
+
+Handle very large n-samples (can do partial_fit)
+Good with large n-cluster (handle large number of icd10)
+No need to define n-cluster before training
+From the list of clustering algorithms, Brich seems to fullfil the criteria. We can set the threshold (how far of neighbour instances should be separated as a new cluster. Low threshold = instances within the same cluster must be very close.).
+
+I tested wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold).
+```
+def brich_training(train):
+	chunk = 10000
+	b = Birch(n_clusters=None,threshold=0.00001)
+	for name in train:
+ ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
+
+ for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+  df.drop(['txn'], axis=1, inplace=True)
+  X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+  #X_train = ssc.transform(X_train)
+  b = b.partial_fit(X_train)
+  print('Number of cluster: '+str(len(b.subcluster_centers_)))
+  #break
+
+	for df in pd.read_csv('../../secret/data/testset/vec/dru.csv', chunksize=chunk, index_col=0):
+ df.drop(['txn'], axis=1, inplace=True)
+ X_train, X_validation, Y_train, Y_validation = get_testset(df)
+ #X_train = ssc.transform(X_train)
+ df['cluster'] = b.predict(X_train)[:len(X_train)]
+ save_file(df,'../../secret/data/birch.csv')
+```
+This just groups the same/similar drugs together but not give me what drug group associates with what diagnosis. This is a plan for next week to find this association. I assume that the associated diagnosis should be the highest count of diagnosis within that cluster.
 #### LSTM
 We feed data to train LSTM (3 layers 512x512x512) with all ICD-10 as a target class and initially evaluation the training loss again evaluation loss. The loss shows that .......(still training the model).
 
