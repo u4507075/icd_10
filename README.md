@@ -205,7 +205,7 @@ Thus, clustering might be a good option to start with because it groups similar 
 
 There are so many kinds of clustering algorithms. Which one should I choose?
 
-Have a look at the comparison of the clustering algorithms in [scikit-learn] (https://scikit-learn.org/stable/modules/clustering.html#spectral-clustering)
+Have a look at the comparison of the clustering algorithms in [scikit-learn](https://scikit-learn.org/stable/modules/clustering.html#spectral-clustering)
 
 The preferred algorithm should be able to:
 
