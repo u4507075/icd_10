@@ -209,9 +209,10 @@ Have a look at the comparison of the clustering algorithms in [scikit-learn](htt
 
 The preferred algorithm should be able to:
 
-Handle very large n-samples (can do partial_fit)
-Good with large n-cluster (handle large number of icd10)
-No need to define n-cluster before training
+1. Handle very large n-samples (can do partial_fit)
+2. Good with large n-cluster (handle large number of icd10)
+3. No need to define n-cluster before training
+
 From the list of clustering algorithms, Brich seems to fullfil the criteria. We can set the threshold (how far of neighbour instances should be separated as a new cluster. Low threshold = instances within the same cluster must be very close.).
 
 I tested wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold).
