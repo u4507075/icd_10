@@ -12,7 +12,8 @@ from preprocessing.trainmodel import evaluate_lstm_model
 from preprocessing.trainmodel import kmean
 from preprocessing.trainmodel import predict_kmean
 from preprocessing.trainmodel import get_neighbour
-from preprocessing.trainmodel import batch_training
+from preprocessing.trainmodel import birch_train
+from preprocessing.trainmodel import birch_test
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -105,7 +106,7 @@ scale_data('../../secret/data/vec/','ilab')
 #predict_kmean('dru','drug')
 #get_neighbour(['dru'],'drug',10000)
 
-batch_training(['dru','idru'])
+birch_train(['dru','idru'],'drug')
 
 #dask_model('reg')
 #dask_model('adm')
