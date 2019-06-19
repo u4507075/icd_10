@@ -466,18 +466,20 @@ def top(x):
 def topsum(x):
 	return x.sum().head(5)
 
-def get_neighbour(train,modelname,n):
+def get_neighbour(train,modelname):
 	chunk = 100000
 	results = []
 	model = pickle.load(open('../../secret/data/model/'+modelname+'.pkl', 'rb'))
 	for name in train:
-		ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+		#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
-			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			X_train = ssc.transform(X_train)
-			df['kmean_'+str(n)] = kmeans.predict(X_train)[:len(X_train)]
-			result = df['icd10'].groupby(df['kmean_'+str(n)]).apply(top).to_frame()
+			if name == 'reg':
+				df.insert(9,'room_dc',0)
+			X_train, X_validation, Y_train, Y_validation = get_testset(df)
+			#X_train = ssc.transform(X_train)
+			df['cluster'] = model.predict(X_train)[:len(X_train)]
+			result = df['icd10'].groupby(df['cluster']).apply(top).to_frame()
 			result = result.rename(columns={'icd10':'icd10_count'})
 			result.reset_index(inplace=True)
 			result = result.rename(columns={'level_1':'icd10'})
@@ -487,20 +489,22 @@ def get_neighbour(train,modelname,n):
 			#if len(results) == 2:
 			#	break
 	total = pd.concat(results)
-	total = total.groupby(['kmean_'+str(n),'icd10']).sum()
+	total = total.groupby(['cluster','icd10']).sum()
 	total.reset_index(inplace=True)
-	total = total.sort_values(by=['kmean_'+str(n),'icd10_count'], ascending=[True,False])
-	total = total.groupby(['kmean_'+str(n)]).head(5)
-	save_file(total,'../../secret/data/model_prediction/'+name+'_kmean_neighbour.csv')
+	total = total.sort_values(by=['cluster','icd10_count'], ascending=[True,False])
+	total = total.groupby(['cluster']).head(5)
+	total.to_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv')
 
-def birch_train(train,modelname):
+def birch_train(train,modelname,n,t):
 	chunk = 10000
-	b = Birch(n_clusters=None,threshold=0.01)
+	b = Birch(n_clusters=n,threshold=t)
 	for name in train:
 		ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
 
 		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
+			if name == 'reg':
+				df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 			#X_train = ssc.transform(X_train)
 			b = b.partial_fit(X_train)
@@ -508,11 +512,13 @@ def birch_train(train,modelname):
 			#break
 	save_model(b,modelname)
 	print('save birch model')
-def birch_test(train,modelname)
+def birch_test(train,modelname):
 	model = pickle.load(open('../../secret/data/model/'+modelname+'.pkl', 'rb'))
 	for name in train:
 		for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
+			if name == 'reg':
+				df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
 			#X_train = ssc.transform(X_train)
 			df['cluster'] = model.predict(X_train)[:len(X_train)]
