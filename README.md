@@ -215,7 +215,7 @@ The preferred algorithm should be able to:
 
 From the list of clustering algorithms, Brich seems to fullfil the criteria. We can set the threshold (how far of neighbour instances should be separated as a new cluster. Low threshold = instances within the same cluster must be very close.).
 
-I tested wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text
+I tested wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text. However, drug names can be slightly different. The differences are the spelling of trade names and/or drug specification. For example, dopamine injection has 50 and 250 milligrams forms or mitoxatone and mitoxantrone. Therefore, approximate match is required to group those drugs together.
 ```
 def brich_training(train):
 	chunk = 10000
@@ -239,6 +239,11 @@ def brich_training(train):
  save_file(df,'../../secret/data/birch.csv')
 ```
 This just groups the same/similar drugs together but not give me what drug group associates with what diagnosis. This is a plan for next week to find this association. I assume that the associated diagnosis should be the highest count of diagnosis within that cluster.
+
+Five thresholds (0.1,0.25,0.5,0.75,1.00) were set to develop five clustering models. The 0.1 threshold model clusters drugs to small groups which the members are very close. The low threshold helps to capture names with exact match. On the other hand, the high threshold creates more flexibility to group same drugs but present in slightly different text together while the low threshold separates those drugs to different groups.
+
+The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then,
+
 #### LSTM
 We feed data to train LSTM (3 layers 512x512x512) with all ICD-10 as a target class and initially evaluation the training loss again evaluation loss. The loss shows that .......(still training the model).
 
