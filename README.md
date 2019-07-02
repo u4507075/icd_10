@@ -251,8 +251,11 @@ weight = number of icd10(x) in the cluster/total number of icd10(x)
 However, the weight does not truely represent the level of drug/icd10 association because the size of cluster does affect to the level. High weight in big cluster falsely represents the high level of association because it also includes other icd10s in the cluster. The purify of the interested icd10 in the cluster is low even high weight which means the association level is low. This pattern is found when the drug is generally used. One drug is used in many icd10s (such as multivitamin, paracetamol, anti-histamine drugs). Therefore, the total number of icd10 in the cluster needs to be counted in the formula.
 
 ```
-weight = number of icd10(x) in the cluster/(total number of icd10(x) x total number of icd10 in the cluster)
+modified weight = number of icd10(x) in the cluster/(total number of icd10(x) x total number of icd10 in the cluster)
 ```
+
+Then, the models were used to predict cluster from the test set and select top ten of icd10s (ranked by the modified weight). Group all predicted icd10s by txm and sum the weights of the same icd10 and rank the icd10s by aggregated weight again.
+
 
 #### LSTM
 We feed data to train LSTM (3 layers 512x512x512) with all ICD-10 as a target class and initially evaluation the training loss again evaluation loss. The loss shows that .......(still training the model).
