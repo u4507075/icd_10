@@ -237,12 +237,22 @@ def brich_training(train):
  #X_train = ssc.transform(X_train)
  df['cluster'] = b.predict(X_train)[:len(X_train)]
  save_file(df,'../../secret/data/birch.csv')
-```
+ ```
 This just groups the same/similar drugs together but not give me what drug group associates with what diagnosis. This is a plan for next week to find this association. I assume that the associated diagnosis should be the highest count of diagnosis within that cluster.
 
 Five thresholds (0.1,0.25,0.5,0.75,1.00) were set to develop five clustering models. The 0.1 threshold model clusters drugs to small groups which the members are very close. The low threshold helps to capture names with exact match. On the other hand, the high threshold creates more flexibility to group same drugs but present in slightly different text together while the low threshold separates those drugs to different groups.
 
-The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then,
+The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then, aggregate the number of icd10 in the cluster. As mentioned, drug with highly specific to a particular diagnosis presents a strong pattern that the ratio of number of icd10 inside and outside cluster is high, defined as weight.
+
+```
+weight = number of icd10(x) in the cluster/total number of icd10(x)
+```
+
+However, the weight does not truely represent the level of drug/icd10 association because the size of cluster does affect to the level. High weight in big cluster falsely represents the high level of association because it also includes other icd10s in the cluster. The purify of the interested icd10 in the cluster is low even high weight which means the association level is low. This pattern is found when the drug is generally used. One drug is used in many icd10s (such as multivitamin, paracetamol, anti-histamine drugs). Therefore, the total number of icd10 in the cluster needs to be counted in the formula.
+
+```
+weight = number of icd10(x) in the cluster/(total number of icd10(x) x total number of icd10 in the cluster)
+```
 
 #### LSTM
 We feed data to train LSTM (3 layers 512x512x512) with all ICD-10 as a target class and initially evaluation the training loss again evaluation loss. The loss shows that .......(still training the model).
