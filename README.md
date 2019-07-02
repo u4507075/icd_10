@@ -189,6 +189,11 @@ StandardScaler standardise dataset using mean and standard deviation of the feat
 ```
 new_value = (x - avg(feature))/(sdev(feature))
 ```
+### Target class
+
+The main problem is the number of target class (icd10) is large (14,000). Moreover, not all input correctly associates to a target class. The target class could be represented in 4 ways.
+1. Individual class: one icd10 is treated as one target class. This approach creates the complexity and redundancy of data which makes the models hard to learn.
+2. Group class: group all icd10s in one txn and embed to a new target class. The combination of icd10s is found that often repeated because the diseases usually relate to each other. For instance, acute renal failure is commonly found with sepsis because sepsis leads to shock and shock causes renal failure.
 
 ## Design the approach to predict ICD-10
 ### Approach 1: Multi-class classification
@@ -290,4 +295,11 @@ git remote -v
 ```
 ## How it works
 ## Model evaluation
+
+According to the nature of the problem, the group diagnosis approach is more appropriate than individual approach because of a large number of target class and incomplete individual mapping. The group validation refers to two parts: mathimatical and clinical validation.
+
+1. Mathimatical validation
+
+2. Clinical validation
+
 ## Limitations
