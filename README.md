@@ -195,6 +195,9 @@ The main problem is the number of target class (icd10) is large (14,000). Moreov
 1. Individual class: one icd10 is treated as one target class. This approach creates the complexity and redundancy of data which makes the models hard to learn.
 2. Group class: group all icd10s in one txn and embed to a new target class. The combination of icd10s is found that often repeated because the diseases usually relate to each other. For instance, acute renal failure is commonly found with sepsis because sepsis leads to shock and shock causes renal failure.
 
+###SNOMED CT
+[SNOMED CT](http://this.or.th/files/44_SNOMED_CT_Manual_VersionThai_201903.pdf?fbclid=IwAR3u0cZyXwefnVH2uCzwqHPC_kHs6ZR1ef6DtDe8yA60R6JkiCbfC53wZP4) is a systematically organized collection of medical terms. SNOMED CT maps medical terms or phrases to a concept id which represents the association to computer processable hirachical concept. SNOMED CT also maps concept id to icd10 which we could use these association to map text from radiological report to icd10 through concept id. 
+
 ## Design the approach to predict ICD-10
 ### Approach 1: Multi-class classification
 #### Scale dataset
