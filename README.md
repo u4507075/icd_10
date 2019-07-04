@@ -223,7 +223,7 @@ The preferred algorithm should be able to:
 
 From the list of clustering algorithms, Brich seems to fullfil the criteria. We can set the threshold (how far of neighbour instances should be separated as a new cluster. Low threshold = instances within the same cluster must be very close.).
 
-I tested wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text. However, drug names can be slightly different. The differences are the spelling of trade names and/or drug specification. For example, dopamine injection has 50 and 250 milligrams forms or mitoxatone and mitoxantrone. Therefore, approximate match is required to group those drugs together.
+I tested Birch clustering wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text. However, drug names can be slightly different. The differences are the spelling of trade names and/or drug specification. For example, dopamine injection has 50 and 250 milligrams forms or mitoxatone and mitoxantrone. Therefore, approximate match is required to group those drugs together.
 ```
 def brich_training(train):
 	chunk = 10000
@@ -246,7 +246,7 @@ def brich_training(train):
  df['cluster'] = b.predict(X_train)[:len(X_train)]
  save_file(df,'../../secret/data/birch.csv')
  ```
-This just groups the same/similar drugs together but not give me what drug group associates with what diagnosis. This is a plan for next week to find this association. I assume that the associated diagnosis should be the highest count of diagnosis within that cluster.
+This approach groups drugs spelling with same or similar text together but not give me what drug group associates with what diagnosis. However, I assume that the true associattion of drug and diagnosis should be high comparing among menbers within the same cluster.
 
 Five thresholds (0.1,0.25,0.5,0.75,1.00) were set to develop five clustering models. The 0.1 threshold model clusters drugs to small groups which the members are very close. The low threshold helps to capture names with exact match. On the other hand, the high threshold creates more flexibility to group same drugs but present in slightly different text together while the low threshold separates those drugs to different groups.
 
@@ -262,7 +262,7 @@ However, the weight does not truely represent the level of drug/icd10 associatio
 modified weight = number of icd10(x) in the cluster/(total number of icd10(x) x total number of icd10 in the cluster)
 ```
 
-Then, the models were used to predict cluster from the test set and select top ten of icd10s (ranked by the modified weight). Group all predicted icd10s by txm and sum the weights of the same icd10 and rank the icd10s by aggregated weight again.
+Then, the models were used to predict cluster from the test set and select top ten of icd10s (ranked by the modified weight). Group all predicted icd10s by txn and sum the weights of the same icd10 and rank the icd10s by aggregated weight again.
 
 
 #### LSTM
