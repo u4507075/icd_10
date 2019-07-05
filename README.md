@@ -223,7 +223,7 @@ The preferred algorithm should be able to:
 
 From the list of clustering algorithms, Brich seems to fullfil the criteria. We can set the threshold (how far of neighbour instances should be separated as a new cluster. Low threshold = instances within the same cluster must be very close.).
 
-I tested Birch clustering wtih drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text. However, drug names can be slightly different. The differences are the spelling of trade names and/or drug specification. For example, dopamine injection has 50 and 250 milligrams forms or mitoxatone and mitoxantrone. Therefore, approximate match is required to group those drugs together.
+I tested Birch clustering with drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text. However, drug names can be slightly different. The differences are the spelling of trade names and/or drug specification. For example, dopamine injection has 50 and 250 milligrams forms or mitoxatone and mitoxantrone. Therefore, approximate match is required to group those drugs together.
 ```
 def brich_training(train):
 	chunk = 10000
