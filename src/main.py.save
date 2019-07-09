@@ -12,10 +12,8 @@ from preprocessing.trainmodel import evaluate_lstm_model
 from preprocessing.trainmodel import kmean
 from preprocessing.trainmodel import predict_kmean
 from preprocessing.trainmodel import get_neighbour
-from preprocessing.trainmodel import get_weight
 from preprocessing.trainmodel import birch_train
 from preprocessing.trainmodel import birch_test
-from preprocessing.trainmodel import birch_predict
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -109,24 +107,11 @@ scale_data('../../secret/data/vec/','ilab')
 #get_neighbour(['dru','idru'],'drug_birch')
 
 #birch_train(['dru','idru'],'drug_birch',None,[0.1,0.25,0.5,0.75,1.00])
-for i in [0.1,0.25,0.5,0.75,1.00]:
+#for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['dru','idru'],'drug_birch_'+str(i))
-#	get_weight('drug_birch_'+str(i))
-#	birch_test(['dru','idru'],'drug_birch_'+str(i))
-	birch_predict(['dru','idru'])
-
-#birch_train(['reg','adm'],'reg_birch',None,[5,6,7,8,9])
-#for i in [5,6,7,8,9]:
-#	get_neighbour(['reg','adm'],'reg_birch_'+str(i))
-#	get_weight('reg_birch_'+str(i))
-#	birch_test(['reg','adm'],'reg_birch_'+str(i))
-#	birch_predict(['reg','adm'])
-
+#birch_test(['dru','idru'],'drug_birch')
+#birch_train(['reg','adm'],'reg_birch',None,[3,4,5,6,7])
 #birch_train(['lab','ilab'],'lab_birch',None,[0.75,1.0,1.25,1.50,1.75])
-#for i in [0.75,1.0,1.25,1.50,1.75]:
-#	get_neighbour(['lab','ilab'],'lab_birch_'+str(i))
-#	get_weight('lab_birch_'+str(i))
-#	birch_test(['lab','ilab'],'lab_birch_'+str(i))
 
 #dask_model('reg')
 #dask_model('adm')

@@ -115,6 +115,11 @@ def save_file(df,p):
 	else:
 		df.to_csv(p)
 
+def remove_file(p):
+	file = Path(p)
+	if file.is_file():
+		os.remove(p)
+
 def train(models, X_train, Y_train, classes):
 	for m in models:
 		if str(m.estimator).startswith('SGDRegressor') or str(m.estimator).startswith('PassiveAggressiveRegressor'):
@@ -461,64 +466,113 @@ def predict_kmean(name,modelname):
 		print('save result')
 
 def top(x):
-	return x.value_counts().head(5)
+	return x.value_counts().head(10)
 
 def topsum(x):
 	return x.sum().head(5)
 
-def get_neighbour(train,modelname,n):
+def get_neighbour(train,modelname):
 	chunk = 100000
 	results = []
 	model = pickle.load(open('../../secret/data/model/'+modelname+'.pkl', 'rb'))
 	for name in train:
-		ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+		#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
-			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			X_train = ssc.transform(X_train)
-			df['kmean_'+str(n)] = kmeans.predict(X_train)[:len(X_train)]
-			result = df['icd10'].groupby(df['kmean_'+str(n)]).apply(top).to_frame()
+			if name == 'reg':
+				df.insert(9,'room_dc',0)
+			X_train, X_validation, Y_train, Y_validation = get_testset(df)
+			#X_train = ssc.transform(X_train)
+			df['cluster'] = model.predict(X_train)[:len(X_train)]
+			result = df['icd10'].groupby(df['cluster']).apply(top).to_frame()
 			result = result.rename(columns={'icd10':'icd10_count'})
 			result.reset_index(inplace=True)
 			result = result.rename(columns={'level_1':'icd10'})
 			results.append(result)
 			#result['kmean_'+str(n)] = result['kmean_'+str(n)].apply(top)
-			print('append result')
+			print('append neighbour')
 			#if len(results) == 2:
 			#	break
 	total = pd.concat(results)
-	total = total.groupby(['kmean_'+str(n),'icd10']).sum()
+	total = total.groupby(['cluster','icd10']).sum()
 	total.reset_index(inplace=True)
-	total = total.sort_values(by=['kmean_'+str(n),'icd10_count'], ascending=[True,False])
-	total = total.groupby(['kmean_'+str(n)]).head(5)
-	save_file(total,'../../secret/data/model_prediction/'+name+'_kmean_neighbour.csv')
+	total = total.sort_values(by=['cluster','icd10_count'], ascending=[True,False])
+	total = total.groupby(['cluster']).head(10)
+	total.to_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv')
 
-def birch_train(train,modelname):
+def get_weight(modelname):
+	df = pd.read_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv', index_col=0)
+	df['total_count'] = df.groupby('icd10')['icd10_count'].transform('sum')
+	df['cluster_count'] = df.groupby('cluster')['icd10_count'].transform('sum')
+	df['weight'] = df['icd10_count']/(df['total_count']*df['cluster_count'])
+	df = df.sort_values(by=['cluster','weight'], ascending=[True,False])
+	df.to_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv')
+	print('save weight to '+modelname)
+
+def birch_predict(filenames):
+	chunk = 1000
+	for name in filenames:
+		id = []
+		for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=100000, index_col=0):
+			id = id + df.index.values.tolist()
+
+		for i in range(0, len(id), chunk):
+			index = id[i:i + chunk]
+			result = []
+			for df in pd.read_csv('../../secret/data/result/'+name+'.csv', chunksize=chunk, index_col=0):
+				df = df[df['index'].isin(index)]
+				result.append(df)
+			total = pd.concat(result)
+			total = total[['index','predicted_icd10','weight']]
+			total = total.groupby(['index', 'predicted_icd10'])['weight'].agg('sum').reset_index()
+			total = total.sort_values(by=['index','weight'], ascending=[True,False])
+			save_file(total,'../../secret/data/result/'+name+'_prediction.csv')
+			print('append prediction')
+	print('complete')
+
+def birch_train(train,modelname,n,threshold):
 	chunk = 10000
-	b = Birch(n_clusters=None,threshold=0.01)
-	for name in train:
-		ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	for t in threshold:
+		b = Birch(n_clusters=n,threshold=t)
+		for name in train:
+			#ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
 
-		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df.drop(['txn'], axis=1, inplace=True)
-			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			#X_train = ssc.transform(X_train)
-			b = b.partial_fit(X_train)
-			print('Number of cluster: '+str(len(b.subcluster_centers_)))
-			#break
-	save_model(b,modelname)
-	print('save birch model')
-def birch_test(train,modelname)
+			for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+				df.drop(['txn'], axis=1, inplace=True)
+				if name == 'reg':
+					df.insert(9,'room_dc',0)
+				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+				#X_train = ssc.transform(X_train)
+				b = b.partial_fit(X_train)
+				print('Number of cluster: '+str(len(b.subcluster_centers_)))
+				#break
+		save_model(b,modelname+'_'+str(t))
+		print('save birch model')
+	print('complete')
+
+def birch_test(train,modelname):
+	chunk = 10000
 	model = pickle.load(open('../../secret/data/model/'+modelname+'.pkl', 'rb'))
+	neighbour = pd.read_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv', index_col=0)
+	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
 	for name in train:
+		#remove_file('../../secret/data/result/'+name+'.csv')
 		for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
+			index = df.index
+			if name == 'reg':
+				df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
 			#X_train = ssc.transform(X_train)
+			df.insert(0,'index',index)
+			df['model_name'] = modelname
 			df['cluster'] = model.predict(X_train)[:len(X_train)]
-			save_file(df,'../../secret/data/model_prediction/'+name+'_birch.csv')
-
-
+			result = pd.merge(df,neighbour, how='left', on='cluster')
+			#print(result)
+			save_file(result,'../../secret/data/result/'+name+'.csv')
+			print('append result')
+			#print(df)
+	print('complete')
 
 
 
