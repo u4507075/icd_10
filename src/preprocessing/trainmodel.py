@@ -490,7 +490,7 @@ def get_neighbour(train,modelname):
 			result = result.rename(columns={'level_1':'icd10'})
 			results.append(result)
 			#result['kmean_'+str(n)] = result['kmean_'+str(n)].apply(top)
-			print('append result')
+			print('append neighbour')
 			#if len(results) == 2:
 			#	break
 	total = pd.concat(results)
@@ -504,7 +504,7 @@ def get_weight(modelname):
 	df = pd.read_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	df['total_count'] = df.groupby('icd10')['icd10_count'].transform('sum')
 	df['cluster_count'] = df.groupby('cluster')['icd10_count'].transform('sum')
-	df['weight'] = df['icd10_count']/df['total_count']
+	df['weight'] = df['icd10_count']/(df['total_count']*df['cluster_count'])
 	df = df.sort_values(by=['cluster','weight'], ascending=[True,False])
 	df.to_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv')
 	print('save weight to '+modelname)
@@ -528,7 +528,7 @@ def birch_predict(filenames):
 			total = total.sort_values(by=['index','weight'], ascending=[True,False])
 			save_file(total,'../../secret/data/result/'+name+'_prediction.csv')
 			print('append prediction')
-
+	print('complete')
 
 def birch_train(train,modelname,n,threshold):
 	chunk = 10000
@@ -548,6 +548,7 @@ def birch_train(train,modelname,n,threshold):
 				#break
 		save_model(b,modelname+'_'+str(t))
 		print('save birch model')
+	print('complete')
 
 def birch_test(train,modelname):
 	chunk = 10000
@@ -571,6 +572,7 @@ def birch_test(train,modelname):
 			save_file(result,'../../secret/data/result/'+name+'.csv')
 			print('append result')
 			#print(df)
+	print('complete')
 
 
 

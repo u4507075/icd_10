@@ -14,7 +14,7 @@ icd_sql = '''
 				LIMIT %n OFFSET %f;
 			 '''
 adm_sql = '''
-				SELECT dx.TXN AS txn,sex,YEAR(CURDATE()) - YEAR(BORN) AS age
+				SELECT dx.TXN AS txn,sex,YEAR(adm.ADM) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
 						,room,room_dc,dx.icd10
 
@@ -24,7 +24,7 @@ adm_sql = '''
 				LIMIT %n OFFSET %f;
 			'''
 reg_sql = '''
-				SELECT dx.TXN AS txn,sex,YEAR(CURDATE()) - YEAR(BORN) AS age
+				SELECT dx.TXN AS txn,sex,YEAR(adm.DATE) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
 						,room,dx.icd10
 
