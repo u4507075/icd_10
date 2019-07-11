@@ -289,6 +289,8 @@ def scale_data(path,filename):
 	chunk = 100000
 	for df in  pd.read_csv(path+filename+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
+		if filename == 'reg':
+			df.insert(9,'room_dc',0)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		ssc.partial_fit(X_train)
 		mmsc.partial_fit(X_train)
