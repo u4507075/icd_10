@@ -109,11 +109,11 @@ scale_data('../../secret/data/vec/','ilab')
 #get_neighbour(['dru','idru'],'drug_birch')
 
 #birch_train(['dru','idru'],'drug_birch',None,[0.1,0.25,0.5,0.75,1.00])
-for i in [0.1,0.25,0.5,0.75,1.00]:
+#for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['dru','idru'],'drug_birch_'+str(i))
 #	get_weight('drug_birch_'+str(i))
 #	birch_test(['dru','idru'],'drug_birch_'+str(i))
-	birch_predict(['dru','idru'])
+#	birch_predict(['dru','idru'])
 
 #birch_train(['reg','adm'],'reg_birch',None,[5,6,7,8,9])
 #for i in [5,6,7,8,9]:
@@ -132,7 +132,7 @@ for i in [0.1,0.25,0.5,0.75,1.00]:
 #dask_model('adm')
 #dask_model('rad')
 #dask_model('irad')
-#dask_model('dru')
+dask_model(['dru','idru'],'drug')
 #dask_model('idru')
 #dask_model('lab')
 #dask_model('ilab')
