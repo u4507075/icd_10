@@ -16,6 +16,8 @@ from preprocessing.trainmodel import get_weight
 from preprocessing.trainmodel import birch_train
 from preprocessing.trainmodel import birch_test
 from preprocessing.trainmodel import birch_predict
+from preprocessing.trainmodel import train_had
+from preprocessing.trainmodel import eval_had
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -145,97 +147,25 @@ scale_data('../../secret/data/vec/','ilab')
 #evaluate_lstm_model('adm')
 #evaluate_lstm_model('idru')
 
-'''
-#Save csv file to sql
-folders = ['raw','vec']
-filenames = ['reg','lab','dru','rad','adm','ilab','idru','irad']
-for folder in folders:
-	for filename in filenames:
-		csv_to_sqldb(config,folder,filename)
-'''
+#train_had()
+eval_had('dru')
 
 
 
 
-### Drug ###
-##getdata(config)
-##getidata(config)
-##get_total_feature('dru')
-##get_total_feature('idru')
-##get_encode_feature('dru')
-##get_encode_feature('idru')
-##encode_feature('dru')
-##encode_feature('idru')
-
-### Lab ###
-##get_lab_data(config)
-##split_lab_data('lab')
-##split_lab_data('ilab')
-##clean_lab_data('lab')
-##clean_lab_data('ilab')
-##get_encode_lab('lab')
-##get_encode_lab('ilab')
-##encode_lab_data('lab')
-#!encode_lab_data('ilab')
-
-##save_admit_data(config)
-##clean_admit_data()
-##onehot_admit_data()
-
-##save_registration_data(config)
-##clean_registration_data()
-##onehot_registration_data()
-
-#get_txn_test_data(config)
-#split_set()
-#split_lab()
-#clean_data('trainingset','trainingset_clean')
-#clean_data('testset','testset_clean')
-
-'''
-files = os.listdir('../../secret/data/trainingset/')
-for f in files:
-	train_model(f.replace('.csv',''))
-'''
-
-#get_validation_data(config)
-#predict_testset()
-
-#preprocess_radio_data()
 
 
 
-##Drug verification dataset##
-#get_drug_verification_registration_data('../../secret/data/registration/registration_onehot.csv')
-#get_drug_verification_registration_data('../../secret/data/admit/admit_onehot.csv')
-#get_drug_verification_lab_data()
 
 
-'''
-import pandas as pd
 
-files = os.listdir('../../secret/data/lab/clean/')
-for lab in files:
-	n = lab.replace('.csv','')
-	print('#### '+n)
-	print('')
-	print('Laboratory findings of '+n+'.')
-	print('')
-	print('<details><summary>lab metadata</summary>')
-	print('<p>')
-	print('')
-	print('| Features | Types | Description |')
-	print('| :--- | :--- | :--- |')
-	print('| TXN | numeric | key identification for a patient visit |')
-	
-	p = '../../secret/data/lab/clean/'+lab
-	for df in  pd.read_csv(p, chunksize=10, index_col=0):
-		for i in df.columns:
-			if i != 'TXN' and i != 'icd10' and i != 'Unnamed: 0.1':
-				print('| '+i+' | binary |  |')
-		break
-	print('| icd10 | text | ICD-10 code (diagnosis) |')
-	print('</p>')
-	print('</details>')
-	print('')
-'''
+
+
+
+
+
+
+
+
+
+

@@ -588,11 +588,50 @@ def birch_test(train,modelname):
 			#print(df)
 	print('complete')
 
+def train_had():
+	p = '/media/bon/My Passport/data/'
+	icd10 =  pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0)
+	icd10_map = dict(zip(icd10['code'],icd10.index))
+	had = pd.read_csv(p+'had.csv', index_col=0)
+	had = had['drug'].values.tolist()
+	chunk = 10000
+	n = 0
+	m = Incremental(MLPClassifier())
+	for name in ['dru','idru']:
+		for df in  pd.read_csv(p+'trainingset/raw/'+name+'.csv', chunksize=chunk, index_col=0, low_memory=False):	
+			df = df[['icd10','drug']]
+			df = pd.concat([df.drop('icd10', axis=1), df['icd10'].map(icd10_map)], axis=1)
+			df['had'] = np.where(df['drug'].isin(had), 1, 0)
+			df = df[['icd10','had']]
+			df1 = df[df['had'] == 1]
+			df1 = df1.drop_duplicates()
+			df2 = df[~df['icd10'].isin(df1['icd10'].values.tolist())]
+			df2 = df2.drop_duplicates()
+			df = pd.concat([df1,df2])
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			m.partial_fit(X_train, Y_train, classes=[0,1])
+			n = n + chunk
+			print('fit '+str(n))
+			print('Loss :'+str(m.loss_))
 
+	save_model(m,'had_mlpclassifier')
 
-
-
-
+def eval_had(name):
+	chunk = 10000
+	loaded_model = pickle.load(open('../../secret/data/model/had_mlpclassifier.pkl', 'rb'))
+	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		dftest = df.copy()
+		dftest.drop(['txn'], axis=1, inplace=True)
+		dftest = dftest[['icd10','drug']]
+		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
+		p = loaded_model.predict_proba(X_train)
+		dfp = pd.DataFrame(data=p,columns=['no_had','yes_had'])
+		df['no_had'] = dfp['no_had'].values.tolist()
+		df['yes_had'] = dfp['yes_had'].values.tolist()
+		#print(df)
+		#df['had'] = loaded_model.predict(X_train)[:len(X_train)]
+		save_file(df,'/media/bon/My Passport/data/model_prediction/'+name+'_had.csv')
+		print('Predict '+name)
 
 
 
