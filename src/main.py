@@ -131,7 +131,7 @@ scale_data('../../secret/data/vec/','ilab')
 #dask_model(['dru','idru'],'drug')
 #dask_model(['reg','adm'],'reg')
 #dask_model(['lab','ilab'],'lab')
-#dask_model(['rad','irad'],'rad')
+dask_model(['rad','irad'],'rad')
 
 #eval_model('reg')
 #eval_model('adm')
