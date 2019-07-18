@@ -74,11 +74,11 @@ import config
 
 
 #get_icd10_data(config)
-#get_adm_data(config)
-#get_reg_data(config)
-#get_drug_data(config)
-#get_lab_data(config)
-#get_rad_data(config)
+get_adm_data(config)
+get_reg_data(config)
+get_drug_data(config)
+get_lab_data(config)
+get_rad_data(config)
 #get_txn_test_data(config)
 
 #word_to_vec('adm')
@@ -127,10 +127,10 @@ scale_data('../../secret/data/vec/','ilab')
 #	birch_predict(['reg','adm'])
 
 #birch_train(['lab','ilab'],'lab_birch',None,[0.75,1.0,1.25,1.50,1.75])
-for i in [0.75,1.0,1.25,1.50,1.75]:
+#for i in [0.75,1.0,1.25,1.50,1.75]:
 #	get_neighbour(['lab','ilab'],'lab_birch_'+str(i))
 #	get_weight('lab_birch_'+str(i))
-	birch_test(['lab','ilab'],'lab_birch_'+str(i))
+#	birch_test(['lab','ilab'],'lab_birch_'+str(i))
 
 #dask_model(['dru','idru'],'drug')
 #dask_model(['reg','adm'],'reg')

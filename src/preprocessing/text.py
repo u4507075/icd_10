@@ -357,7 +357,7 @@ def getdata(config, sql, filename):
 		else:
 			df.to_csv(p)
 		offset = offset + n
-		print('Save data chunk: '+str(offset))
+		print('Save data chunk: '+str(offset)+' to '+filename)
 
 def save_data(df,path,name):
 	p = path+'/'+name
