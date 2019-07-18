@@ -87,9 +87,9 @@ TXN is a joining key for adm.csv, ilab.csv, irad.csv, and idru.csv.
 **DO NOT** use TXN to join across groups.
 The file "icd10.csv" (9.5M) is a for mapping ICD-10 code (using in the datasets) to ICD-10 description.
 
-#### Registration data
+#### Registration and admission data
 
-The registration data is the demographic information of patients who visited at the outer patient department (OPD) at Maharaj Nakhon Chiang Mai hospital. 
+The registration data is the demographic information of patients who visited at the outer patient department (OPD) at Maharaj Nakhon Chiang Mai hospital. The admission data is the demographic information of patients who admitted to the internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. The structure of both dataset is the same except there is no room_dc (assign zero to all instances) in registration data.
 
 | Features | Types | Description |
 | :--- | :--- | :--- |
@@ -105,27 +105,8 @@ The registration data is the demographic information of patients who visited at 
 | blood | categorical | a = blood group A b = blood group B, o = blood group O, ab = blood group AB 
 | rh | categorical | n = blood group Rh negative, p = blood group Rh positive |
 | room | string | Room codes that patients visited |
-| icd10 | string | ICD-10 code (diagnosis) |
-
-#### Admission data
-
-The admission data is the demographic information of patients who admitted to the internal wards (inner patient departments (IPD) cases) at Maharaj Nakhon Chiang Mai hospital. 
-
-| Features | Types | Description |
-| :--- | :--- | :--- |
-| txn | numeric | key identification for a patient visit |
-| sex | categorical | m = male, f = female |
-| age | numeric | age (year) |
-| wt | numeric | weight (kg) |
-| pulse | numeric | pulse rate (times/min) |
-| resp | numeric | respiratory rate (times/min) |
-| temp | numeric | body temperature (celcius) |
-| sbp | numeric | systolic blood pressure (mmHg) |
-| dbp | numeric | diastolic blood pressure (mmHg) |
-| blood | categorical | a = blood group A b = blood group B, o = blood group O, ab = blood group AB 
-| rh | categorical | n = blood group Rh negative, p = blood group Rh positive |
-| room | string | Room codes that patients admitted |
-| room_dc | string | Room codes that patients discharged |
+| room_dc | string | Room codes that patients discharged (available only in admission dataset)|
+| dx_type | numeric | 0 = missing data, 1 = principal diagnosis, 2 = co-morbidity, 3 = complication, 4 = other, 5 = external injury |
 | icd10 | string | ICD-10 code (diagnosis) |
 
 #### Laboratory data
@@ -137,6 +118,7 @@ The laboratory data is Laboratory findings investigated in OPD (lab.csv) and IPD
 | lab_name | string | Lab code |
 | name | string | Lab items within the lab code |
 | value | object | value of lab items (can be numeric (only value) or string (value with unit)) |
+| dx_type | numeric | 0 = missing data, 1 = principal diagnosis, 2 = co-morbidity, 3 = complication, 4 = other, 5 = external injury |
 | icd10 | string | ICD-10 code (diagnosis) |
 
 #### Radiological report data
@@ -149,6 +131,7 @@ The radiological report data is the reports that radiologists took notes after t
 | location | string | location of examination such as cest, hand, abdomen |
 | position | string | position of examination such as plain film, posteroanterior (pa), lateral |
 | report | string | radiological report |
+| dx_type | numeric | 0 = missing data, 1 = principal diagnosis, 2 = co-morbidity, 3 = complication, 4 = other, 5 = external injury |
 | icd10 | string | ICD-10 code (diagnosis) |
 
 #### Drug prescription data
@@ -160,6 +143,7 @@ The drug prescription data is the information of type of drugs which were prescr
 | TXN | numeric | key identification for a patient visit |
 | drug | string | Drug code |
 | drug_name | string | Drug name with or without description |
+| dx_type | numeric | 0 = missing data, 1 = principal diagnosis, 2 = co-morbidity, 3 = complication, 4 = other, 5 = external injury |
 | icd10 | string | ICD-10 code (diagnosis) |
 
 ### Limitations of the dataset
