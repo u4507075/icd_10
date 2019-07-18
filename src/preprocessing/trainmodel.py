@@ -165,8 +165,6 @@ def dask_model(train, modelname):
 		ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
-			if name == 'reg':
-				df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 			X_train = ssc.transform(X_train)
 			#X_validation = ssc.transform(X_validation)
@@ -192,8 +190,6 @@ def eval_model(name):
 	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest.drop(['txn'], axis=1, inplace=True)
-		if name == 'reg':
-			df.insert(9,'room_dc',0)
 		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
 		X_train = ssc.transform(X_train)
 		#print(len(X_train))
@@ -289,8 +285,6 @@ def scale_data(path,filename):
 	chunk = 100000
 	for df in  pd.read_csv(path+filename+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
-		if filename == 'reg':
-			df.insert(9,'room_dc',0)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		ssc.partial_fit(X_train)
 		mmsc.partial_fit(X_train)
@@ -493,8 +487,6 @@ def get_neighbour(train,modelname):
 		#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
-			if name == 'reg':
-				df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
 			#X_train = ssc.transform(X_train)
 			df['cluster'] = model.predict(X_train)[:len(X_train)]
@@ -524,25 +516,65 @@ def get_weight(modelname):
 	print('save weight to '+modelname)
 
 def birch_predict(filenames):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
 	chunk = 1000
 	for name in filenames:
 		id = []
-		for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=100000, index_col=0):
+		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=100000, index_col=0):
 			id = id + df.index.values.tolist()
 
 		for i in range(0, len(id), chunk):
 			index = id[i:i + chunk]
 			result = []
-			for df in pd.read_csv('../../secret/data/result/'+name+'.csv', chunksize=chunk, index_col=0):
+			for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
 				df = df[df['index'].isin(index)]
 				result.append(df)
 			total = pd.concat(result)
 			total = total[['index','predicted_icd10','weight']]
 			total = total.groupby(['index', 'predicted_icd10'])['weight'].agg('sum').reset_index()
 			total = total.sort_values(by=['index','weight'], ascending=[True,False])
-			save_file(total,'../../secret/data/result/'+name+'_prediction.csv')
+			save_file(total,mypath+'result/'+name+'_prediction.csv')
 			print('append prediction')
 	print('complete')
+
+def distance(x):
+	return x
+def birch_finetune(train):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	chunk = 10000
+	samples = []
+	for name in train:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			samples.append(df.sample(frac=1.0))
+			break
+		break
+
+	df1 = pd.concat(samples)
+	X_train, X_validation, Y_train, Y_validation = get_testset(df)
+	
+	for i in range(1,1000,1):
+		i = i*0.01
+		b = Birch(n_clusters=None,threshold=i)
+		b = b.fit(X_train)
+		df = df1.copy()
+		df['cluster'] = b.predict(X_train)[:len(X_train)]
+		t = b.transform(X_train)[:len(X_train)]
+		df['distances'] = t.tolist()
+		df['distance'] = df.apply(lambda row: row['distances'][row['cluster']], axis=1)
+		df['distance'] = df['distance']*df['distance']
+		df['square'] = df.groupby('cluster')['distance'].transform('sum')
+		#df['distance'] = df[['index','cluster']].apply(lambda x: t[x[0]][x[1]])
+		#df['center'] = df['cluster'].apply(lambda x: b.subcluster_centers_[x])
+		#df['variance'] = df.groupby('cluster')['drug'].transform('var')
+		df = df[['cluster','square']]
+		df = df.drop_duplicates()
+		df = df.fillna(0)
+		s = df['square'].sum()
+		print(str(i)+','+str(len(b.subcluster_centers_))+','+str(s))
+		#break
 
 def birch_train(train,modelname,n,threshold):
 	chunk = 10000
@@ -553,8 +585,6 @@ def birch_train(train,modelname,n,threshold):
 
 			for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 				df.drop(['txn'], axis=1, inplace=True)
-				if name == 'reg':
-					df.insert(9,'room_dc',0)
 				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 				#X_train = ssc.transform(X_train)
 				b = b.partial_fit(X_train)
@@ -565,17 +595,17 @@ def birch_train(train,modelname,n,threshold):
 	print('complete')
 
 def birch_test(train,modelname):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
 	chunk = 10000
-	model = pickle.load(open('../../secret/data/model/'+modelname+'.pkl', 'rb'))
-	neighbour = pd.read_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv', index_col=0)
+	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
+	neighbour = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
 	for name in train:
 		#remove_file('../../secret/data/result/'+name+'.csv')
-		for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			index = df.index
-			if name == 'reg':
-				df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
 			#X_train = ssc.transform(X_train)
 			df.insert(0,'index',index)
@@ -583,7 +613,7 @@ def birch_test(train,modelname):
 			df['cluster'] = model.predict(X_train)[:len(X_train)]
 			result = pd.merge(df,neighbour, how='left', on='cluster')
 			#print(result)
-			save_file(result,'../../secret/data/result/'+name+'.csv')
+			save_file(result,mypath+'result/'+name+'.csv')
 			print('append result')
 			#print(df)
 	print('complete')

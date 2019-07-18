@@ -16,7 +16,7 @@ icd_sql = '''
 adm_sql = '''
 				SELECT dx.TXN AS txn,sex,YEAR(adm.ADM) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
-						,room,room_dc,dx.icd10
+						,room,room_dc,dx.dxtype AS principal_dx,dx.icd10
 
 				FROM icd10.idx dx
 				INNER JOIN icd10.adm adm
@@ -26,7 +26,7 @@ adm_sql = '''
 reg_sql = '''
 				SELECT dx.TXN AS txn,sex,YEAR(adm.DATE) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
-						,room,dx.icd10
+						,room,0 AS room_dc,dx.dxtype AS principal_dx,dx.icd10
 
 				FROM icd10.odx dx
 				INNER JOIN icd10.reg adm
@@ -36,7 +36,7 @@ reg_sql = '''
 reg_2005_sql = '''
 				SELECT dx.TXN AS txn,sex,YEAR(CURDATE()) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
-						,room,dx.icd10
+						,room,0 AS room_dc,dx.dxtype AS principal_dx,dx.icd10
 
 				FROM icd10.odx dx
 				INNER JOIN icd10.reg_2005 adm
@@ -46,7 +46,7 @@ reg_2005_sql = '''
 reg_2006_sql = '''
 				SELECT dx.TXN AS txn,sex,YEAR(CURDATE()) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
-						,room,dx.icd10
+						,room,0 AS room_dc,dx.dxtype AS principal_dx,dx.icd10
 
 				FROM icd10.odx dx
 				INNER JOIN icd10.reg_2006 adm
@@ -56,7 +56,7 @@ reg_2006_sql = '''
 reg_2007_sql = '''
 				SELECT dx.TXN AS txn,sex,YEAR(CURDATE()) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
-						,room,dx.icd10
+						,room,0 AS room_dc,dx.dxtype AS principal_dx,dx.icd10
 
 				FROM icd10.odx dx
 				INNER JOIN icd10.reg_2007 adm
@@ -66,7 +66,7 @@ reg_2007_sql = '''
 reg_2008_sql = '''
 				SELECT dx.TXN AS txn,sex,YEAR(CURDATE()) - YEAR(BORN) AS age
 						,wt,pulse,resp,temp,bp,blood,rh
-						,room,dx.icd10
+						,room,0 AS room_dc,dx.dxtype AS principal_dx,dx.icd10
 
 				FROM icd10.odx dx
 				INNER JOIN icd10.reg_2008 adm
@@ -78,6 +78,7 @@ dru_sql = '''
 			 		dx.TXN AS txn,
 			 		dru.CODE AS drug,
 					dru.NAME AS drug_name,
+					dx.dxtype AS principal_dx,
 			 		dx.icd10
 		 		/*CODER*/
 				FROM icd10.odx dx
@@ -91,6 +92,7 @@ idru_sql = '''
 			 		dx.TXN AS txn,
 			 		dru.CODE AS drug,
 					dru.NAME AS drug_name,
+					dx.dxtype AS principal_dx,
 			 		dx.icd10
 		 		/*CODER*/
 				FROM icd10.idx dx
@@ -105,6 +107,7 @@ lab_sql = '''
 					 lab.NAME AS lab_name,
 					 lab.LST AS name,
 					 lab.REP as value,
+					 dx.dxtype AS principal_dx,
 					 dx.icd10
 				FROM icd10.odx dx
 				INNER JOIN icd10.lab lab
@@ -118,6 +121,7 @@ ilab_sql = '''
 					 lab.NAME AS lab_name,
 					 lab.LST AS name,
 					 lab.REP as value,
+					 dx.dxtype AS principal_dx,
 					 dx.icd10
 				 
 				FROM icd10.idx dx
@@ -132,6 +136,7 @@ lis_sql = '''
 					 lis.NAME AS lab_name,
 					 lis.LST AS name,
 					 lis.REP as value,
+					 dx.dxtype AS principal_dx,
 					 dx.icd10
 				 
 				FROM icd10.odx dx
@@ -146,6 +151,7 @@ ilis_sql = '''
 					 lis.NAME AS lab_name,
 					 lis.LST AS name,
 					 lis.REP as value,
+					 dx.dxtype AS principal_dx,
 					 dx.icd10
 				 
 				FROM icd10.idx dx
@@ -161,6 +167,7 @@ rad_sql = '''
 					 LOWER(rad.NAME) AS location,
 					 LOWER(rad.LST) AS position,
 					 rad.REP as report,
+					 dx.dxtype AS principal_dx,
 					 dx.icd10
 				 
 				FROM icd10.odx dx
@@ -175,6 +182,7 @@ irad_sql = '''
 					 LOWER(rad.NAME) AS location,
 					 LOWER(rad.LST) AS position,
 					 rad.REP as report,
+					 dx.dxtype AS principal_dx,
 					 dx.icd10
 				 
 				FROM icd10.idx dx

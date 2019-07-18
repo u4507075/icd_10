@@ -18,6 +18,7 @@ from preprocessing.trainmodel import birch_test
 from preprocessing.trainmodel import birch_predict
 from preprocessing.trainmodel import train_had
 from preprocessing.trainmodel import eval_had
+from preprocessing.trainmodel import birch_finetune
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -103,6 +104,7 @@ scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
 
+###birch_finetune(['dru'])
 #kmean('reg')
 #kmean(['dru','idru'],'drug')
 #predict_kmean('reg')
@@ -125,15 +127,15 @@ scale_data('../../secret/data/vec/','ilab')
 #	birch_predict(['reg','adm'])
 
 #birch_train(['lab','ilab'],'lab_birch',None,[0.75,1.0,1.25,1.50,1.75])
-#for i in [0.75,1.0,1.25,1.50,1.75]:
+for i in [0.75,1.0,1.25,1.50,1.75]:
 #	get_neighbour(['lab','ilab'],'lab_birch_'+str(i))
 #	get_weight('lab_birch_'+str(i))
-#	birch_test(['lab','ilab'],'lab_birch_'+str(i))
+	birch_test(['lab','ilab'],'lab_birch_'+str(i))
 
 #dask_model(['dru','idru'],'drug')
 #dask_model(['reg','adm'],'reg')
 #dask_model(['lab','ilab'],'lab')
-dask_model(['rad','irad'],'rad')
+#dask_model(['rad','irad'],'rad')
 
 #eval_model('reg')
 #eval_model('adm')
@@ -148,7 +150,7 @@ dask_model(['rad','irad'],'rad')
 #evaluate_lstm_model('idru')
 
 #train_had()
-eval_had('dru')
+#eval_had('dru')
 
 
 
