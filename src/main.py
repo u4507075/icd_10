@@ -62,7 +62,7 @@ from preprocessing.text import get_txn_test_data
 from preprocessing.text import split_data
 from preprocessing.text import csv_to_sqldb
 
-#from preprocessing.vec import word_to_vec
+from preprocessing.vec import word_to_vec
 #from preprocessing.vec import radio_to_vec
 
 import sys
@@ -74,10 +74,10 @@ import config
 
 
 #get_icd10_data(config)
-get_adm_data(config)
-get_reg_data(config)
-get_drug_data(config)
-get_lab_data(config)
+#get_adm_data(config)
+#get_reg_data(config)
+#get_drug_data(config)
+#get_lab_data(config)
 get_rad_data(config)
 #get_txn_test_data(config)
 

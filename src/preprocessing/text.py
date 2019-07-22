@@ -290,7 +290,7 @@ def get_connection(config):
 def getdata(config, sql, filename):
 	checkpath()
 	db_connection = get_connection(config)
-	n = 100000
+	n = 10000
 	offset = 0
 	while True:
 		df = pd.read_sql(getquery(sql,n,offset), con=db_connection)
@@ -326,18 +326,18 @@ def getdata(config, sql, filename):
 		if 'name' in df and 'value' in df:
 			d1 = df['name'].str.split(';',expand=True)
 			d1 = d1.merge(df, right_index = True, left_index = True)
-			d1 = d1.melt(id_vars = ['txn','lab_name','value','icd10'], value_name = 'name')
+			d1 = d1.melt(id_vars = ['txn','lab_name','value','dx_type','icd10'], value_name = 'name')
 			d1 = d1.sort_values(['txn', 'icd10', 'variable'], ascending=True)
 			d1 = d1.drop('value', axis=1)
 			d1 = d1[d1['variable'] != 'name']
 			d2 = df['value'].str.split(';',expand=True)
 			d2 = d2.merge(df, right_index = True, left_index = True)
-			d2 = d2.melt(id_vars = ['txn','lab_name','name','icd10'], value_name = 'value')
+			d2 = d2.melt(id_vars = ['txn','lab_name','name','dx_type','icd10'], value_name = 'value')
 			d2 = d2.sort_values(['txn', 'icd10', 'variable'], ascending=True)
 			d2 = d2.drop('name', axis=1)
 			d2 = d2[d2['variable'] != 'name']
-			df = pd.merge(d1,d2,on=['txn','lab_name','icd10','variable'])
-			df = df[['txn','lab_name','name','value','icd10']]
+			df = pd.merge(d1,d2,on=['txn','lab_name','dx_type','icd10','variable'])
+			df = df[['txn','lab_name','name','value','dx_type','icd10']]
 
 		if 'report' in df:
 			df['report'] = df['report'].apply(remove_junk)
