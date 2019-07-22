@@ -695,8 +695,8 @@ def train_lgb(train):
 
 def train_xgb(train):
 	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
-	chunk = 100000
+	#mypath = '/media/bon/My Passport/data/'
+	chunk = 1000
 	xgb_estimator = None
 	# First three are for incremental learning:
 	xgb_params = {
@@ -706,7 +706,11 @@ def train_xgb(train):
 	  'silent': False,
 	  }
 	for name in train:
-		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		for df in pd.read_csv(mypath+'raw/'+name+'.csv', chunksize=chunk, index_col=0):
+			print(df)
+			break
+		break
+	'''
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
 
@@ -716,7 +720,6 @@ def train_xgb(train):
                         # Pass partially trained model:
                         xgb_model = xgb_estimator)
 
-  
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
-
+	'''

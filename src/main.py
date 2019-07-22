@@ -79,7 +79,7 @@ import config
 #get_adm_data(config)
 #get_reg_data(config)
 #get_drug_data(config)
-#get_lab_data(config)
+get_lab_data(config)
 #get_rad_data(config)
 #get_txn_test_data(config)
 
@@ -154,8 +154,7 @@ scale_data('../../secret/data/vec/','ilab')
 #train_had()
 #eval_had('dru')
 
-
-train_xgb(['dru','idru'])
+#train_xgb(['rad','ilab'])
 
 
 
