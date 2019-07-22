@@ -45,6 +45,7 @@ from sklearn.externals import joblib
 from keras.models import model_from_json
 import joblib as jl
 import gc
+from sklearn.metrics.pairwise import cosine_similarity
 '''
 from creme import linear_model
 from creme import naive_bayes
@@ -548,53 +549,81 @@ def birch_finetune(train):
 	mypath = '/media/bon/My Passport/data/'
 	chunk = 10000
 	samples = []
+	b = Birch(n_clusters=None,threshold=0.01)
 	for name in train:
 		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
-			samples.append(df.sample(frac=1.0))
-			break
+			#samples.append(df.sample(frac=1.0))
+			#break
+			X_train, X_validation, Y_train, Y_validation = get_testset(df)
+			b = b.fit(X_train)
+			print('Number of clusters: '+str(len(b.subcluster_centers_)))
 		break
-
+	'''
 	df1 = pd.concat(samples)
-	X_train, X_validation, Y_train, Y_validation = get_testset(df)
+	X_train, X_validation, Y_train, Y_validation = get_testset(df1)
 	
-	for i in range(1,1000,1):
-		i = i*0.01
-		b = Birch(n_clusters=None,threshold=i)
+	for i in range(1,100,1):
+		i = i*100
+		b = Birch(n_clusters=i,threshold=0.01)
 		b = b.fit(X_train)
 		df = df1.copy()
 		df['cluster'] = b.predict(X_train)[:len(X_train)]
+		df['icd10_count'] = df.groupby(['cluster','icd10'])['icd10'].transform('count')
+		df['icd10_totalcount'] = df.groupby('cluster')['icd10'].transform('count')
+		df['ratio'] = df['icd10_count']/df['icd10_totalcount']
+		df = df.sort_values(by=['cluster','icd10_count'], ascending=[True,False])
+		df = df[['icd10','cluster','ratio']]
+		df = df.drop_duplicates()
+		print('Threshold '+str(i)+' '+str(df['ratio'].mean()))
+	'''
+	'''
 		t = b.transform(X_train)[:len(X_train)]
 		df['distances'] = t.tolist()
 		df['distance'] = df.apply(lambda row: row['distances'][row['cluster']], axis=1)
 		df['distance'] = df['distance']*df['distance']
 		df['square'] = df.groupby('cluster')['distance'].transform('sum')
-		#df['distance'] = df[['index','cluster']].apply(lambda x: t[x[0]][x[1]])
-		#df['center'] = df['cluster'].apply(lambda x: b.subcluster_centers_[x])
-		#df['variance'] = df.groupby('cluster')['drug'].transform('var')
 		df = df[['cluster','square']]
 		df = df.drop_duplicates()
 		df = df.fillna(0)
 		s = df['square'].sum()
 		print(str(i)+','+str(len(b.subcluster_centers_))+','+str(s))
 		#break
+	'''
 
-def birch_train(train,modelname,n,threshold):
+def birch_train(train,modelname):
 	chunk = 10000
-	for t in threshold:
-		b = Birch(n_clusters=n,threshold=t)
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	n = 0
+	t = 0.01
+	while True:
+		n = 0
+		print('Threshold = '+str(t))
+		b = Birch(n_clusters=None,threshold=t)
 		for name in train:
 			#ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
 
-			for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 				df.drop(['txn'], axis=1, inplace=True)
+				if name == 'reg':
+					df.insert(9,'room_dc',0)
 				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 				#X_train = ssc.transform(X_train)
 				b = b.partial_fit(X_train)
-				print('Number of cluster: '+str(len(b.subcluster_centers_)))
-				#break
-		save_model(b,modelname+'_'+str(t))
-		print('save birch model')
+				n = len(b.subcluster_centers_)
+				print('Number of cluster: '+str(n))
+				if n > 15000:
+					print('Too many clusters')
+					break
+			if n > 15000:
+				break
+		if n <= 15000:
+			save_model(b,modelname+'_'+str(t))
+			print('save birch model')
+			break
+		else:
+			t = t+0.01
 	print('complete')
 
 def birch_test(train,modelname):
@@ -666,6 +695,12 @@ def eval_had(name):
 		save_file(df,'/media/bon/My Passport/data/model_prediction/'+name+'_had.csv')
 		print('Predict '+name)
 
+def cosine_vectorized(array1, array2):
+    sumyy = (array2**2).sum(1)
+    sumxx = (array1**2).sum(1, keepdims=1)
+    sumxy = array1.dot(array2.T)
+    return (sumxy/np.sqrt(sumxx))/np.sqrt(sumyy)
+
 def train_lgb(train):
 	mypath = '../../secret/data/'
 	mypath = '/media/bon/My Passport/data/'
@@ -674,11 +709,11 @@ def train_lgb(train):
 	# First one necessary for incremental learning:
 	lgb_params = {
 	  'objective': 'regression',
-	  'verbosity': 100,
+	  'verbosity': 100
 	}
 	evals_result = {}
 	for name in train:
-		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		for df in pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
 			lgb_estimator = lgb.train(lgb_params,
@@ -689,9 +724,17 @@ def train_lgb(train):
 								 evals_result=evals_result,
                          num_boost_round=100,
 								 keep_training_booster=True)
+			Y_pred = list(lgb_estimator.predict(X_validation))
+			y_pred = [round(x) for x in Y_pred]
+			#print(list(Y_validation))
+			#print(y_pred)
+			acc = accuracy_score(list(Y_validation), y_pred)
+			print(acc)
+			sim = cosine_similarity([list(Y_validation)], [y_pred])
+			print(sim)
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
-			print(evals_result)
+			#print(evals_result)
 
 def train_xgb(train):
 	mypath = '../../secret/data/'
@@ -706,20 +749,22 @@ def train_xgb(train):
 	  'silent': False,
 	  }
 	for name in train:
-		for df in pd.read_csv(mypath+'raw/'+name+'.csv', chunksize=chunk, index_col=0):
-			print(df)
-			break
-		break
-	'''
+		for df in pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
 
 			xgb_estimator = xgb.train({}, 
                         dtrain=xgb.DMatrix(X_train, label=Y_train),
                         evals=[(xgb.DMatrix(X_validation, Y_validation),"Valid")],
-                        # Pass partially trained model:
+                        num_boost_round=100,
                         xgb_model = xgb_estimator)
-
+		
+			Y_pred = list(xgb_estimator.predict(xgb.DMatrix(X_validation)))
+			y_pred = [round(x) for x in Y_pred]
+			acc = accuracy_score(list(Y_validation), y_pred)
+			print(acc)
+			sim = cosine_similarity([list(Y_validation)], [y_pred])
+			print(sim)
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
 	'''

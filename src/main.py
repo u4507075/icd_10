@@ -106,7 +106,7 @@ scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
 
-###birch_finetune(['dru'])
+#birch_finetune(['lab'])
 #kmean('reg')
 #kmean(['dru','idru'],'drug')
 #predict_kmean('reg')
@@ -121,8 +121,8 @@ scale_data('../../secret/data/vec/','ilab')
 #	birch_test(['dru','idru'],'drug_birch_'+str(i))
 #	birch_predict(['dru','idru'])
 
-#birch_train(['reg','adm'],'reg_birch',None,[5,6,7,8,9])
-#for i in [5,6,7,8,9]:
+birch_train(['reg','adm'],'reg_birch')
+#for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['reg','adm'],'reg_birch_'+str(i))
 #	get_weight('reg_birch_'+str(i))
 #	birch_test(['reg','adm'],'reg_birch_'+str(i))
@@ -156,6 +156,7 @@ scale_data('../../secret/data/vec/','ilab')
 
 #train_xgb(['rad','ilab'])
 
+#train_xgb(['reg','adm'])
 
 
 
