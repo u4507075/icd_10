@@ -19,6 +19,8 @@ from preprocessing.trainmodel import birch_predict
 from preprocessing.trainmodel import train_had
 from preprocessing.trainmodel import eval_had
 from preprocessing.trainmodel import birch_finetune
+from preprocessing.trainmodel import train_lgb
+from preprocessing.trainmodel import train_xgb
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -78,7 +80,7 @@ import config
 #get_reg_data(config)
 #get_drug_data(config)
 #get_lab_data(config)
-get_rad_data(config)
+#get_rad_data(config)
 #get_txn_test_data(config)
 
 #word_to_vec('adm')
@@ -153,6 +155,7 @@ scale_data('../../secret/data/vec/','ilab')
 #eval_had('dru')
 
 
+train_xgb(['dru','idru'])
 
 
 
