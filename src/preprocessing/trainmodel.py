@@ -38,10 +38,13 @@ from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.optimizers import SGD
 from dask_ml.wrappers import Incremental
+import lightgbm as lgb
+import xgboost as xgb
 
 from sklearn.externals import joblib
 from keras.models import model_from_json
 import joblib as jl
+import gc
 '''
 from creme import linear_model
 from creme import naive_bayes
@@ -66,7 +69,7 @@ def get_dataset(trainingset, validation_size):
 	if validation_size == None:
 		X_train = np.concatenate((X_train, X_validation))
 		Y_train = np.concatenate((Y_train, Y_validation))
-	X_train, Y_train = shuffle(X_train, Y_train, random_state=seed)
+		X_train, Y_train = shuffle(X_train, Y_train, random_state=seed)
 	return X_train, X_validation, Y_train, Y_validation
 
 def get_testset(trainingset):
@@ -663,8 +666,57 @@ def eval_had(name):
 		save_file(df,'/media/bon/My Passport/data/model_prediction/'+name+'_had.csv')
 		print('Predict '+name)
 
+def train_lgb(train):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	chunk = 100000
+	lgb_estimator = None
+	# First one necessary for incremental learning:
+	lgb_params = {
+	  'objective': 'regression',
+	  'verbosity': 100,
+	}
+	evals_result = {}
+	for name in train:
+		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
+			lgb_estimator = lgb.train(lgb_params,
+                         # Pass partially trained model:
+                         init_model=lgb_estimator,
+                         train_set=lgb.Dataset(X_train, Y_train),
+                         valid_sets=lgb.Dataset(X_validation, Y_validation),
+								 evals_result=evals_result,
+                         num_boost_round=100,
+								 keep_training_booster=True)
+			del df, X_train, X_validation, Y_train, Y_validation
+			gc.collect()
+			print(evals_result)
 
+def train_xgb(train):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	chunk = 100000
+	xgb_estimator = None
+	# First three are for incremental learning:
+	xgb_params = {
+	  'updater':'refresh',
+	  'process_type': 'update',
+	  'refresh_leaf': True,
+	  'silent': False,
+	  }
+	for name in train:
+		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
 
+			xgb_estimator = xgb.train({}, 
+                        dtrain=xgb.DMatrix(X_train, label=Y_train),
+                        evals=[(xgb.DMatrix(X_validation, Y_validation),"Valid")],
+                        # Pass partially trained model:
+                        xgb_model = xgb_estimator)
 
-
+  
+			del df, X_train, X_validation, Y_train, Y_validation
+			gc.collect()
 
