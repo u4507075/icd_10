@@ -56,10 +56,17 @@ Our objectives are to develop machine learning model to mapp missing or verify I
 ### May - June 2019
   * Apply NLP and standard medical terminologies to preprocess input features.
   * Develop and evaluate machine learning model.
-### June 2019
-  * Close the project either, the model performance is greater than 80% or it is the end of June.
-### July - August 2019
-  * Write and submit a paper.
+### 31 August 2019
+  * Model validation (first round).
+### 30 September 2019
+  * Model validation (second round).
+### 31 October 2019
+  * Model validation (third round).
+### November 2019
+  * Discuss the result
+### December
+  * Close the project and write a manuscript.
+
   
 ## Materials and methods
 ### Target group
@@ -281,11 +288,68 @@ git push
 git remote -v
 ```
 ## How it works
-## Model evaluation
+## Validation protocol
 
-According to the nature of the problem, the group diagnosis approach is more appropriate than individual approach because of a large number of target class and incomplete individual mapping. The group validation refers to two parts: mathimatical and clinical validation.
+Because we have several teams to develop different approachs to predict ICD-10, we need to set up a standard protocol to validate across those approaches. We devide the validation protocol into to two parts: mathimatical and clinical validation.
 
 1. Mathimatical validation
+
+We aim to see how effective the model could predict correct diagnoses per visit. For example, the patient in this visit was diagnosed with 5 ICD-10s and prescribed with 8 drugs.
+
+| Drug prescription | ICD-10 |
+| :--- | :--- |
+| ANapril Tab 5 mg | Angina pectoris, unspecified |
+| Bestatin Tab   20 mg | Atherosclerotic heart disease |
+| Dipazide Tab 5 mg *ยาเบาหวาน* | Essential (primary) hypertension |
+| Furosemide Tab 40 mg | Hyperlipidaemia, unspecified |
+| Hidil Cap 300 mg | Type 2 diabetes mellitus, without complications |
+| Metoprolol 100 Stada Tab | |
+| Monolin  60 SR CAP. | |
+| Siamformet Tab 500 mg | |
+
+Develop **ONE** model per **ONE** dataset (1 model for adm+reg, 1 model for dru+idru, 1 model for lab+ilab, and 1 model for rad+irad), independently. The predict the top twenty most likely ICD-10 per instance with probability weight (range from 0 - 1). For example, use the model to predict all instances in the same TXN (8 instances in this case) to predict 20 most likely ICD-10s.
+
+| ICD-10 | Probability weight |
+| :--- | :--- |
+| Ischaemic cardiomyopathy  | 0.37 |
+| Rheumatic mitral insufficiency  | 0.13 |
+| Chronic viral hepatitis C  | 0.09 |
+| Congestive heart failure  | 0.05 |
+| Epilepsy, unspecified  | 0.05 |
+| **Hyperlipidaemia, unspecified**  | 0.04 |
+| Primary pulmonary hypertension  | 0.04 |
+| Acute subendocardial myocardial infarction  | 0.03 |
+| Diabetes mellitus, without complications  | 0.03 |
+| Chronic renal failure, unspecified  | 0.03 |
+| **Atherosclerotic heart disease**  | 0.02 |
+| Tricuspid insufficiency  | 0.02 |
+| Mitral stenosis  | 0.02 |
+| Personal history of major surgery, not elsewhere classified  | 0.02 |
+| **Type 2 diabetes mellitus, without complications**  | 0.01 |
+| Systemic lupus erythematosus with involvement of organs and systems  | 0.01 |
+| Atrial fibrillation and atrial flutter  | 0.01 |
+| **Essential (primary) hypertension**  | 0.01 |
+| Cholera  | 0.01 |
+| Disorder of lipoprotein metabolism, unspecified  | 0.00 |
+
+Count the number of true positive (TP), false positive (FP), true negative (TN), and false negative (FN), without considering the sequence. 
+
+```
+True positive (TP) = the number of actual ICD-10 that present in the list
+```
+```
+False positive (FP) = the number of incorrect ICD-10 that present in the list
+```
+```
+True negative (TN) = the number of incorrect ICD-10 after the last actual ICD-10 presenting in the list
+```
+```
+False negative (TN) = the number of actual ICD-10 that not present in the list
+```
+
+
+In this case, TP = 4, FP = 14, TN = 2, and FN = 1
+
 
 2. Clinical validation
 
