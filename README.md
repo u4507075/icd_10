@@ -294,6 +294,7 @@ Because we have several teams to develop different approachs to predict ICD-10, 
 
 1. Mathimatical validation
 
+***Example I:***
 We aim to see how effective the model could predict correct diagnoses per visit. For example, the patient in this visit was diagnosed with 5 ICD-10s and prescribed with 8 drugs.
 
 | Drug prescription | ICD-10 |
@@ -307,7 +308,7 @@ We aim to see how effective the model could predict correct diagnoses per visit.
 | Monolin  60 SR CAP. | |
 | Siamformet Tab 500 mg | |
 
-Develop **ONE** model per **ONE** dataset (1 model for adm+reg, 1 model for dru+idru, 1 model for lab+ilab, and 1 model for rad+irad), independently. The predict the top twenty most likely ICD-10 per instance with probability weight (range from 0 - 1). For example, use the model to predict all instances in the same TXN (8 instances in this case) to predict 20 most likely ICD-10s.
+Develop **ONE** model per **ONE** dataset (1 model for adm+reg, 1 model for dru+idru, 1 model for lab+ilab, and 1 model for rad+irad), independently. The predict the top twenty most likely ICD-10 per instance with probability weight (range from 0 - 1). For example, use the model to predict all instances in the same TXN (8 instances in this case) to predict 20 most likely ICD-10s. The predicted ICD-10s which match to the actual ICD-10 are presented in bold (except Angina pectoris, unspecified because it is not in the list).
 
 | ICD-10 | Probability weight |
 | :--- | :--- |
@@ -338,7 +339,7 @@ Count the number of true positive (TP), false positive (FP), true negative (TN),
 True positive (TP) = the number of actual ICD-10 that present in the list
 ```
 ```
-False positive (FP) = the number of incorrect ICD-10 that present in the list
+False positive (FP) = the number of incorrect ICD-10 that present in the list before the last actual ICD-10 presenting in the list
 ```
 ```
 True negative (TN) = the number of incorrect ICD-10 after the last actual ICD-10 presenting in the list
@@ -348,7 +349,104 @@ False negative (TN) = the number of actual ICD-10 that not present in the list
 ```
 
 
-In this case, TP = 4, FP = 14, TN = 2, and FN = 1
+For top 20, TP = 4, FP = 14, TN = 2, and FN = 1.
+Then, calculate accuracy, precision, recall, and F1 score (see the formulas [here](https://en.wikipedia.org/wiki/Confusion_matrix)).
+
+Accuracy = (TP+TN)/N = (4+2)/20 = 0.40
+Precision = TP/(TP+FP) = 4/(4+14) = 0.22
+Recall = TP/(TP+FN) = 4/(4+1) = 0.80
+F1 score = 2TP/(2TP+FP+FN) = (2x4)/((2X4)+14+1) = 0.35
+
+Apply the same process to top 15, 10, and 5.
+
+For top 15, TP = 3, FP = 12, TN = 0, and FN = 2.
+For top 10, TP = 1, FP = 9, TN = 4, and FN = 4.
+For top 5, TP = 0, FP = 5, TN = 0, and FN = 5.
+
+Then, calculate accuracy, precision, recall, and F1 score again (process not shown).
+
+| N | Accuracy | Precision | Recall | F1 score |
+| :--- | :--- | :--- | :--- | :--- |
+| 20 | 0.40 | 0.22 | 0.80 | 0.35 |
+| 15 | 0.20 | 0.20 | 0.60 | 0.33 |
+| 10 | 0.50 | 0.10 | 0.20 | 0.13 |
+| 5 | 0.00 | 0.00 | 0.00 | 0.00 |
+
+***Example II:***
+The diagnosis if this case is Malignant neoplasm of cervix uteri, unspecified.
+
+| ICD-10 | Probability weight |
+| :--- | :--- |
+| ***Malignant neoplasm of cervix uteri, unspecified*** | 0.23 |
+| Traumatic subdural haemorrhage | 0.17 |
+| Malignant neoplasm of nasopharynx, unspecified | 0.15 |
+| Personal history of major surgery, not elsewhere classified | 0.06 |
+| Malignant neoplasm of bronchus or lung, unspecified | 0.05 |
+| Radiotherapy session | 0.05 |
+| Malignant neoplasm of upper lobe, bronchus or lung | 0.05 |
+| Malignant neoplasm of breast, unspecified | 0.05 |
+| Secondary malignant neoplasm of lung | 0.03 |
+| Malignant neoplasm of ovary | 0.03 |
+| Malingnat neoplasm of exocervix | 0.02 |
+| Secondary malignant neoplasm of liver | 0.02 |
+| Chemotherapy session for neoplasm | 0.02 |
+| Traumatic subdural haemorrhage: without open intracranial wound | 0.02 |
+| Anaemia in neoplastic disease (C00-D48+) | 0.01 |
+| Intrahepatic bile duct carcinoma | 0.01 |
+| Agranulocytosis | 0.00 |
+| Essential (primary) hypertension | 0.00 |
+| Hypokalaemia | 0.00 |
+| Acute posthaemorrhagic anaemia | 0.00 |
+
+For top 20, TP = 1, FP = 0, TN = 19, and FN = 0.
+For top 15, TP = 1, FP = 0, TN = 14, and FN = 0.
+For top 10, TP = 1, FP = 0, TN = 9, and FN = 0.
+For top 5, TP = 1, FP = 0, TN = 4, and FN = 0.
+
+| N | Accuracy | Precision | Recall | F1 score |
+| :--- | :--- | :--- | :--- | :--- |
+| 20 | 1.00 | 1.00 | 1.00 | 1.00 |
+| 15 | 1.00 | 1.00 | 1.00 | 1.00 |
+| 10 | 1.00 | 1.00 | 1.00 | 1.00 |
+| 5 | 1.00 | 1.00 | 1.00 | 1.00 |
+
+***Example III:***
+The diagnosis if this case is Parkinson's disease.
+
+| ICD-10 | Probability weight |
+| :--- | :--- |
+| Dementia in Parkinson's disease (G20+) | 0.46 |
+| ***Parkinson's disease*** | 0.29 |
+| Sequelae of cerebral infarction | 0.20 |
+| Other superficial injuries of lower leg | 0.01 |
+| Mitral stenosis | 0.01 |
+| Motorcycle rider injured in collision with car, pick-up truck or van, driver injured in traffic accident: during unspec activity | 0.00 |
+| Motorcycle rider injured in noncollision transport accident, driver injured in traffic accident: during unspec activity | 0.00 |
+| Acute lymphoblastic leukaemia | 0.00 |
+| Cholera | 0.00 |
+| Hyperlipidaemia, unspecified | 0.00 |
+| Anaemia in other chronic diseases classified elsewhere | 0.00 |
+| Urinary tract infection, site not specified | 0.00 |
+| Agranulocytosis | 0.00 |
+| Essential (primary) hypertension | 0.00 |
+| Type 2 diabetes mellitus, without complications | 0.00 |
+| Single live birth | 0.00 |
+| Chemotherapy session for neoplasm | 0.00 |
+| Atrial fibrillation and atrial flutter | 0.00 |
+| Hyposmolality and hyponatraemia | 0.00 |
+| Septicaemia, unspecified | 0.00 |
+
+For top 20, TP = 1, FP = 1, TN = 18, and FN = 0.
+For top 15, TP = 1, FP = 1, TN = 13, and FN = 0.
+For top 10, TP = 1, FP = 1, TN = 8, and FN = 0.
+For top 5, TP = 1, FP = 1, TN = 3, and FN = 0.
+
+| N | Accuracy | Precision | Recall | F1 score |
+| :--- | :--- | :--- | :--- | :--- |
+| 20 | 0.95 | 0.50 | 1.00 | 0.67 |
+| 15 | 0.93 | 0.50 | 1.00 | 0.67 |
+| 10 | 0.90 | 0.50 | 1.00 | 0.67 |
+| 5 | 0.80 | 0.50 | 1.00 | 0.67 |
 
 
 2. Clinical validation
