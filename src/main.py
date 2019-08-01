@@ -90,10 +90,10 @@ import config
 #word_to_vec('lab')
 #word_to_vec('ilab')
 #radio_to_vec('rad')
-##radio_to_vec('irad')
+#radio_to_vec('irad')
 
 #split_data('raw')
-#split_data('vec')
+split_data('vec')
 
 '''
 scale_data('../../secret/data/vec/','reg')
@@ -106,15 +106,15 @@ scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
 
-#birch_finetune(['lab'])
 
-kmean(['dru','idru'],'drug')
+#kmean('reg')
+#kmean(['dru','idru'],'drug')
 #predict_kmean('reg')
 #kmean(['dru','idru'],'drug')
 #predict_kmean('dru','drug')
 #get_neighbour(['dru','idru'],'drug_birch')
 
-#birch_train(['dru','idru'],'drug_birch',None,[0.1,0.25,0.5,0.75,1.00])
+#birch_train(['dru','idru'],'drug_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['dru','idru'],'drug_birch_'+str(i))
 #	get_weight('drug_birch_'+str(i))
@@ -128,7 +128,7 @@ kmean(['dru','idru'],'drug')
 #	birch_test(['reg','adm'],'reg_birch_'+str(i))
 #	birch_predict(['reg','adm'])
 
-#birch_train(['lab','ilab'],'lab_birch',None,[0.75,1.0,1.25,1.50,1.75])
+#birch_train(['lab','ilab'],'lab_birch')
 #for i in [0.75,1.0,1.25,1.50,1.75]:
 #	get_neighbour(['lab','ilab'],'lab_birch_'+str(i))
 #	get_weight('lab_birch_'+str(i))
