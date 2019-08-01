@@ -592,11 +592,12 @@ def birch_finetune(train):
 	'''
 
 def birch_train(train,modelname):
-	chunk = 10000
+	chunk = 100000
 	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
+	#mypath = '/media/bon/My Passport/data/'
 	n = 0
-	t = 0.01
+	t = 0.5
+	target_cluster = 5000
 	while True:
 		n = 0
 		print('Threshold = '+str(t))
@@ -612,18 +613,18 @@ def birch_train(train,modelname):
 				#X_train = ssc.transform(X_train)
 				b = b.partial_fit(X_train)
 				n = len(b.subcluster_centers_)
-				print('Number of cluster: '+str(n))
-				if n > 15000:
+				print('Number of cluster: '+modelname+' '+str(n))
+				if n > target_cluster:
 					print('Too many clusters')
 					break
-			if n > 15000:
+			if n > target_cluster:
 				break
-		if n <= 15000:
+		if n <= target_cluster:
 			save_model(b,modelname+'_'+str(t))
 			print('save birch model')
 			break
 		else:
-			t = t+0.01
+			t = t+0.1
 	print('complete')
 
 def birch_test(train,modelname):
@@ -767,4 +768,3 @@ def train_xgb(train):
 			print(sim)
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
-	'''
