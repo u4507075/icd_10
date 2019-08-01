@@ -419,46 +419,22 @@ def evaluate_lstm_model(name):
 
 def kmean(train,modelname):
 	chunk = 30000
-	'''
-	reg
-	100: err 1695
-	200: err 1141
-	300: err 878
-	400: err 935
-	500: err 887
-	600: err 660
-	700: err 602
-	800: err 477
-	900: err 637
-	1000:err 585
+	n = 15000
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	kmeans = MiniBatchKMeans(n_clusters=n, random_state=0, batch_size=1000)
+	for name in train:
+		ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 
-	dru
-	100:   err 822
-       	1000:  err 163
-	5000:  err 50
-	10000: err 
-	15000: err 
-	20000: err 
-	25000: err 
-	30000: err 
-	'''
-	#n = [100,1000,5000,10000,15000,20000,25000,30000]
-	n = [20000]
-	for i in n:
-		print('Number of Cluster :'+str(i))
-		kmeans = MiniBatchKMeans(n_clusters=i, random_state=0, batch_size=6)
-		for name in train:
-			ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			X_train = ssc.transform(X_train)
+			kmeans = kmeans.partial_fit(X_train)
+			print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
+			print(kmeans.inertia_)
+	save_model(kmeans,modelname+'_kmean_'+str(n))
 
-			for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-				df.drop(['txn'], axis=1, inplace=True)
-				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-				X_train = ssc.transform(X_train)
-				kmeans = kmeans.partial_fit(X_train)
-				print('train')
-				#break
-		save_model(kmeans,modelname+'_kmean_'+str(i))
-		print(kmeans.inertia_)
 def predict_kmean(name,modelname):
 	chunk = 10000
 	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
@@ -767,4 +743,4 @@ def train_xgb(train):
 			print(sim)
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
-	'''
+

@@ -64,7 +64,7 @@ from preprocessing.text import get_txn_test_data
 from preprocessing.text import split_data
 from preprocessing.text import csv_to_sqldb
 
-from preprocessing.vec import word_to_vec
+#from preprocessing.vec import word_to_vec
 #from preprocessing.vec import radio_to_vec
 
 import sys
@@ -79,7 +79,7 @@ import config
 #get_adm_data(config)
 #get_reg_data(config)
 #get_drug_data(config)
-get_lab_data(config)
+#get_lab_data(config)
 #get_rad_data(config)
 #get_txn_test_data(config)
 
@@ -107,8 +107,8 @@ scale_data('../../secret/data/vec/','ilab')
 '''
 
 #birch_finetune(['lab'])
-#kmean('reg')
-#kmean(['dru','idru'],'drug')
+
+kmean(['dru','idru'],'drug')
 #predict_kmean('reg')
 #kmean(['dru','idru'],'drug')
 #predict_kmean('dru','drug')
@@ -121,7 +121,7 @@ scale_data('../../secret/data/vec/','ilab')
 #	birch_test(['dru','idru'],'drug_birch_'+str(i))
 #	birch_predict(['dru','idru'])
 
-birch_train(['reg','adm'],'reg_birch')
+#birch_train(['reg','adm'],'reg_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['reg','adm'],'reg_birch_'+str(i))
 #	get_weight('reg_birch_'+str(i))
