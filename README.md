@@ -345,7 +345,7 @@ False positive (FP) = the number of incorrect ICD-10 that present in the list be
 True negative (TN) = the number of incorrect ICD-10 after the last actual ICD-10 presenting in the list
 ```
 ```
-False negative (TN) = the number of actual ICD-10 that not present in the list
+False negative (FN) = the number of actual ICD-10 that not present in the list
 ```
 
 
@@ -448,6 +448,17 @@ For top 5, TP = 1, FP = 1, TN = 3, and FN = 0.
 | 10 | 0.90 | 0.50 | 1.00 | 0.67 |
 | 5 | 0.80 | 0.50 | 1.00 | 0.67 |
 
+After you finish validating all instances, then calculate weighted average accuracy, precision, recall, and F1 score.
+
+```
+weighted average accuracy = ((acc1 x n1) + (acc2 x n2) .... (accn x nn))/N
+n = number of actual diagnoses in that txn, N = total number of actual diagnoses
+```
+
+weighted average accuracy top20 = ((0.40 x 5) + (1.00 x 1) + (0.95 x 1))/7 = 3.95/7 = 0.56
+weighted average precision top20 = ((0.22 x 5) + (1.00 x 1) + (0.50 x 1))/7 = 2.60/7 = 0.37
+weighted average recall top20 = ((0.80 x 5) + (1.00 x 1) + (0.95 x 1))/7 = 6.00/7 = 0.86
+weighted average F1 score top20 = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7 = 3.32/7 = 0.47
 
 2. Clinical validation
 
