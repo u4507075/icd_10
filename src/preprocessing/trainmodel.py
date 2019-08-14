@@ -462,10 +462,12 @@ def topsum(x):
 def get_neighbour(train,modelname):
 	chunk = 100000
 	results = []
-	model = pickle.load(open('../../secret/data/model/'+modelname+'.pkl', 'rb'))
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
 	for name in train:
 		#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
-		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
 			#X_train = ssc.transform(X_train)
@@ -484,15 +486,17 @@ def get_neighbour(train,modelname):
 	total.reset_index(inplace=True)
 	total = total.sort_values(by=['cluster','icd10_count'], ascending=[True,False])
 	total = total.groupby(['cluster']).head(10)
-	total.to_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv')
+	total.to_csv(mypath+'/model_prediction/'+modelname+'_neighbour.csv')
 
 def get_weight(modelname):
-	df = pd.read_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv', index_col=0)
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	df = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	df['total_count'] = df.groupby('icd10')['icd10_count'].transform('sum')
 	df['cluster_count'] = df.groupby('cluster')['icd10_count'].transform('sum')
 	df['weight'] = df['icd10_count']/(df['total_count']*df['cluster_count'])
 	df = df.sort_values(by=['cluster','weight'], ascending=[True,False])
-	df.to_csv('../../secret/data/model_prediction/'+modelname+'_neighbour.csv')
+	df.to_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv')
 	print('save weight to '+modelname)
 
 def birch_predict(filenames):
@@ -518,23 +522,134 @@ def birch_predict(filenames):
 			print('append prediction')
 	print('complete')
 
-def distance(x):
-	return x
-def birch_finetune(train):
+def count(x):
+	return len(x[x['actual_icd10'].isna()]) + len(x[(pd.notna(x['actual_icd10'])) & (pd.notna(x['predicted_icd10']))])
+
+def dxn(x):
+	return len(x[pd.notna(x['actual_icd10'])])
+
+def tp(x):
+	return len(x[(pd.notna(x['actual_icd10'])) & (pd.notna(x['predicted_icd10']))])
+
+def fp(x):
+	df = x.reset_index()
+	total = len(df)
+	actual = len(df[(pd.notna(df['actual_icd10']))])
+	df = df[(pd.notna(df['actual_icd10'])) & (pd.notna(df['predicted_icd10']))]
+	if len(df) == 0:
+		return total - actual
+	else:
+		return df.tail(1).index.values.astype(int)[0]-len(df)+1
+
+def tn(x):
+	df = x.reset_index()
+	df1 = df[(pd.notna(df['actual_icd10'])) & (pd.notna(df['predicted_icd10']))]
+	if len(df1) == 0:
+		return 0
+	else:
+		return len(df[(df['actual_icd10'].isna()) & (df['predicted_icd10'].index > df1.tail(1).index.values.astype(int)[0])])
+
+def fn(x):
+	return len(x[(pd.notna(x['actual_icd10'])) & (x['predicted_icd10'].isna())])
+
+def performance(df):
+	#df = pd.read_csv('test.csv', index_col=0)
+	result = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(count).reset_index(name='n')
+	result['dxn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(dxn).reset_index(name='dxn')['dxn']
+	result['tp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(tp).reset_index(name='tp')['tp']
+	result['fp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(fp).reset_index(name='fp')['fp']
+	result['tn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(tn).reset_index(name='tn')['tn']
+	result['fn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(fn).reset_index(name='fn')['fn']
+	result['accuracy'] = (result['tp']+result['tn'])/result['n']
+	result['precision'] = result['tp']/(result['tp']+result['fp'])
+	result['recall'] = result['tp']/(result['tp']+result['fn'])
+	result['f_measure'] = 2*result['tp']/((2*result['tp'])+result['fp']+result['fn'])
+	
+	print(result)
+	print((result['accuracy']*result['dxn']).sum()/result['dxn'].sum())
+	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
+	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
+	print((result['f_measure']*result['dxn']).sum()/result['dxn'].sum())
+def validate(filenames):
+
 	mypath = '../../secret/data/'
 	mypath = '/media/bon/My Passport/data/'
 	chunk = 10000
-	samples = []
-	b = Birch(n_clusters=None,threshold=0.01)
-	for name in train:
-		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df.drop(['txn'], axis=1, inplace=True)
-			#samples.append(df.sample(frac=1.0))
-			#break
-			X_train, X_validation, Y_train, Y_validation = get_testset(df)
-			b = b.fit(X_train)
-			print('Number of clusters: '+str(len(b.subcluster_centers_)))
+	n = 5
+	for name in filenames:
+		txn = []
+		for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
+			txn = txn + df['txn'].values.tolist()
+
+		for i in range(0, len(txn), chunk):
+			txn_range = txn[i:i + chunk]
+			test = []
+			for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
+				df = df[df['txn'].isin(txn_range)]
+				df['index'] = df.index
+				test.append(df)
+			testset = pd.concat(test)
+			result = []
+			for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
+				df = df[df['index'].isin(testset.index.values.tolist())]
+				result.append(df)
+			predictset = pd.concat(result)
+			#print(testset)
+			#print(predictset)
+			total = pd.merge(testset, predictset, on=['index'])
+			total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
+			total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
+			#print(total)
+			validateset = total[['txn','predicted_icd10','weight']]
+			validateset['sum_weight'] = validateset.groupby(['txn','predicted_icd10'])['weight'].transform('sum')
+			validateset = validateset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
+			validateset.drop(['weight'], axis=1, inplace=True)
+			validateset = validateset.drop_duplicates()
+			validateset = validateset.groupby('txn').head(n)
+
+			actualset = total[['txn','actual_icd10']]
+			actualset = actualset.drop_duplicates()
+
+			dataset1 = pd.merge(validateset, actualset, how='left', left_on=['txn','predicted_icd10'], right_on=['txn','actual_icd10'])
+			dataset2 = pd.merge(actualset, validateset, how='left', right_on=['txn','predicted_icd10'], left_on=['txn','actual_icd10'])
+			dataset = dataset1.append(dataset2, ignore_index=True)
+			dataset = dataset.drop_duplicates()
+			dataset = dataset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
+			#print(dataset)
+			#dataset.to_csv('test.csv')
+			performance(dataset)
+			break
+			print('append prediction')
 		break
+	print('complete')
+
+	
+
+def distance(x):
+	return x
+def birch_finetune(name):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	chunk = 1000000
+	t = 1
+	data = None
+	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		data = df
+		break
+	data.drop(['txn'], axis=1, inplace=True)
+	X_train, X_validation, Y_train, Y_validation = get_testset(data)
+
+	while True:
+		b = Birch(n_clusters=None,threshold=t)
+		b = b.fit(X_train)
+		print('Threshold :'+str(t))
+		print('Number of clusters: '+str(len(b.subcluster_centers_)))
+		if len(b.subcluster_centers_) > 15000:
+			print('Target threshold :'+str((t-0.1)))
+			break
+		else:
+			t = t-0.1
+
 	'''
 	df1 = pd.concat(samples)
 	X_train, X_validation, Y_train, Y_validation = get_testset(df1)
@@ -566,7 +681,7 @@ def birch_finetune(train):
 		print(str(i)+','+str(len(b.subcluster_centers_))+','+str(s))
 		#break
 	'''
-
+'''
 def birch_train(train,modelname):
 	chunk = 100000
 	mypath = '../../secret/data/'
@@ -601,6 +716,25 @@ def birch_train(train,modelname):
 			break
 		else:
 			t = t+0.1
+	print('complete')
+'''
+def birch_train(train,modelname,t):
+	chunk = 100000
+	#mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	print('Threshold = '+str(t))
+	b = Birch(n_clusters=None,threshold=t)
+	for name in train:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			if name == 'reg':
+				df.insert(9,'room_dc',0)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			b = b.partial_fit(X_train)
+			n = len(b.subcluster_centers_)
+			print('Number of cluster: '+modelname+' '+str(n))
+
+	save_model(b,modelname+'_'+str(t))
 	print('complete')
 
 def birch_test(train,modelname):
@@ -744,4 +878,5 @@ def train_xgb(train):
 			print(sim)
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
+
 

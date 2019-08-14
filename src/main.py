@@ -21,6 +21,7 @@ from preprocessing.trainmodel import eval_had
 from preprocessing.trainmodel import birch_finetune
 from preprocessing.trainmodel import train_lgb
 from preprocessing.trainmodel import train_xgb
+from preprocessing.trainmodel import validate
 
 from preprocessing.lab import get_lab_data
 from preprocessing.lab import split_lab_data
@@ -93,7 +94,7 @@ import config
 #radio_to_vec('irad')
 
 #split_data('raw')
-split_data('vec')
+#split_data('vec')
 
 '''
 scale_data('../../secret/data/vec/','reg')
@@ -107,12 +108,14 @@ scale_data('../../secret/data/vec/','ilab')
 '''
 
 
-#kmean('reg')
 #kmean(['dru','idru'],'drug')
-#predict_kmean('reg')
-#kmean(['dru','idru'],'drug')
-#predict_kmean('dru','drug')
-#get_neighbour(['dru','idru'],'drug_birch')
+#get_neighbour(['dru','idru'],'drug_kmean_15000')
+#get_weight('drug_kmean_15000')
+#birch_test(['dru','idru'],'drug_kmean_15000')
+#birch_predict(['dru','idru'])
+#validate(['dru','idru'])
+
+birch_finetune('dru')
 
 #birch_train(['dru','idru'],'drug_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
