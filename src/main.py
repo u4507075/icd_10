@@ -93,7 +93,7 @@ import config
 #radio_to_vec('irad')
 
 #split_data('raw')
-split_data('vec')
+#split_data('vec')
 
 '''
 scale_data('../../secret/data/vec/','reg')
@@ -160,10 +160,10 @@ scale_data('../../secret/data/vec/','ilab')
 
 
 
-
-
-
-
+import pandas as pd
+for df in pd.read_csv('../../secret/data/testset/raw/lab.csv', chunksize=100, index_col=0):
+	print(df)
+	break
 
 
 

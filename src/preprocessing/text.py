@@ -351,6 +351,7 @@ def getdata(config, sql, filename):
 			df = df.sample(frac=0.1).reset_index(drop=True)
 		p = path+filename+'.csv'
 		file = Path(p)
+
 		if file.is_file():
 			with open(p, 'a') as f:
 				df.to_csv(f, header=False)
