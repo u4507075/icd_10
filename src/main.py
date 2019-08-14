@@ -163,10 +163,10 @@ birch_finetune('dru')
 
 
 
-
-
-
-
+import pandas as pd
+for df in pd.read_csv('../../secret/data/testset/raw/lab.csv', chunksize=100, index_col=0):
+	print(df)
+	break
 
 
 
