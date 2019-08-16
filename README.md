@@ -212,34 +212,16 @@ The preferred algorithm should be able to:
 2. Good with large n-cluster (handle large number of icd10)
 3. No need to define n-cluster before training
 
-From the list of clustering algorithms, Brich seems to fullfil the criteria. We can set the threshold (how far of neighbour instances should be separated as a new cluster. Low threshold = instances within the same cluster must be very close.).
+From the list of clustering algorithms, [Birch](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.Birch.html#sklearn.cluster.Birch) and [MiniBatchKmeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html#sklearn.cluster.MiniBatchKMeans) fullfil the criteria. In Birch, we can either set threshold (how far of neighbour instances that should be separated as a new cluster) or number of cluster where as MiniBatchKmeans could be only set the number of cluster. Low threshold means instances within the same cluster are very close to each other.
 
-I tested Birch clustering with drug dataset. It works quite well to group the similar drugs together (how close they are, depending on the threshold). Clustering works well to group same drugs because same drugs usually present in the same text. However, drug names can be slightly different. The differences are the spelling of trade names and/or drug specification. For example, dopamine injection has 50 and 250 milligrams forms or mitoxatone and mitoxantrone. Therefore, approximate match is required to group those drugs together.
-```
-def brich_training(train):
-	chunk = 10000
-	b = Birch(n_clusters=None,threshold=0.00001)
-	for name in train:
- ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
+Next, we have to choose an optimal number of cluster. We know that the higher number of cluster creates smaller clusters and usually lower error rate but trends to overfitting. There are several [ways](https://jtemporal.com/kmeans-and-elbow-method/) to decide depending on your objectives. In this case, we aim to get each cluster as large as possible to represent one ICD-10. Approximately 15,000 ICD-10s were recorded in the database. We use this number to determine the target number of cluster. We can directly set the number of cluster in MiniBatchKMeans whereas we need to fine tune the threshold to get the number of cluster as close as 15,000 in Birch.
 
- for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-  df.drop(['txn'], axis=1, inplace=True)
-  X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-  #X_train = ssc.transform(X_train)
-  b = b.partial_fit(X_train)
-  print('Number of cluster: '+str(len(b.subcluster_centers_)))
-  #break
-
-	for df in pd.read_csv('../../secret/data/testset/vec/dru.csv', chunksize=chunk, index_col=0):
- df.drop(['txn'], axis=1, inplace=True)
- X_train, X_validation, Y_train, Y_validation = get_testset(df)
- #X_train = ssc.transform(X_train)
- df['cluster'] = b.predict(X_train)[:len(X_train)]
- save_file(df,'../../secret/data/birch.csv')
- ```
-This approach groups drugs spelling with same or similar text together but not give me what drug group associates with what diagnosis. However, I assume that the true associattion of drug and diagnosis should be high comparing among menbers within the same cluster.
-
-Five thresholds (0.1,0.25,0.5,0.75,1.00) were set to develop five clustering models. The 0.1 threshold model clusters drugs to small groups which the members are very close. The low threshold helps to capture names with exact match. On the other hand, the high threshold creates more flexibility to group same drugs but present in slightly different text together while the low threshold separates those drugs to different groups.
+| Dataset | MiniBatchKmeans (n_cluster) | Birch (threshold) |
+| :--- | :--- | :--- |
+| reg and adm | 15,000 | xxx |
+| lab and ilab | 15,000 | xxx |
+| dru and idru | 15,000 | xxx |
+| rad and irad | 15,000 | xxx |
 
 The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then, aggregate the number of icd10 in the cluster. As mentioned, drug with highly specific to a particular diagnosis presents a strong pattern that the ratio of number of icd10 inside and outside cluster is high, defined as weight.
 
