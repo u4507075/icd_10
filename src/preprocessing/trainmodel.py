@@ -625,13 +625,12 @@ def validate(filenames):
 
 	
 
-def distance(x):
+def distance(x,t):
 	return x
-def birch_finetune(train):
+def birch_finetune(train,t):
 	mypath = '../../secret/data/'
 	mypath = '/media/bon/My Passport/data/'
-	chunk = 10000
-	t = 1
+	chunk = 50000
 	gap = t/2
 	print(train)
 	while True:
