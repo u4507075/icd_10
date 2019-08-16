@@ -275,6 +275,7 @@ git remote -v
 Because we have several teams to develop different approachs to predict ICD-10, we need to set up a standard protocol to validate across those approaches. We devide the validation protocol into to two parts: mathimatical and clinical validation.
 
 1. Mathimatical validation
+The model predict probability on each instance aggregated by TXN which cannot be directly measured by standard [evaluation metrics](https://www.analyticsvidhya.com/blog/2019/08/11-important-model-evaluation-error-metrics/). [Probability scoring methods](https://machinelearningmastery.com/how-to-score-probability-predictions-in-python/) are commonly used to measure the performance of probability prediction by calculating how close the probability of predicted class to actual class. These methods still treat the measurement per instance whereas our aim is to measure the performance as a group of instances aggregated by TXN. Therefore, we modified the standard evaluation metrics with probability scoring methods to define our evaluation approach.
 
 ***Example I:***
 We aim to see how effective the model could predict correct diagnoses per visit. For example, the patient in this visit was diagnosed with 5 ICD-10s and prescribed with 8 drugs.
