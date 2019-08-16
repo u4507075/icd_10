@@ -627,28 +627,76 @@ def validate(filenames):
 
 def distance(x):
 	return x
-def birch_finetune(name):
+def birch_finetune(train):
 	mypath = '../../secret/data/'
 	mypath = '/media/bon/My Passport/data/'
-	chunk = 1000000
+	chunk = 10000
 	t = 1
+	gap = t/2
+	print(train)
+	while True:
+		b = Birch(n_clusters=None,threshold=t)
+		n = 1
+		for name in train:
+			for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+				df.drop(['txn'], axis=1, inplace=True)
+				if name == 'reg':
+					df.insert(9,'room_dc',0)
+				X_train, X_validation, Y_train, Y_validation = get_testset(df)
+				b = b.partial_fit(X_train)
+				n = len(b.subcluster_centers_)
+				print(n)
+				if n > 15000:
+					break
+			if n > 15000:
+				break
+		gap = gap/2
+		if n > 15000:
+			t = t+gap
+		else:
+			t = t-gap
+		print('Adjust threshold to :'+str(t))
+		if gap < 0.01:
+			print('Target threshold for '+str(train)+' : '+str(t))
+			break
+
+		#plt.figure(figsize=(8, 6))
+		#plt.scatter(X_train[:,0], X_train[:,1], c=b.labels_.astype(float))
+		#plt.show()
+
+def kmean_finetune(name):
+	mypath = '../../secret/data/'
+	mypath = '/media/bon/My Passport/data/'
+	chunk = 100000
+	t = 0.1
 	data = None
+	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
 	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		data = df
 		break
 	data.drop(['txn'], axis=1, inplace=True)
 	X_train, X_validation, Y_train, Y_validation = get_testset(data)
-
-	while True:
-		b = Birch(n_clusters=None,threshold=t)
-		b = b.fit(X_train)
-		print('Threshold :'+str(t))
-		print('Number of clusters: '+str(len(b.subcluster_centers_)))
-		if len(b.subcluster_centers_) > 15000:
-			print('Target threshold :'+str((t-0.1)))
-			break
-		else:
-			t = t-0.1
+	X_train = ssc.transform(X_train)
+	ss = []
+	r = range(10,15)
+	for k in r:
+		kmeans = MiniBatchKMeans(n_clusters=k, random_state=0, batch_size=1000)
+		kmeans = kmeans.fit(X_train)
+		ss.append(kmeans.inertia_)
+		# Getting the cluster labels
+		labels = kmeans.predict(X_train)
+		# Centroid values
+		centroids = kmeans.cluster_centers_
+		plt.figure(figsize=(8, 6))
+		plt.scatter(X_train[:,0], X_train[:,1], c=kmeans.labels_.astype(float))
+		plt.show()
+	'''
+	plt.plot(r, ss, 'bx-')
+	plt.xlabel('k')
+	plt.ylabel('Sum_of_squared_distances')
+	plt.title('Elbow Method For Optimal k')
+	plt.show()
+	'''
 
 	'''
 	df1 = pd.concat(samples)

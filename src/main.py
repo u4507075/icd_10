@@ -19,6 +19,7 @@ from preprocessing.trainmodel import birch_predict
 from preprocessing.trainmodel import train_had
 from preprocessing.trainmodel import eval_had
 from preprocessing.trainmodel import birch_finetune
+from preprocessing.trainmodel import kmean_finetune
 from preprocessing.trainmodel import train_lgb
 from preprocessing.trainmodel import train_xgb
 from preprocessing.trainmodel import validate
@@ -115,7 +116,8 @@ scale_data('../../secret/data/vec/','ilab')
 #birch_predict(['dru','idru'])
 #validate(['dru','idru'])
 
-birch_finetune('dru')
+#kmean_finetune('dru')
+birch_finetune(['dru','idru'])
 
 #birch_train(['dru','idru'],'drug_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
@@ -161,13 +163,13 @@ birch_finetune('dru')
 
 #train_xgb(['reg','adm'])
 
-
+'''
 
 import pandas as pd
 for df in pd.read_csv('../../secret/data/testset/raw/lab.csv', chunksize=100, index_col=0):
 	print(df)
 	break
-
+'''
 
 
 
