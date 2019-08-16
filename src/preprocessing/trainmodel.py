@@ -629,7 +629,7 @@ def distance(x,t):
 	return x
 def birch_finetune(train,t):
 	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
+	#mypath = '/media/bon/My Passport/data/'
 	chunk = 50000
 	gap = t/2
 	print(train)
