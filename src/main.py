@@ -116,8 +116,8 @@ scale_data('../../secret/data/vec/','ilab')
 #birch_predict(['dru','idru'])
 #validate(['dru','idru'])
 
-kmean(['lab','ilab'],'lab')
-birch_finetune(['dru','idru'],1)
+#kmean_finetune('dru')
+#birch_finetune(['dru','idru'],1)
 
 #birch_finetune(['dru','idru'],0.1)
 
