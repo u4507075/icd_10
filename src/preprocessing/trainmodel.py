@@ -56,6 +56,9 @@ from creme import tree
 import math
 from sklearn.metrics import accuracy_score
 
+mypath = '../../secret/data/'
+mypath = '/media/bon/My Passport/data1/'
+
 def get_dataset(trainingset, validation_size):
 	for name in trainingset.columns:
 		if name != 'icd10' and str(trainingset[name].dtype) == 'object':
@@ -99,7 +102,7 @@ def eval(testset_path,model):
 	print(cr)
 
 def get_target_class(p,name):
-	p = '../../secret/data/drug/'+name
+	p = mypath+'drug/'+name
 	value = []
 	for df in  pd.read_csv(p, chunksize=10000):
 		v = df[feature].unique().tolist()
@@ -109,7 +112,7 @@ def get_target_class(p,name):
 		print(len(value))
 
 	df = pd.DataFrame.from_dict({feature:value})
-	df.to_csv('../../secret/data/test/'+name+'_class.csv')
+	df.to_csv(mypath+'test/'+name+'_class.csv')
 	print(df)
 
 def save_file(df,p):
@@ -133,7 +136,7 @@ def train_model(models, X_train, Y_train, classes):
 			m.partial_fit(X_train, Y_train, classes=classes)
 			print('Loss :'+str(m.loss_))
 	return models
-
+'''
 def test(m, X_validation, Y_validation):
 	if str(m.estimator).startswith('SGDRegressor') or str(m.estimator).startswith('PassiveAggressiveRegressor'):
 		m.partial_fit(X_train, Y_train)
@@ -160,14 +163,14 @@ def dask_model(train, modelname):
 			Incremental(MLPClassifier())]
 	#model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-regressor']
 	model_names = ['mlpclassifier']
-	#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 	chunk = 10000
 	n = 0
 	#inc = Incremental(c, scoring='accuracy')
-	classes = pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0).index.values
+	classes = pd.read_csv(mypath+'raw/icd10.csv', index_col=0).index.values
 	for name in train:
-		ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
-		for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 			X_train = ssc.transform(X_train)
@@ -186,29 +189,29 @@ def dask_model(train, modelname):
 
 def eval_model(name):
 	chunk = 10000
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 	#model_names = ['passive-aggrassive-classifier','sgd-classifier','perceptron','sgd-regressor','passive-aggrassive-regressor']
 	model_names = ['mlpclassifier']
-	if not os.path.exists('../../secret/data/model_prediction/'):
-		os.makedirs('../../secret/data/model_prediction/')
-	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	if not os.path.exists(mypath+'model_prediction/'):
+		os.makedirs(mypath+'model_prediction/')
+	for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
 		X_train = ssc.transform(X_train)
 		#print(len(X_train))
 		for modelname in model_names:
-			loaded_model = pickle.load(open('../../secret/data/model/'+name+'_'+modelname+'.pkl', 'rb'))
+			loaded_model = pickle.load(open(mypath+'model/'+name+'_'+modelname+'.pkl', 'rb'))
 			#result = loaded_model.score(X_train, Y_train)
 			#print(result)
 			df[modelname] = loaded_model.predict(X_train)[:len(X_train)]
-		save_file(df,'../../secret/data/model_prediction/'+name+'.csv')
+		save_file(df,mypath+'model_prediction/'+name+'.csv')
 		print('Predict '+name)
-
+'''
 '''
 def creme_model(name):
 	#Need python >= 3.6
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 	chunk = 10000
 	optimizer = optim.VanillaSGD(lr=0.01)
 	#model = linear_model.LinearRegression(optimizer)
@@ -221,7 +224,7 @@ def creme_model(name):
 	y_pred = []
 	metric = metrics.Accuracy()
 
-	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv(mypath+'vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
 		X_train = ssc.transform(X_train)
@@ -239,8 +242,9 @@ def creme_model(name):
 		acc = accuracy_score(y_true, y_pred)
 		print(acc)
 '''
+'''
 def save_history():
-	files = os.listdir('../../secret/data/trainingset/')
+	files = os.listdir(mypath+'trainingset/')
 
 	stop = False
 
@@ -249,7 +253,7 @@ def save_history():
 		if stop:
 			break
 		print(filename)
-		p = '../../secret/data/trainingset/'+filename+'.csv'
+		p = mypath+'trainingset/'+filename+'.csv'
 		targets = []
 		for df in  pd.read_csv(p, chunksize=100000, index_col=0):
 			df['icd10'] = df['icd10'].apply(str)
@@ -258,14 +262,14 @@ def save_history():
 			targets = list(set(targets))
 		targets.sort()
 
-		if not os.path.exists('../../secret/data/model_performance/'):
-			os.makedirs('../../secret/data/model_performance/')
+		if not os.path.exists(mypath+'model_performance/'):
+			os.makedirs(mypath+'model_performance/')
 
-		if not os.path.exists('../../secret/data/model/'):
-			os.makedirs('../../secret/data/model/')
+		if not os.path.exists(mypath+'model/'):
+			os.makedirs(mypath+'model/')
 
-		if not os.path.exists('../../secret/data/model/'+filename):
-			os.makedirs('../../secret/data/model/'+filename)
+		if not os.path.exists(mypath+'model/'+filename):
+			os.makedirs(mypath+'model/'+filename)
 
 		regex = re.compile('[A-Z]')
 		target_classes = [i for i in targets if regex.match(i)]
@@ -274,13 +278,13 @@ def save_history():
 			if stop:
 				break
 			
-			if not Path('../../secret/data/model_performance/training_record.csv').is_file():
-				save_file(pd.DataFrame(columns=['feature','icd10']),'../../secret/data/model_performance/training_record.csv')
+			if not Path(mypath+'model_performance/training_record.csv').is_file():
+				save_file(pd.DataFrame(columns=['feature','icd10']),mypath+'model_performance/training_record.csv')
 
-			save_file(pd.DataFrame([[filename,target]],columns=['feature','icd10']),'../../secret/data/model_performance/training_record.csv')
+			save_file(pd.DataFrame([[filename,target]],columns=['feature','icd10']),mypath+'model_performance/training_record.csv')
 			if filename == 'L1901' and target == 'M8445':
 				stop = True
-
+'''
 def scale_data(path,filename):
 	# scale to 0 - 1 without changing the distribution pattern, outlier still affects
 	mmsc = MinMaxScaler(feature_range = (0, 1))
@@ -319,30 +323,30 @@ def history_loss(loss,val_loss):
 	plt.show()
 
 def save_model(model,filename):
-	pkl_filename = '../../secret/data/model/'+filename+".pkl"  
+	pkl_filename = mypath+'model/'+filename+".pkl"  
 	with open(pkl_filename, 'wb') as file:  
 		 pickle.dump(model, file)
 	print("save model")
 
 def save_lstm_model(model,filename):
-	if not os.path.exists('../../secret/data/model/'):
-		os.makedirs('../../secret/data/model/')
+	if not os.path.exists(mypath+'model/'):
+		os.makedirs(mypath+'model/')
 	# serialize model to JSON
 	model_json = model.to_json()
-	with open('../../secret/data/model/'+filename+".json", "w") as json_file:
+	with open(mypath+'model/'+filename+".json", "w") as json_file:
 		 json_file.write(model_json)
 	# serialize weights to HDF5
-	model.save_weights('../../secret/data/model/'+filename+".h5")
+	model.save_weights(mypath+'model/'+filename+".h5")
 	print("save model")
 
 def load_model(filename):
 	# load json and create model
-	json_file = open('../../secret/data/model/'+filename+'.json', 'r')
+	json_file = open(mypath+'model/'+filename+'.json', 'r')
 	loaded_model_json = json_file.read()
 	json_file.close()
 	loaded_model = model_from_json(loaded_model_json)
 	# load weights into new model
-	loaded_model.load_weights('../../secret/data/model/'+filename+'.h5')
+	loaded_model.load_weights(mypath+'model/'+filename+'.h5')
 	print("Loaded model from disk")
 	return loaded_model
 
@@ -358,7 +362,7 @@ def lstm_model(name,f):
 	
 	regressor = Sequential()
 
-	file = Path('../../secret/data/model/'+name+'_lstm.h5')
+	file = Path(mypath+'model/'+name+'_lstm.h5')
 	total_history = None
 	if file.is_file():
 		regressor = load_model(name)
@@ -374,10 +378,10 @@ def lstm_model(name,f):
 				        optimizer='adam',
 				        metrics=['accuracy'])
 
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save') 
-	#ssc = joblib.load('../../secret/data/vec/'+name+'_minmaxscaler.save') 
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save') 
+	#ssc = joblib.load(mypath+'vec/'+name+'_minmaxscaler.save') 
 
-	for df in  pd.read_csv('../../secret/data/trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		X_train = ssc.fit_transform(X_train)
@@ -391,25 +395,25 @@ def lstm_model(name,f):
 		#	break
 		#predict(testset,testvalue,ssc,regressor)
 		save_file(pd.DataFrame([[history.history['loss'],history.history['val_loss']]], columns=['loss','val_loss']),
-					'../../secret/data/model/'+name+'_history.csv')
+					mypath+'model/'+name+'_history.csv')
 
 
 		save_lstm_model(regressor,name+'_lstm')
-		if Path('../../secret/data/model/'+name+'_history.csv').is_file():
-			total_history = pd.read_csv('../../secret/data/model/'+name+'_history.csv', index_col=0)
+		if Path(mypath+'model/'+name+'_history.csv').is_file():
+			total_history = pd.read_csv(mypath+'model/'+name+'_history.csv', index_col=0)
 			history_loss(total_history['loss'].values.tolist(), total_history['val_loss'].values.tolist())
 		#break
 
 def evaluate_lstm_model(name):
-	file = Path('../../secret/data/model/'+name+'.h5')
+	file = Path(mypath+'model/'+name+'.h5')
 	regressor = load_model(name)
 	regressor.compile(loss='mean_squared_error',
 				        optimizer='adam',
 				        metrics=['accuracy'])
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save') 
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save') 
 	chunk = 10000
 
-	for df in  pd.read_csv('../../secret/data/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv(mypath+'vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, 0.1)
 		X_validation = ssc.fit_transform(X_validation)
@@ -420,39 +424,37 @@ def evaluate_lstm_model(name):
 def kmean(train,modelname):
 	chunk = 30000
 	n = 15000
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
 	kmeans = MiniBatchKMeans(n_clusters=n, random_state=0, batch_size=1000)
 	for name in train:
-		ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
+		#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 
 		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			X_train = ssc.transform(X_train)
+			#X_train = ssc.transform(X_train)
 			kmeans = kmeans.partial_fit(X_train)
 			print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
 			print(kmeans.inertia_)
 	save_model(kmeans,modelname+'_kmean_'+str(n))
-
+'''
 def predict_kmean(name,modelname):
 	chunk = 10000
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
-	if not os.path.exists('../../secret/data/model_prediction/'):
-		os.makedirs('../../secret/data/model_prediction/')
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
+	if not os.path.exists(mypath+'model_prediction/'):
+		os.makedirs(mypath+'model_prediction/')
 	#n = [100,1000,5000,10000,15000,20000,25000,30000]
 	n = [100,1000,10000]
-	for df in  pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(dftest, None)
 		X_train = ssc.transform(X_train)
 		for i in n:
-			kmeans = pickle.load(open('../../secret/data/model/'+modelname+'_kmean_'+str(i)+'.pkl', 'rb'))
+			kmeans = pickle.load(open(mypath+'model/'+modelname+'_kmean_'+str(i)+'.pkl', 'rb'))
 			df['kmean_'+str(i)] = kmeans.predict(X_train)[:len(X_train)]
-		save_file(df,'../../secret/data/model_prediction/'+name+'_kmean.csv')
+		save_file(df,mypath+'model_prediction/'+name+'_kmean.csv')
 		print('save result')
-
+'''
 def top(x):
 	return x.value_counts().head(10)
 
@@ -462,11 +464,9 @@ def topsum(x):
 def get_neighbour(train,modelname):
 	chunk = 100000
 	results = []
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
 	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
 	for name in train:
-		#ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+		#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
@@ -489,8 +489,6 @@ def get_neighbour(train,modelname):
 	total.to_csv(mypath+'/model_prediction/'+modelname+'_neighbour.csv')
 
 def get_weight(modelname):
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
 	df = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	df['total_count'] = df.groupby('icd10')['icd10_count'].transform('sum')
 	df['cluster_count'] = df.groupby('cluster')['icd10_count'].transform('sum')
@@ -499,9 +497,29 @@ def get_weight(modelname):
 	df.to_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv')
 	print('save weight to '+modelname)
 
-def birch_predict(filenames):
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
+def predict_cluster(train,modelname):
+	chunk = 10000
+	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
+	neighbour = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
+	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
+	for name in train:
+		#remove_file(mypath+'result/'+name+'.csv')
+		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			index = df.index
+			X_train, X_validation, Y_train, Y_validation = get_testset(df)
+			#X_train = ssc.transform(X_train)
+			df.insert(0,'index',index)
+			df['model_name'] = modelname
+			df['cluster'] = model.predict(X_train)[:len(X_train)]
+			result = pd.merge(df,neighbour, how='left', on='cluster')
+			#print(result)
+			save_file(result,mypath+'result/'+name+'.csv')
+			print('append result')
+			#print(df)
+	print('complete')
+
+def predict_icd10(filenames):
 	chunk = 1000
 	for name in filenames:
 		id = []
@@ -520,6 +538,56 @@ def birch_predict(filenames):
 			total = total.sort_values(by=['index','weight'], ascending=[True,False])
 			save_file(total,mypath+'result/'+name+'_prediction.csv')
 			print('append prediction')
+	print('complete')
+
+def validate(filenames):
+	chunk = 10000
+	n = 5
+	for name in filenames:
+		txn = []
+		for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
+			txn = txn + df['txn'].values.tolist()
+
+		for i in range(0, len(txn), chunk):
+			txn_range = txn[i:i + chunk]
+			test = []
+			for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
+				df = df[df['txn'].isin(txn_range)]
+				df['index'] = df.index
+				test.append(df)
+			testset = pd.concat(test)
+			result = []
+			for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
+				df = df[df['index'].isin(testset.index.values.tolist())]
+				result.append(df)
+			predictset = pd.concat(result)
+			#print(testset)
+			#print(predictset)
+			total = pd.merge(testset, predictset, on=['index'])
+			total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
+			total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
+			#print(total)
+			validateset = total[['txn','predicted_icd10','weight']]
+			validateset['sum_weight'] = validateset.groupby(['txn','predicted_icd10'])['weight'].transform('sum')
+			validateset = validateset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
+			validateset.drop(['weight'], axis=1, inplace=True)
+			validateset = validateset.drop_duplicates()
+			validateset = validateset.groupby('txn').head(n)
+
+			actualset = total[['txn','actual_icd10']]
+			actualset = actualset.drop_duplicates()
+
+			dataset1 = pd.merge(validateset, actualset, how='left', left_on=['txn','predicted_icd10'], right_on=['txn','actual_icd10'])
+			dataset2 = pd.merge(actualset, validateset, how='left', right_on=['txn','predicted_icd10'], left_on=['txn','actual_icd10'])
+			dataset = dataset1.append(dataset2, ignore_index=True)
+			dataset = dataset.drop_duplicates()
+			dataset = dataset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
+			#print(dataset)
+			#dataset.to_csv('test.csv')
+			performance(dataset)
+			break
+			print('append prediction')
+		break
 	print('complete')
 
 def count(x):
@@ -570,66 +638,10 @@ def performance(df):
 	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['f_measure']*result['dxn']).sum()/result['dxn'].sum())
-def validate(filenames):
-
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
-	chunk = 10000
-	n = 5
-	for name in filenames:
-		txn = []
-		for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
-			txn = txn + df['txn'].values.tolist()
-
-		for i in range(0, len(txn), chunk):
-			txn_range = txn[i:i + chunk]
-			test = []
-			for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
-				df = df[df['txn'].isin(txn_range)]
-				df['index'] = df.index
-				test.append(df)
-			testset = pd.concat(test)
-			result = []
-			for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
-				df = df[df['index'].isin(testset.index.values.tolist())]
-				result.append(df)
-			predictset = pd.concat(result)
-			#print(testset)
-			#print(predictset)
-			total = pd.merge(testset, predictset, on=['index'])
-			total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
-			total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
-			#print(total)
-			validateset = total[['txn','predicted_icd10','weight']]
-			validateset['sum_weight'] = validateset.groupby(['txn','predicted_icd10'])['weight'].transform('sum')
-			validateset = validateset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
-			validateset.drop(['weight'], axis=1, inplace=True)
-			validateset = validateset.drop_duplicates()
-			validateset = validateset.groupby('txn').head(n)
-
-			actualset = total[['txn','actual_icd10']]
-			actualset = actualset.drop_duplicates()
-
-			dataset1 = pd.merge(validateset, actualset, how='left', left_on=['txn','predicted_icd10'], right_on=['txn','actual_icd10'])
-			dataset2 = pd.merge(actualset, validateset, how='left', right_on=['txn','predicted_icd10'], left_on=['txn','actual_icd10'])
-			dataset = dataset1.append(dataset2, ignore_index=True)
-			dataset = dataset.drop_duplicates()
-			dataset = dataset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
-			#print(dataset)
-			#dataset.to_csv('test.csv')
-			performance(dataset)
-			break
-			print('append prediction')
-		break
-	print('complete')
-
-	
 
 def distance(x,t):
 	return x
 def birch_finetune(train,t):
-	mypath = '../../secret/data/'
-	#mypath = '/media/bon/My Passport/data/'
 	chunk = 50000
 	gap = t/2
 	print(train)
@@ -664,12 +676,11 @@ def birch_finetune(train,t):
 		#plt.show()
 
 def kmean_finetune(name):
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
+
 	chunk = 100000
 	t = 0.1
 	data = None
-	ssc = joblib.load('../../secret/data/vec/'+name+'_standardscaler.save')
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		data = df
 		break
@@ -731,7 +742,7 @@ def kmean_finetune(name):
 '''
 def birch_train(train,modelname):
 	chunk = 100000
-	mypath = '../../secret/data/'
+	mypath = mypath+''
 	#mypath = '/media/bon/My Passport/data/'
 	n = 0
 	t = 0.5
@@ -741,7 +752,7 @@ def birch_train(train,modelname):
 		print('Threshold = '+str(t))
 		b = Birch(n_clusters=None,threshold=t)
 		for name in train:
-			#ssc = jl.load('../../secret/data/vec/'+name+'_standardscaler.save')
+			#ssc = jl.load(mypath+'vec/'+name+'_standardscaler.save')
 
 			for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 				df.drop(['txn'], axis=1, inplace=True)
@@ -767,8 +778,6 @@ def birch_train(train,modelname):
 '''
 def birch_train(train,modelname,t):
 	chunk = 100000
-	#mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
 	print('Threshold = '+str(t))
 	b = Birch(n_clusters=None,threshold=t)
 	for name in train:
@@ -784,33 +793,9 @@ def birch_train(train,modelname,t):
 	save_model(b,modelname+'_'+str(t))
 	print('complete')
 
-def birch_test(train,modelname):
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
-	chunk = 10000
-	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
-	neighbour = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
-	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
-	for name in train:
-		#remove_file('../../secret/data/result/'+name+'.csv')
-		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df.drop(['txn'], axis=1, inplace=True)
-			index = df.index
-			X_train, X_validation, Y_train, Y_validation = get_testset(df)
-			#X_train = ssc.transform(X_train)
-			df.insert(0,'index',index)
-			df['model_name'] = modelname
-			df['cluster'] = model.predict(X_train)[:len(X_train)]
-			result = pd.merge(df,neighbour, how='left', on='cluster')
-			#print(result)
-			save_file(result,mypath+'result/'+name+'.csv')
-			print('append result')
-			#print(df)
-	print('complete')
-
 def train_had():
 	p = '/media/bon/My Passport/data/'
-	icd10 =  pd.read_csv('../../secret/data/raw/icd10.csv', index_col=0)
+	icd10 =  pd.read_csv(mypath+'raw/icd10.csv', index_col=0)
 	icd10_map = dict(zip(icd10['code'],icd10.index))
 	had = pd.read_csv(p+'had.csv', index_col=0)
 	had = had['drug'].values.tolist()
@@ -838,8 +823,8 @@ def train_had():
 
 def eval_had(name):
 	chunk = 10000
-	loaded_model = pickle.load(open('../../secret/data/model/had_mlpclassifier.pkl', 'rb'))
-	for df in pd.read_csv('../../secret/data/testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	loaded_model = pickle.load(open(mypath+'model/had_mlpclassifier.pkl', 'rb'))
+	for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest.drop(['txn'], axis=1, inplace=True)
 		dftest = dftest[['icd10','drug']]
@@ -860,8 +845,6 @@ def cosine_vectorized(array1, array2):
     return (sumxy/np.sqrt(sumxx))/np.sqrt(sumyy)
 
 def train_lgb(train):
-	mypath = '../../secret/data/'
-	mypath = '/media/bon/My Passport/data/'
 	chunk = 100000
 	lgb_estimator = None
 	# First one necessary for incremental learning:
@@ -895,8 +878,6 @@ def train_lgb(train):
 			#print(evals_result)
 
 def train_xgb(train):
-	mypath = '../../secret/data/'
-	#mypath = '/media/bon/My Passport/data/'
 	chunk = 1000
 	xgb_estimator = None
 	# First three are for incremental learning:

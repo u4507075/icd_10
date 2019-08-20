@@ -1,9 +1,3 @@
-from preprocessing.getdata import getdata
-from preprocessing.getdata import getidata
-from preprocessing.onehot import get_total_feature
-from preprocessing.onehot import onehot
-from preprocessing.drug_encode import get_encode_feature
-from preprocessing.drug_encode import encode_feature
 from preprocessing.trainmodel import scale_data
 from preprocessing.trainmodel import dask_model
 from preprocessing.trainmodel import eval_model
@@ -14,8 +8,8 @@ from preprocessing.trainmodel import predict_kmean
 from preprocessing.trainmodel import get_neighbour
 from preprocessing.trainmodel import get_weight
 from preprocessing.trainmodel import birch_train
-from preprocessing.trainmodel import birch_test
-from preprocessing.trainmodel import birch_predict
+from preprocessing.trainmodel import predict_cluster
+from preprocessing.trainmodel import predict_icd10
 from preprocessing.trainmodel import train_had
 from preprocessing.trainmodel import eval_had
 from preprocessing.trainmodel import birch_finetune
@@ -24,47 +18,19 @@ from preprocessing.trainmodel import train_lgb
 from preprocessing.trainmodel import train_xgb
 from preprocessing.trainmodel import validate
 
-from preprocessing.lab import get_lab_data
-from preprocessing.lab import split_lab_data
-from preprocessing.lab import clean_lab_data
-from preprocessing.lab import tonumeric_lab_data
-from preprocessing.lab import get_encode_lab
-from preprocessing.lab import encode_lab_data
-
-from preprocessing.admit import save_admit_data
-from preprocessing.admit import clean_admit_data
-from preprocessing.admit import onehot_admit_data
-
-from preprocessing.registration import save_registration_data
-from preprocessing.registration import clean_registration_data
-from preprocessing.registration import onehot_registration_data
-
-from preprocessing.split import get_txn_test_data
-from preprocessing.split import split_set
-from preprocessing.split import split_lab
-from preprocessing.split import clean_data
-
-
-
-from preprocessing.drug_verification import get_drug_verification_registration_data
-from preprocessing.drug_verification import get_drug_verification_lab_data
-
-from validation.validation import predict_testset
-
-from validation.testset import get_validation_data
 
 
 
 
-from preprocessing.text import get_icd10_data
-from preprocessing.text import get_adm_data
-from preprocessing.text import get_reg_data
-from preprocessing.text import get_drug_data
-from preprocessing.text import get_lab_data
-from preprocessing.text import get_rad_data
-from preprocessing.text import get_txn_test_data
-from preprocessing.text import split_data
-from preprocessing.text import csv_to_sqldb
+from preprocessing.preprocess import get_icd10_data
+from preprocessing.preprocess import get_adm_data
+from preprocessing.preprocess import get_reg_data
+from preprocessing.preprocess import get_drug_data
+from preprocessing.preprocess import get_lab_data
+from preprocessing.preprocess import get_rad_data
+from preprocessing.preprocess import get_txn_test_data
+from preprocessing.preprocess import split_data
+from preprocessing.preprocess import csv_to_sqldb
 
 #from preprocessing.vec import word_to_vec
 #from preprocessing.vec import radio_to_vec
@@ -109,11 +75,11 @@ scale_data('../../secret/data/vec/','ilab')
 '''
 
 
-#kmean(['dru','idru'],'drug')
+kmean(['dru','idru'],'drug')
 #get_neighbour(['dru','idru'],'drug_kmean_15000')
 #get_weight('drug_kmean_15000')
-#birch_test(['dru','idru'],'drug_kmean_15000')
-#birch_predict(['dru','idru'])
+#predict_cluster(['dru','idru'],'drug_kmean_15000')
+#predict_icd10(['dru','idru'])
 #validate(['dru','idru'])
 
 #kmean_finetune('dru')
@@ -125,21 +91,21 @@ scale_data('../../secret/data/vec/','ilab')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['dru','idru'],'drug_birch_'+str(i))
 #	get_weight('drug_birch_'+str(i))
-#	birch_test(['dru','idru'],'drug_birch_'+str(i))
-#	birch_predict(['dru','idru'])
+#	predict_cluster(['dru','idru'],'drug_birch_'+str(i))
+#	predict_icd10(['dru','idru'])
 
 #birch_train(['reg','adm'],'reg_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
 #	get_neighbour(['reg','adm'],'reg_birch_'+str(i))
 #	get_weight('reg_birch_'+str(i))
-#	birch_test(['reg','adm'],'reg_birch_'+str(i))
-#	birch_predict(['reg','adm'])
+#	predict_cluster(['reg','adm'],'reg_birch_'+str(i))
+#	predict_icd10(['reg','adm'])
 
 #birch_train(['lab','ilab'],'lab_birch')
 #for i in [0.75,1.0,1.25,1.50,1.75]:
 #	get_neighbour(['lab','ilab'],'lab_birch_'+str(i))
 #	get_weight('lab_birch_'+str(i))
-#	birch_test(['lab','ilab'],'lab_birch_'+str(i))
+#	predict_cluster(['lab','ilab'],'lab_birch_'+str(i))
 
 #dask_model(['dru','idru'],'drug')
 #dask_model(['reg','adm'],'reg')
