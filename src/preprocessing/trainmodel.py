@@ -514,14 +514,14 @@ def predict_cluster(train,modelname):
 			df['cluster'] = model.predict(X_train)[:len(X_train)]
 			result = pd.merge(df,neighbour, how='left', on='cluster')
 			#print(result)
-			save_file(result,mypath+'result/'+name+'.csv')
+			save_file(result,mypath+'result/'+name+'_'+modelname+'.csv')
 			print('append result')
 			#print(df)
 	print('complete')
 
-def predict_icd10(filenames):
+def predict_icd10(train,modelname):
 	chunk = 1000
-	for name in filenames:
+	for name in train:
 		id = []
 		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=100000, index_col=0):
 			id = id + df.index.values.tolist()
@@ -529,21 +529,21 @@ def predict_icd10(filenames):
 		for i in range(0, len(id), chunk):
 			index = id[i:i + chunk]
 			result = []
-			for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
+			for df in pd.read_csv(mypath+'result/'+modelname+'.csv', chunksize=chunk, index_col=0):
 				df = df[df['index'].isin(index)]
 				result.append(df)
 			total = pd.concat(result)
 			total = total[['index','predicted_icd10','weight']]
 			total = total.groupby(['index', 'predicted_icd10'])['weight'].agg('sum').reset_index()
 			total = total.sort_values(by=['index','weight'], ascending=[True,False])
-			save_file(total,mypath+'result/'+name+'_prediction.csv')
+			save_file(total,mypath+'result/'+name+'_'+modelname+'_prediction.csv')
 			print('append prediction')
 	print('complete')
 
-def validate(filenames):
+def validate(train,modelname):
 	chunk = 10000
 	n = 5
-	for name in filenames:
+	for name in train:
 		txn = []
 		for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
 			txn = txn + df['txn'].values.tolist()
@@ -557,15 +557,17 @@ def validate(filenames):
 				test.append(df)
 			testset = pd.concat(test)
 			result = []
-			for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
+			for df in pd.read_csv(mypath+'result/'+name+'_'+modelname+'.csv', chunksize=chunk, index_col=0):
 				df = df[df['index'].isin(testset.index.values.tolist())]
 				result.append(df)
 			predictset = pd.concat(result)
+			predictset = predictset[['index','icd10','predicted_icd10','weight']]
+			predictset = predictset.rename(columns={'icd10':'actual_icd10'})
 			#print(testset)
 			#print(predictset)
 			total = pd.merge(testset, predictset, on=['index'])
-			total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
-			total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
+			#total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
+			#total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
 			#print(total)
 			validateset = total[['txn','predicted_icd10','weight']]
 			validateset['sum_weight'] = validateset.groupby(['txn','predicted_icd10'])['weight'].transform('sum')
@@ -586,7 +588,7 @@ def validate(filenames):
 			#dataset.to_csv('test.csv')
 			performance(dataset)
 			break
-			print('append prediction')
+			#print('append prediction')
 		break
 	print('complete')
 
@@ -633,7 +635,7 @@ def performance(df):
 	result['recall'] = result['tp']/(result['tp']+result['fn'])
 	result['f_measure'] = 2*result['tp']/((2*result['tp'])+result['fp']+result['fn'])
 	
-	print(result)
+	#print(result)
 	print((result['accuracy']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
@@ -651,8 +653,8 @@ def birch_finetune(train,t):
 		for name in train:
 			for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 				df.drop(['txn'], axis=1, inplace=True)
-				if name == 'reg':
-					df.insert(9,'room_dc',0)
+				#if name == 'reg':
+				#	df.insert(9,'room_dc',0)
 				X_train, X_validation, Y_train, Y_validation = get_testset(df)
 				b = b.partial_fit(X_train)
 				n = len(b.subcluster_centers_)
@@ -783,8 +785,8 @@ def birch_train(train,modelname,t):
 	for name in train:
 		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
-			if name == 'reg':
-				df.insert(9,'room_dc',0)
+			#if name == 'reg':
+			#	df.insert(9,'room_dc',0)
 			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 			b = b.partial_fit(X_train)
 			n = len(b.subcluster_centers_)

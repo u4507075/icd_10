@@ -1,26 +1,22 @@
 from preprocessing.trainmodel import scale_data
-from preprocessing.trainmodel import dask_model
-from preprocessing.trainmodel import eval_model
-from preprocessing.trainmodel import lstm_model
-from preprocessing.trainmodel import evaluate_lstm_model
+#from preprocessing.trainmodel import dask_model
+#from preprocessing.trainmodel import eval_model
+#from preprocessing.trainmodel import lstm_model
+#from preprocessing.trainmodel import evaluate_lstm_model
 from preprocessing.trainmodel import kmean
-from preprocessing.trainmodel import predict_kmean
+#from preprocessing.trainmodel import predict_kmean
 from preprocessing.trainmodel import get_neighbour
 from preprocessing.trainmodel import get_weight
-from preprocessing.trainmodel import birch_train
+#from preprocessing.trainmodel import birch_train
 from preprocessing.trainmodel import predict_cluster
 from preprocessing.trainmodel import predict_icd10
-from preprocessing.trainmodel import train_had
-from preprocessing.trainmodel import eval_had
+#from preprocessing.trainmodel import train_had
+#from preprocessing.trainmodel import eval_had
 from preprocessing.trainmodel import birch_finetune
 from preprocessing.trainmodel import kmean_finetune
-from preprocessing.trainmodel import train_lgb
-from preprocessing.trainmodel import train_xgb
+#from preprocessing.trainmodel import train_lgb
+#from preprocessing.trainmodel import train_xgb
 from preprocessing.trainmodel import validate
-
-
-
-
 
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
@@ -75,12 +71,12 @@ scale_data('../../secret/data/vec/','ilab')
 '''
 
 
-kmean(['dru','idru'],'drug')
+#kmean(['dru','idru'],'drug')
 #get_neighbour(['dru','idru'],'drug_kmean_15000')
 #get_weight('drug_kmean_15000')
 #predict_cluster(['dru','idru'],'drug_kmean_15000')
-#predict_icd10(['dru','idru'])
-#validate(['dru','idru'])
+#predict_icd10(['dru','idru'],'drug_kmean_15000')
+validate(['dru','idru'],'drug_kmean_15000')
 
 #kmean_finetune('dru')
 #birch_finetune(['dru','idru'],1)
