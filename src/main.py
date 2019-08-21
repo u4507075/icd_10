@@ -73,15 +73,30 @@ scale_data('../../secret/data/vec/','ilab')
 
 #kmean(['dru','idru'],'drug')
 #get_neighbour(['dru','idru'],'drug_kmean_15000')
+
 #get_weight('drug_kmean_15000')
 #predict_cluster(['dru','idru'],'drug_kmean_15000')
 #predict_icd10(['dru','idru'],'drug_kmean_15000')
-validate(['dru','idru'],'drug_kmean_15000')
+#validate(['dru','idru'],'drug_kmean_15000')
 
-#kmean_finetune('dru')
-#birch_finetune(['dru','idru'],1)
+#kmean(['reg','adm'],'reg')
+#get_neighbour(['reg','adm'],'reg_kmean_15000')
+#get_weight('reg_kmean_15000')
+#predict_cluster(['reg','adm'],'reg_kmean_15000')
+#validate(['reg','adm'],'reg_kmean_15000')
+
+#kmean(['lab','ilab'],'lab')
+
+#kmean(['rad','irad'],'rad')
+#get_neighbour(['rad','irad'],'rad_kmean_15000')
+
+
 
 #birch_finetune(['dru','idru'],0.1)
+#birch_finetune(['reg','adm'],1)
+#birch_finetune(['lab','ilab'],1)
+#birch_finetune(['rad','irad'],1)
+
 
 #birch_train(['dru','idru'],'drug_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:

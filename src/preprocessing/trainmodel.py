@@ -57,7 +57,7 @@ import math
 from sklearn.metrics import accuracy_score
 
 mypath = '../../secret/data/'
-mypath = '/media/bon/My Passport/data1/'
+#mypath = '/media/bon/My Passport/data1/'
 
 def get_dataset(trainingset, validation_size):
 	for name in trainingset.columns:
@@ -658,7 +658,7 @@ def birch_finetune(train,t):
 				X_train, X_validation, Y_train, Y_validation = get_testset(df)
 				b = b.partial_fit(X_train)
 				n = len(b.subcluster_centers_)
-				print(n)
+				#print(n)
 				if n > 15000:
 					break
 			if n > 15000:
@@ -668,6 +668,7 @@ def birch_finetune(train,t):
 			t = t+gap
 		else:
 			t = t-gap
+		print('Number of cluster :'+str(n))
 		print('Adjust threshold to :'+str(t))
 		if gap < 0.01:
 			print('Target threshold for '+str(train)+' : '+str(t))
