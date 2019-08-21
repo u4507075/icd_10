@@ -55,9 +55,12 @@ from creme import tree
 '''
 import math
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import coverage_error
+from sklearn.metrics import label_ranking_average_precision_score
+from sklearn.metrics import label_ranking_loss
 
 mypath = '../../secret/data/'
-#mypath = '/media/bon/My Passport/data1/'
+mypath = '/media/bon/My Passport/data/'
 
 def get_dataset(trainingset, validation_size):
 	for name in trainingset.columns:
@@ -541,8 +544,9 @@ def predict_icd10(train,modelname):
 	print('complete')
 
 def validate(train,modelname):
+
 	chunk = 10000
-	n = 5
+	n = 10
 	for name in train:
 		txn = []
 		for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
@@ -592,6 +596,8 @@ def validate(train,modelname):
 		break
 	print('complete')
 
+	#performance(None)
+
 def count(x):
 	return len(x[x['actual_icd10'].isna()]) + len(x[(pd.notna(x['actual_icd10'])) & (pd.notna(x['predicted_icd10']))])
 
@@ -622,8 +628,29 @@ def tn(x):
 def fn(x):
 	return len(x[(pd.notna(x['actual_icd10'])) & (x['predicted_icd10'].isna())])
 
+def rank_y_true(x):
+	y_true = [0] * 38969
+
+	for i in x['actual_icd10'].values.tolist():
+		if pd.notna(i):
+			y_true[int(i)] = 1
+	
+	return y_true
+
+def rank_y_score(x):
+	y_score = [0] * 38969
+	
+	for i in range(len(x['predicted_icd10'].values.tolist())):
+		v = x['predicted_icd10'].values.tolist()[i]
+		if pd.notna(v):
+			y_score[int(v)] = x['sum_weight'].values.tolist()[i]
+	return y_score
+	
 def performance(df):
+	#print(df)
 	#df = pd.read_csv('test.csv', index_col=0)
+	#df = df.head(500)
+	'''
 	result = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(count).reset_index(name='n')
 	result['dxn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(dxn).reset_index(name='dxn')['dxn']
 	result['tp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(tp).reset_index(name='tp')['tp']
@@ -640,6 +667,12 @@ def performance(df):
 	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['f_measure']*result['dxn']).sum()/result['dxn'].sum())
+	'''
+	y_true = np.array(df.groupby('txn').apply(rank_y_true).reset_index(name='y_true')['y_true'].values.tolist())
+	y_score = np.array(df.groupby('txn').apply(rank_y_score).reset_index(name='y_score')['y_score'].values.tolist())
+	print('coverage error '+ str(coverage_error(y_true, y_score)))
+	print('Average precision score '+ str(label_ranking_average_precision_score(y_true, y_score)))
+	print('Ranking loss '+ str(label_ranking_loss(y_true, y_score)))
 
 def distance(x,t):
 	return x

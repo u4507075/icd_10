@@ -83,7 +83,7 @@ scale_data('../../secret/data/vec/','ilab')
 #get_neighbour(['reg','adm'],'reg_kmean_15000')
 #get_weight('reg_kmean_15000')
 #predict_cluster(['reg','adm'],'reg_kmean_15000')
-#validate(['reg','adm'],'reg_kmean_15000')
+validate(['reg','adm'],'reg_kmean_15000')
 
 #kmean(['lab','ilab'],'lab')
 
