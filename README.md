@@ -272,9 +272,17 @@ git remote -v
 ## How it works
 ## Validation protocol
 
-Because we have several teams to develop different approachs to predict ICD-10, we need to set up a standard protocol to validate across those approaches. We devide the validation protocol into to two parts: mathimatical and clinical validation.
+Because we have several teams to develop different approachs to predict ICD-10, we need to set up a standard protocol to validate across those approaches. We devide the validation protocol into to two parts: multilabel ranking metrics and TXN-based metrics.
+1. Multilabel ranking metrics
+[Multilabel ranking metrics](https://scikit-learn.org/stable/modules/model_evaluation.html#multilabel-ranking-metrics) is a way to measure model performance when there is more than one correct answer per unit. The metrics include coverage error, label ranking average precision, and ranking loss.
 
-1. Mathimatical validation
+1.1 Coverage error (CR) computes the average number of labels included in the final prediction that covers all true labels. The lower number means the better performance. The lowerest error means when the coverage error is equal to the average number of true label.
+
+1.2 Label ranking average precision (AP) measure if the true labels are in the higer rank?. The value range is between 0 - 1 and 1 is the best.
+
+1.3 Rank loss (RL) computes the avarage of the number of pairs that are incorrectly ordered. The value range is between 0 - 1 and 0 is the best.
+
+2. TXN-based metrics
 The model predict probability on each instance aggregated by TXN which cannot be directly measured by standard [evaluation metrics](https://www.analyticsvidhya.com/blog/2019/08/11-important-model-evaluation-error-metrics/). [Probability scoring methods](https://machinelearningmastery.com/how-to-score-probability-predictions-in-python/) are commonly used to measure the performance of probability prediction by calculating how close the probability of predicted class to actual class. These methods still treat the measurement per instance whereas our aim is to measure the performance as a group of instances aggregated by TXN. Therefore, we modified the standard evaluation metrics with probability scoring methods to define our evaluation approach.
 
 ***Example I:***
@@ -438,11 +446,16 @@ weighted average accuracy = ((acc1 x n1) + (acc2 x n2) .... (accn x nn))/N
 n = number of actual diagnoses in that txn, N = total number of actual diagnoses
 ```
 
-weighted average accuracy top20 = ((0.40 x 5) + (1.00 x 1) + (0.95 x 1))/7 = 3.95/7 = 0.56
-weighted average precision top20 = ((0.22 x 5) + (1.00 x 1) + (0.50 x 1))/7 = 2.60/7 = 0.37
-weighted average recall top20 = ((0.80 x 5) + (1.00 x 1) + (0.95 x 1))/7 = 6.00/7 = 0.86
-weighted average F1 score top20 = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7 = 3.32/7 = 0.47
+weighted average accuracy top20 (A20) = ((0.40 x 5) + (1.00 x 1) + (0.95 x 1))/7 = 3.95/7 = 0.56
+weighted average precision top20 (P20) = ((0.22 x 5) + (1.00 x 1) + (0.50 x 1))/7 = 2.60/7 = 0.37
+weighted average recall top20 (R20) = ((0.80 x 5) + (1.00 x 1) + (0.95 x 1))/7 = 6.00/7 = 0.86
+weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7 = 3.32/7 = 0.47
 
-2. Clinical validation
+## Result
+10,000 instances (from the testset) were used to evaluate the multilabel ranking metrics.
+
+| Dataset | Model | CR | AP | RL | A10 | P10 | R10 | F10 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| reg | MiniBatchKmean (n_cluster=15,000,top=10) | 38,268 (total=38,969, avg_true_label=1.4)| 0.02 | 0.90 | 0.14 | 0.08 | 0.06 | 0.06 |
 
 ## Limitations
