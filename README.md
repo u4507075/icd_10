@@ -216,11 +216,11 @@ From the list of clustering algorithms, [Birch](https://scikit-learn.org/stable/
 
 Next, we have to choose an optimal number of cluster. We know that the higher number of cluster creates smaller clusters and usually lower error rate but trends to overfitting. There are several [ways](https://jtemporal.com/kmeans-and-elbow-method/) to decide depending on your objectives. In this case, we aim to get each cluster as large as possible to represent one ICD-10. Approximately 15,000 ICD-10s were recorded in the database. We use this number to determine the target number of cluster. We can directly set the number of cluster in MiniBatchKMeans whereas we need to fine tune the threshold to get the number of cluster as close as 15,000 in Birch.
 
-| Dataset | MiniBatchKmeans (n_cluster) | Birch (threshold) |
+| Dataset | MiniBatchKmeans (n_cluster) | Birch (threshold,n_cluster) |
 | :--- | :--- | :--- |
 | reg and adm | 15,000 | xxx |
 | lab and ilab | 15,000 | xxx |
-| dru and idru | 15,000 | xxx |
+| dru and idru | 15,000 | (0.1375,15010) |
 | rad and irad | 15,000 | xxx |
 
 The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then, aggregate the number of icd10 in the cluster. As mentioned, drug with highly specific to a particular diagnosis presents a strong pattern that the ratio of number of icd10 inside and outside cluster is high, defined as weight.
