@@ -218,7 +218,7 @@ Next, we have to choose an optimal number of cluster. We know that the higher nu
 
 | Dataset | MiniBatchKmeans (n_cluster) | Birch (threshold,n_cluster) |
 | :--- | :--- | :--- |
-| reg and adm | 15,000 | xxx |
+| reg and adm | 15,000 | (3.0117,14983) |
 | lab and ilab | 15,000 | xxx |
 | dru and idru | 15,000 | (0.1375,15010) |
 | rad and irad | 15,000 | xxx |
