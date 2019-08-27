@@ -456,8 +456,11 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 
 | Dataset | Model | CR | AP | RL | A10 | P10 | R10 | F10 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| reg (vec) | MiniBatchKmean (n_cluster=15,000,top=10) | 38,268 (total=38,969, avg_true_label=1.4)| 0.02 | 0.90 | 0.14 | 0.08 
+| reg (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,268 (total=38,969, avg_true_label=1.4)| 0.02 | 0.90 | 0.14 | 0.08 
 | dru (raw) | Alex secret (RL_3) | 42 | 0.55 | 0.016 |  |  |  | |
 | dru (raw) | Alex secret (RL) | 180 | 0.46 | 0.012 |  |  |  | |
+
+*RL = all icd-10 letters
+*RL_3 = first 3 icd-10 letters
 
 ## Limitations
