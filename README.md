@@ -221,7 +221,7 @@ Next, we have to choose an optimal number of cluster. We know that the higher nu
 | reg and adm | 15,000 | (3.0117,14983) |
 | lab and ilab | 15,000 | xxx |
 | dru and idru | 15,000 | (0.1375,15010) |
-| rad and irad | 15,000 | xxx |
+| rad and irad | 15,000 | (9.53125,13546) |
 
 The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then, aggregate the number of icd10 in the cluster. As mentioned, drug with highly specific to a particular diagnosis presents a strong pattern that the ratio of number of icd10 inside and outside cluster is high, defined as weight.
 
@@ -463,12 +463,12 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | lab & ilab (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,969 | 0.01 | 0.97 | 0.18 | 0.09 | 0.02 | 0.03 |
 | dru (raw)        | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
 | dru (raw)        | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
-| idru (raw)       | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
-| idru (raw)       | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
-| rad (raw)        | Yassien secret (RL_3)                        | 18     | 0.53 | 0.94  |     |      |      | 0.42 |
-| rad (raw)        | Yassien secret (RL)                          | 70     | 0.48 | 0.77  |     |      |      | 0.38 |
-| irad (raw)       | Yassien secret (RL_3)                        | 11     | 0.66 | 0.45  |     |      |      | 0.56 |
-| irad (raw)       | Yassien secret (RL)                          | 26     | 0.62 | 0.26  |     |      |      | 0.51 |
+| idru (raw)       | Alex secret (RL_3)                           | 79     | 0.58 | 0.014 |     |      |      |      |
+| idru (raw)       | Alex secret (RL)                             | 388    | 0.47 | 0.011 |     |      |      |      |
+| rad (raw)        | Yassien secret (RL_3)                        | 18     | 0.53 | 0.94  |     |      |      |      |
+| rad (raw)        | Yassien secret (RL)                          | 70     | 0.48 | 0.77  |     |      |      |      |
+| irad (raw)       | Yassien secret (RL_3)                        | 11     | 0.66 | 0.45  |     |      |      |      |
+| irad (raw)       | Yassien secret (RL)                          | 26     | 0.62 | 0.26  |     |      |      |      |
 
 
 CR = coverage error
