@@ -452,12 +452,13 @@ weighted average recall top20 (R20) = ((0.80 x 5) + (1.00 x 1) + (0.95 x 1))/7 =
 weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7 = 3.32/7 = 0.47
 
 ## Result
-10,000 instances (from the testset) were used to evaluate the multilabel ranking metrics.
+10,000 instances (from the testset) were used to evaluate the multilabel ranking metrics. Total number of ICD-10 is total=38,969, avg_true_label=1.4.
 
 | Dataset | Model | CR | AP | RL | A10 | P10 | R10 | F10 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| reg & adm (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,268 (total=38,969, avg_true_label=1.4)| 0.02 | 0.90 | 0.14 | 0.08 |
-| dru & idru (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,869 | 0.008 | 0.98 | 0.35 | 0.21 | 0.01 | 0.03 |
+| reg & adm (vec)  | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,268 | 0.02 | 0.90 | 0.14 | 0.08 | 0.06 | 0.05 |
+| dru & idru (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,869 | 0.01 | 0.98 | 0.35 | 0.21 | 0.01 | 0.03 |
+| rad & irad (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 23,382 | 0.22 | 0.60 | 0.33 | 0.22 | 0.39 | 0.26 |
 | dru (raw) | Alex secret (RL_3) | 42 | 0.55 | 0.016 |  |  |  | |
 | dru (raw) | Alex secret (RL) | 180 | 0.46 | 0.012 |  |  |  | |
 
