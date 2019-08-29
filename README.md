@@ -461,8 +461,15 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | dru & idru (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,869 | 0.01 | 0.98 | 0.35 | 0.21 | 0.01 | 0.03 |
 | rad & irad (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 23,382 | 0.22 | 0.60 | 0.33 | 0.22 | 0.39 | 0.26 |
 | lab & ilab (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,969 | 0.01 | 0.97 | 0.18 | 0.09 | 0.02 | 0.03 |
-| dru (raw) | Alex secret (RL_3) | 42 | 0.55 | 0.016 |  |  |  | |
-| dru (raw) | Alex secret (RL) | 180 | 0.46 | 0.012 |  |  |  | |
+| dru (raw)        | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
+| dru (raw)        | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
+| idru (raw)       | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
+| idru (raw)       | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
+| rad (raw)        | Yassien secret (RL_3)                        | 18     | 0.53 | 0.94  |     |      |      | 0.42 |
+| rad (raw)        | Yassien secret (RL)                          | 70     | 0.48 | 0.77  |     |      |      | 0.38 |
+| irad (raw)       | Yassien secret (RL_3)                        | 11     | 0.66 | 0.45  |     |      |      | 0.56 |
+| irad (raw)       | Yassien secret (RL)                          | 26     | 0.62 | 0.26  |     |      |      | 0.51 |
+
 
 CR = coverage error
 AP = label ranking average precision
