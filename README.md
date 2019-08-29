@@ -471,14 +471,14 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | irad (raw)       | Yassien secret (RL)                          | 26     | 0.62 | 0.26  |     |      |      |      |
 
 
-CR = coverage error
-AP = label ranking average precision
-AP = rank loss
-A10 = weight average accuracy (using top 10 predictions)
-P10 = weight average precision (using top 10 predictions)
-R10 = weight average recall (using top 10 predictions)
-F10 = weight average F-measure (using top 10 predictions)
-*RL = all icd-10 letters
+CR = coverage error, 
+AP = label ranking average precision, 
+AP = rank loss, 
+A10 = weight average accuracy (using top 10 predictions), 
+P10 = weight average precision (using top 10 predictions), 
+R10 = weight average recall (using top 10 predictions), 
+F10 = weight average F-measure (using top 10 predictions), 
+*RL = all icd-10 letters, 
 *RL_3 = first 3 icd-10 letters
 
 
