@@ -218,9 +218,9 @@ Next, we have to choose an optimal number of cluster. We know that the higher nu
 
 | Dataset | MiniBatchKmeans (n_cluster) | Birch (threshold,n_cluster) |
 | :--- | :--- | :--- |
-| reg and adm | 15,000 | (3.0117,14983) |
-| lab and ilab | 15,000 | xxx |
-| dru and idru | 15,000 | (0.1375,15010) |
+| reg and adm | 15,000 | (3.5,9522) |
+| lab and ilab | 15,000 | (1.25,) |
+| dru and idru | 15,000 | (0.4,) |
 | rad and irad | 15,000 | (9.53125,13546) |
 
 The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then, aggregate the number of icd10 in the cluster. As mentioned, drug with highly specific to a particular diagnosis presents a strong pattern that the ratio of number of icd10 inside and outside cluster is high, defined as weight.
