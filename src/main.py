@@ -7,7 +7,7 @@ from preprocessing.trainmodel import kmean
 #from preprocessing.trainmodel import predict_kmean
 from preprocessing.trainmodel import get_neighbour
 from preprocessing.trainmodel import get_weight
-#from preprocessing.trainmodel import birch_train
+from preprocessing.trainmodel import birch_train
 from preprocessing.trainmodel import predict_cluster
 from preprocessing.trainmodel import predict_icd10
 #from preprocessing.trainmodel import train_had
@@ -17,6 +17,7 @@ from preprocessing.trainmodel import kmean_finetune
 #from preprocessing.trainmodel import train_lgb
 #from preprocessing.trainmodel import train_xgb
 from preprocessing.trainmodel import validate
+from preprocessing.trainmodel import combine_prediction
 
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
@@ -73,7 +74,6 @@ scale_data('../../secret/data/vec/','ilab')
 
 #kmean(['dru','idru'],'drug')
 #get_neighbour(['dru','idru'],'drug_kmean_15000')
-
 #get_weight('drug_kmean_15000')
 #predict_cluster(['dru','idru'],'drug_kmean_15000')
 #predict_icd10(['dru','idru'],'drug_kmean_15000')
@@ -83,19 +83,49 @@ scale_data('../../secret/data/vec/','ilab')
 #get_neighbour(['reg','adm'],'reg_kmean_15000')
 #get_weight('reg_kmean_15000')
 #predict_cluster(['reg','adm'],'reg_kmean_15000')
-validate(['reg','adm'],'reg_kmean_15000')
+#validate(['reg','adm'],'reg_kmean_15000')
 
 #kmean(['lab','ilab'],'lab')
+#get_neighbour(['lab','ilab'],'lab_kmean_15000')
+#get_weight('lab_kmean_15000')
+#predict_cluster(['lab','ilab'],'lab_kmean_15000')
+#validate(['lab','ilab'],'lab_kmean_15000')
 
 #kmean(['rad','irad'],'rad')
 #get_neighbour(['rad','irad'],'rad_kmean_15000')
+#get_weight('rad_kmean_15000')
+#predict_cluster(['rad','irad'],'rad_kmean_15000')
+#validate(['rad','irad'],'rad_kmean_15000')
 
 
+#combine_prediction(['dru_drug_kmean_15000','idru_drug_kmean_15000','reg_reg_kmean_15000','adm_reg_kmean_15000','rad_rad_kmean_15000','irad_rad_kmean_15000'],'kmean_15000')
+#validate(['reg'],'combined_kmean_15000',combine=True)
 
 #birch_finetune(['dru','idru'],0.1)
-#birch_finetune(['reg','adm'],1)
-#birch_finetune(['lab','ilab'],1)
-#birch_finetune(['rad','irad'],1)
+#birch_finetune(['reg','adm'],3)
+#birch_finetune(['lab','ilab'],2)
+#birch_finetune(['rad','irad'],10)
+
+#birch_train(['reg','adm'],'reg_birch',3.5)
+birch_train(['dru','idru'],'drug_birch',0.35)
+##birch_train(['rad','irad'],'rad_birch',10.0)
+#birch_train(['lab','ilab'],'lab_birch',1.25)
+
+#get_neighbour(['reg','adm'],'reg_birch')
+#get_neighbour(['dru','idru'],'drug_birch')
+##get_neighbour(['rad','irad'],'rad_birch')
+##get_neighbour(['lab','ilab'],'lab_birch')
+
+#get_weight('reg_birch')
+#get_weight('drug_birch')
+##get_weight('rad_birch')
+##get_weight('lab_birch')
+
+#predict_cluster(['reg','adm'],'reg_birch')
+#predict_cluster(['dru','idru'],'drug_birch')
+
+#validate(['reg','adm'],'reg_birch')
+#validate(['dru','idru'],'drug_birch')
 
 
 #birch_train(['dru','idru'],'drug_birch')

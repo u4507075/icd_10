@@ -60,7 +60,7 @@ from sklearn.metrics import label_ranking_average_precision_score
 from sklearn.metrics import label_ranking_loss
 
 mypath = '../../secret/data/'
-mypath = '/media/bon/My Passport/data/'
+#mypath = '/media/bon/My Passport/data/'
 
 def get_dataset(trainingset, validation_size):
 	for name in trainingset.columns:
@@ -465,7 +465,7 @@ def topsum(x):
 	return x.sum().head(5)
 
 def get_neighbour(train,modelname):
-	chunk = 100000
+	chunk = 10000
 	results = []
 	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
 	for name in train:
@@ -481,7 +481,7 @@ def get_neighbour(train,modelname):
 			result = result.rename(columns={'level_1':'icd10'})
 			results.append(result)
 			#result['kmean_'+str(n)] = result['kmean_'+str(n)].apply(top)
-			print('append neighbour')
+			print('append neighbour to '+modelname)
 			#if len(results) == 2:
 			#	break
 	total = pd.concat(results)
@@ -506,7 +506,7 @@ def predict_cluster(train,modelname):
 	neighbour = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
 	for name in train:
-		#remove_file(mypath+'result/'+name+'.csv')
+		remove_file(result,mypath+'result/'+name+'_'+modelname+'.csv')
 		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			index = df.index
@@ -518,9 +518,19 @@ def predict_cluster(train,modelname):
 			result = pd.merge(df,neighbour, how='left', on='cluster')
 			#print(result)
 			save_file(result,mypath+'result/'+name+'_'+modelname+'.csv')
-			print('append result')
+			print('append result to '+modelname)
 			#print(df)
 	print('complete')
+def combine_prediction(files,modelname):
+	chunk = 100000
+	remove_file(mypath+'result/combined_'+modelname+'.csv')
+	for name in files:
+		for df in pd.read_csv(mypath+'result/'+name+'.csv', chunksize=chunk, index_col=0):
+			#print(df)
+			df = df[['index','icd10','predicted_icd10','weight']]
+			save_file(df,mypath+'result/combined_'+modelname+'.csv')
+			print('append combine_prediction')
+	print('Saved combined_'+modelname)
 
 def predict_icd10(train,modelname):
 	chunk = 1000
@@ -543,7 +553,7 @@ def predict_icd10(train,modelname):
 			print('append prediction')
 	print('complete')
 
-def validate(train,modelname):
+def validate(train,modelname,combine=False):
 
 	chunk = 10000
 	n = 10
@@ -557,11 +567,15 @@ def validate(train,modelname):
 			test = []
 			for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
 				df = df[df['txn'].isin(txn_range)]
+				df = df[['txn','icd10']]
 				df['index'] = df.index
 				test.append(df)
 			testset = pd.concat(test)
 			result = []
-			for df in pd.read_csv(mypath+'result/'+name+'_'+modelname+'.csv', chunksize=chunk, index_col=0):
+			filename = name+'_'+modelname
+			if combine:
+				filename = modelname
+			for df in pd.read_csv(mypath+'result/'+filename+'.csv', chunksize=chunk, index_col=0):
 				df = df[df['index'].isin(testset.index.values.tolist())]
 				result.append(df)
 			predictset = pd.concat(result)
@@ -650,7 +664,7 @@ def performance(df):
 	#print(df)
 	#df = pd.read_csv('test.csv', index_col=0)
 	#df = df.head(500)
-	'''
+
 	result = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(count).reset_index(name='n')
 	result['dxn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(dxn).reset_index(name='dxn')['dxn']
 	result['tp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(tp).reset_index(name='tp')['tp']
@@ -661,13 +675,13 @@ def performance(df):
 	result['precision'] = result['tp']/(result['tp']+result['fp'])
 	result['recall'] = result['tp']/(result['tp']+result['fn'])
 	result['f_measure'] = 2*result['tp']/((2*result['tp'])+result['fp']+result['fn'])
-	
+
 	#print(result)
 	print((result['accuracy']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['f_measure']*result['dxn']).sum()/result['dxn'].sum())
-	'''
+
 	y_true = np.array(df.groupby('txn').apply(rank_y_true).reset_index(name='y_true')['y_true'].values.tolist())
 	y_score = np.array(df.groupby('txn').apply(rank_y_score).reset_index(name='y_score')['y_score'].values.tolist())
 	print('coverage error '+ str(coverage_error(y_true, y_score)))
@@ -677,12 +691,13 @@ def performance(df):
 def distance(x,t):
 	return x
 def birch_finetune(train,t):
-	chunk = 50000
+	chunk = 20000
 	gap = t/2
 	print(train)
 	while True:
 		b = Birch(n_clusters=None,threshold=t)
 		n = 1
+		print('Threshold :'+str(t))
 		for name in train:
 			for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 				df.drop(['txn'], axis=1, inplace=True)
@@ -691,7 +706,8 @@ def birch_finetune(train,t):
 				X_train, X_validation, Y_train, Y_validation = get_testset(df)
 				b = b.partial_fit(X_train)
 				n = len(b.subcluster_centers_)
-				#print(n)
+				print('Threshold :'+str(t))
+				print('Number of cluster :'+str(n))
 				if n > 15000:
 					break
 			if n > 15000:
@@ -702,9 +718,9 @@ def birch_finetune(train,t):
 		else:
 			t = t-gap
 		print('Number of cluster :'+str(n))
-		print('Adjust threshold to :'+str(t))
+		#print('Adjust threshold to :'+str(t))
 		if gap < 0.01:
-			print('Target threshold for '+str(train)+' : '+str(t))
+			#print('Target threshold for '+str(train)+' : '+str(t))
 			break
 
 		#plt.figure(figsize=(8, 6))
@@ -813,7 +829,7 @@ def birch_train(train,modelname):
 	print('complete')
 '''
 def birch_train(train,modelname,t):
-	chunk = 100000
+	chunk = 10000
 	print('Threshold = '+str(t))
 	b = Birch(n_clusters=None,threshold=t)
 	for name in train:
@@ -826,7 +842,7 @@ def birch_train(train,modelname,t):
 			n = len(b.subcluster_centers_)
 			print('Number of cluster: '+modelname+' '+str(n))
 
-	save_model(b,modelname+'_'+str(t))
+	save_model(b,modelname)
 	print('complete')
 
 def train_had():
