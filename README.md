@@ -221,7 +221,7 @@ Next, we have to choose an optimal number of cluster. We know that the higher nu
 | reg and adm | 15,000 | (3.5,9522) |
 | lab and ilab | 15,000 | (1.25,5446) |
 | dru and idru | 15,000 | (0.4,4380) |
-| rad and irad | 15,000 | (9.53125,13546) |
+| rad and irad | 15,000 | (15,1536) |
 
 The models were trained with the training dataset (dru and idru csv files) then use the trained models predict cluster using the same training dataset. Then, aggregate the number of icd10 in the cluster. As mentioned, drug with highly specific to a particular diagnosis presents a strong pattern that the ratio of number of icd10 inside and outside cluster is high, defined as weight.
 
@@ -454,6 +454,8 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 ## Result
 10,000 instances (from the testset) were used to evaluate the multilabel ranking metrics. Total number of ICD-10 is total=38,969, avg_true_label=1.4.
 
+**August 2019: First iteration**
+
 | Dataset          | Model                                        | CR     | AP   | RL   | A10  | P10  | R10  | F10 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | xxx & xxx (xxx)  | Perfect model                                | 2      | 1.00 | 0.00 | 1.00 | 1.00 | 1.00 | 1.00 |
@@ -461,9 +463,9 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | dru & idru (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,869 | 0.01 | 0.98 | 0.35 | 0.21 | 0.01 | 0.03 |
 | rad & irad (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 23,382 | 0.22 | 0.60 | 0.33 | 0.22 | 0.39 | 0.26 |
 | lab & ilab (vec) | MiniBatchKmean (n_cluster=15,000,top=10, RL) | 38,969 | 0.01 | 0.97 | 0.18 | 0.09 | 0.02 | 0.03 |
-| reg & adm (vec)  | Birch (n_cluster=9,522,top=10 RL)            | 38,268 |  |  | 0.19 | 0.10 | 0.07 | 0.07 |
-| dru & idru (vec) | Birch (n_cluster=4,380,top=10 RL)            | 38,869 |  |  |  |  |  |  |
-| rad & irad (vec) | Birch (n_cluster=13,546,top=10 RL)           | 23,382 |  |  |  |  |  |  |
+| reg & adm (vec)  | Birch (n_cluster=9,522,top=10 RL)            | 38,869 | 0.02 | 0.93 | 0.19 | 0.10 | 0.07 | 0.07 |
+| dru & idru (vec) | Birch (n_cluster=4,380,top=10 RL)            | 38,869 | 0.01 | 0.98 | 0.28 | 0.15 | 0.01 | 0.02 |
+| rad & irad (vec) | Birch (n_cluster=13,546,top=10 RL)           | 26,305 | 0.11 | 0.67 | 0.22 | 0.11 | 0.32 | 0.15 |
 | lab & ilab (vec) | Birch (n_cluster=5,446,top=10 RL)            | 38,969 |  |  |  |  |  |  |
 | dru (raw)        | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
 | dru (raw)        | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
@@ -476,10 +478,6 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | irad (raw)       | Yassien secret (RL_3)                        | 11     | 0.66 | 0.45  |     |      |      |      |
 | irad (raw)       | Yassien secret (RL)                          | 26     | 0.62 | 0.26  |     |      |      |      |
 
-| reg and adm | 15,000 | (3.5,9522) |
-| lab and ilab | 15,000 | (1.25,5446) |
-| dru and idru | 15,000 | (0.4,4380) |
-| rad and irad | 15,000 | (9.53125,13546) |
 
 CR = coverage error, 
 AP = label ranking average precision, 
