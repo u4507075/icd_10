@@ -10,8 +10,8 @@ from preprocessing.trainmodel import get_weight
 from preprocessing.trainmodel import birch_train
 from preprocessing.trainmodel import predict_cluster
 from preprocessing.trainmodel import predict_icd10
-#from preprocessing.trainmodel import train_had
-#from preprocessing.trainmodel import eval_had
+from preprocessing.trainmodel import train_had
+from preprocessing.trainmodel import eval_had
 from preprocessing.trainmodel import birch_finetune
 from preprocessing.trainmodel import kmean_finetune
 #from preprocessing.trainmodel import train_lgb
@@ -71,6 +71,18 @@ scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
 
+#kmean('dru')
+#kmean('idru')
+#kmean('reg')
+#kmean('adm')
+#kmean('lab')
+#kmean('ilab')
+#kmean('rad')
+#kmean('irad')
+
+
+
+
 
 #kmean(['dru','idru'],'drug')
 #get_neighbour(['dru','idru'],'drug_kmean_15000')
@@ -107,26 +119,27 @@ scale_data('../../secret/data/vec/','ilab')
 #birch_finetune(['rad','irad'],10)
 
 #birch_train(['reg','adm'],'reg_birch',3.5)
-birch_train(['dru','idru'],'drug_birch',0.35)
-##birch_train(['rad','irad'],'rad_birch',10.0)
+#birch_train(['dru','idru'],'drug_birch',0.35)
+#birch_train(['rad','irad'],'rad_birch',15.0)
 #birch_train(['lab','ilab'],'lab_birch',1.25)
 
 #get_neighbour(['reg','adm'],'reg_birch')
 #get_neighbour(['dru','idru'],'drug_birch')
-##get_neighbour(['rad','irad'],'rad_birch')
-##get_neighbour(['lab','ilab'],'lab_birch')
+#get_neighbour(['rad','irad'],'rad_birch')
+#get_neighbour(['lab','ilab'],'lab_birch')
 
 #get_weight('reg_birch')
 #get_weight('drug_birch')
-##get_weight('rad_birch')
+#get_weight('rad_birch')
 ##get_weight('lab_birch')
 
 #predict_cluster(['reg','adm'],'reg_birch')
 #predict_cluster(['dru','idru'],'drug_birch')
+#predict_cluster(['rad','irad'],'rad_birch')
 
 #validate(['reg','adm'],'reg_birch')
 #validate(['dru','idru'],'drug_birch')
-
+#validate(['rad','irad'],'rad_birch')
 
 #birch_train(['dru','idru'],'drug_birch')
 #for i in [0.1,0.25,0.5,0.75,1.00]:
@@ -172,14 +185,23 @@ birch_train(['dru','idru'],'drug_birch',0.35)
 
 #train_xgb(['reg','adm'])
 
-'''
 
+'''
 import pandas as pd
-for df in pd.read_csv('../../secret/data/testset/raw/lab.csv', chunksize=100, index_col=0):
-	print(df)
-	break
-'''
+import numpy as np
+mypath = '../../secret/data/'
+had = pd.read_csv(mypath+'had.csv', index_col=0)
+had = had['drug'].values.tolist()
 
+for df in pd.read_csv('../../secret/data/trainingset/raw/idru.csv', chunksize=100000, index_col=0):
+	df = df[df['icd10']=='S012']
+	if len(df) > 0:
+		df['had'] = np.where(df['drug'].isin(had), 1, 0)
+		df = df[df['had'] == 1]
+		if len(df) > 0:
+			print(df)
+
+'''
 
 
 

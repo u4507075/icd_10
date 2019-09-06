@@ -424,21 +424,19 @@ def evaluate_lstm_model(name):
 		predict(X_validation,Y_validation,ssc,regressor)
 
 
-def kmean(train,modelname):
+def kmean(name):
 	chunk = 30000
 	n = 15000
+	#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 	kmeans = MiniBatchKMeans(n_clusters=n, random_state=0, batch_size=1000)
-	for name in train:
-		#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
-
-		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df.drop(['txn'], axis=1, inplace=True)
-			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			#X_train = ssc.transform(X_train)
-			kmeans = kmeans.partial_fit(X_train)
-			print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
-			print(kmeans.inertia_)
-	save_model(kmeans,modelname+'_kmean_'+str(n))
+	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+		#X_train = ssc.transform(X_train)
+		kmeans = kmeans.partial_fit(X_train)
+		print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
+		print(kmeans.inertia_)
+	save_model(kmeans,name+'_kmean_'+str(n))
 '''
 def predict_kmean(name,modelname):
 	chunk = 10000
@@ -506,7 +504,7 @@ def predict_cluster(train,modelname):
 	neighbour = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
 	for name in train:
-		remove_file(result,mypath+'result/'+name+'_'+modelname+'.csv')
+		remove_file(mypath+'result/'+name+'_'+modelname+'.csv')
 		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
 			df.drop(['txn'], axis=1, inplace=True)
 			index = df.index
@@ -604,7 +602,7 @@ def validate(train,modelname,combine=False):
 			dataset = dataset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
 			#print(dataset)
 			#dataset.to_csv('test.csv')
-			performance(dataset)
+			performance(dataset.head(10000))
 			break
 			#print('append prediction')
 		break
@@ -846,20 +844,19 @@ def birch_train(train,modelname,t):
 	print('complete')
 
 def train_had():
-	p = '/media/bon/My Passport/data/'
 	icd10 =  pd.read_csv(mypath+'raw/icd10.csv', index_col=0)
 	icd10_map = dict(zip(icd10['code'],icd10.index))
-	had = pd.read_csv(p+'had.csv', index_col=0)
+	had = pd.read_csv(mypath+'had.csv', index_col=0)
 	had = had['drug'].values.tolist()
 	chunk = 10000
 	n = 0
 	m = Incremental(MLPClassifier())
 	for name in ['dru','idru']:
-		for df in  pd.read_csv(p+'trainingset/raw/'+name+'.csv', chunksize=chunk, index_col=0, low_memory=False):	
-			df = df[['icd10','drug']]
+		for df in  pd.read_csv(mypath+'trainingset/raw/'+name+'.csv', chunksize=chunk, index_col=0, low_memory=False):	
+			df = df[['icd10','dx_type','drug']]
 			df = pd.concat([df.drop('icd10', axis=1), df['icd10'].map(icd10_map)], axis=1)
 			df['had'] = np.where(df['drug'].isin(had), 1, 0)
-			df = df[['icd10','had']]
+			df = df[['icd10','dx_type','had']]
 			df1 = df[df['had'] == 1]
 			df1 = df1.drop_duplicates()
 			df2 = df[~df['icd10'].isin(df1['icd10'].values.tolist())]
@@ -876,19 +873,25 @@ def train_had():
 def eval_had(name):
 	chunk = 10000
 	loaded_model = pickle.load(open(mypath+'model/had_mlpclassifier.pkl', 'rb'))
-	for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+	icd10 =  pd.read_csv(mypath+'raw/icd10.csv', index_col=0)
+	icd10_map = dict(zip(icd10['code'],icd10.index))
+
+	for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
+		dftest = pd.concat([dftest.drop('icd10', axis=1), dftest['icd10'].map(icd10_map)], axis=1)
 		dftest.drop(['txn'], axis=1, inplace=True)
-		dftest = dftest[['icd10','drug']]
+		dftest = dftest[['icd10','dx_type','drug']]
 		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
 		p = loaded_model.predict_proba(X_train)
 		dfp = pd.DataFrame(data=p,columns=['no_had','yes_had'])
 		df['no_had'] = dfp['no_had'].values.tolist()
 		df['yes_had'] = dfp['yes_had'].values.tolist()
-		#print(df)
+		print(df)
 		#df['had'] = loaded_model.predict(X_train)[:len(X_train)]
-		save_file(df,'/media/bon/My Passport/data/model_prediction/'+name+'_had.csv')
+		#save_file(df,'/media/bon/My Passport/data/model_prediction/'+name+'_had.csv')
 		print('Predict '+name)
+		df.to_csv(mypath+'model_prediction/'+name+'_had.csv')
+		break
 
 def cosine_vectorized(array1, array2):
     sumyy = (array2**2).sum(1)
