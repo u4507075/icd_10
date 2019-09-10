@@ -454,7 +454,7 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 ## Result
 10,000 instances (from the testset) were used to evaluate the multilabel ranking metrics. Total number of ICD-10 is total=38,969, avg_true_label=1.4.
 
-**August 2019: First iteration**
+**August 2019: 1/4 iteration**
 
 | Dataset          | Model                                        | CR     | AP   | RL   | A10  | P10  | R10  | F10 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -466,7 +466,9 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | reg & adm (vec)  | Birch (n_cluster=9,522,top=10 RL)            | 38,869 | 0.02 | 0.93 | 0.19 | 0.10 | 0.07 | 0.07 |
 | dru & idru (vec) | Birch (n_cluster=4,380,top=10 RL)            | 38,869 | 0.01 | 0.98 | 0.28 | 0.15 | 0.01 | 0.02 |
 | rad & irad (vec) | Birch (n_cluster=13,546,top=10 RL)           | 26,305 | 0.11 | 0.67 | 0.22 | 0.11 | 0.32 | 0.15 |
-| lab & ilab (vec) | Birch (n_cluster=5,446,top=10 RL)            | 38,969 |  |  |  |  |  |  |
+| lab & ilab (vec) | Birch (n_cluster=5,446,top=10 RL)            | 38,969 |      |      |      |      |      |      |
+| dru & idru (vec) | MiniBatchKmean (n_cluster=5,top=max RL)      | 25,757 | 0.12 | 0.56  |     |      |      |      |
+| dru & idru (vec) | MiniBatchKmean (n_cluster=10,top=max RL)     |        |      |       |     |      |      |      |
 | dru (raw)        | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
 | dru (raw)        | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
 | idru (raw)       | Alex secret (RL_3)                           | 79     | 0.58 | 0.014 |     |      |      |      |
@@ -489,5 +491,14 @@ F10 = weight average F-measure (using top 10 predictions),
 *RL = all icd-10 letters, 
 *RL_3 = first 3 icd-10 letters
 
+Lesson learn:
+1. We developed 1 model per dataset. Each model worked independently to predict icd10.
+2. The model performance ranges around 30 - 60% where drug and rad dataset provided the most useful information for classification. This quite makes sense because most drug prescription was quite specific to diagnoses. The radiological reports are usually presented with a provisional diagnosis within the text where the machine learning model could learn to match the diagnosis presenting in the report to icd10. The registration data did not provide a specific pattern to identify an individual icd10 but it could help to scope a group of diagnosis which was distributed to different gender and age range. Laboratory report generally presents normal result (only some cases provide abnormal results which strongly indicating diseses). However, the pattern of orderring laboratory test is also able to tell the clue of the scope of differential diagnosis what doctors think the most. Although the radiological report provides a good performance, most patients did not get radiological investigation while the registration data is almost complete but providign less information gain. 
+3. Therefore, the next idea is we might think two things:
+3.1 Improve the individual model performance.
+3.2 Combine the models together.
+Expected performance for the next iteration is 60% accuracy.
+
+**September 2019: 2/4 iteration**
 
 ## Limitations
