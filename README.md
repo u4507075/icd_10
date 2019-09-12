@@ -467,8 +467,13 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | dru & idru (vec) | Birch (n_cluster=4,380,top=10 RL)            | 38,869 | 0.01 | 0.98 | 0.28 | 0.15 | 0.01 | 0.02 |
 | rad & irad (vec) | Birch (n_cluster=13,546,top=10 RL)           | 26,305 | 0.11 | 0.67 | 0.22 | 0.11 | 0.32 | 0.15 |
 | lab & ilab (vec) | Birch (n_cluster=5,446,top=10 RL)            | 38,969 |      |      |      |      |      |      |
-| dru & idru (vec) | MiniBatchKmean (n_cluster=5,top=max RL)      | 25,757 | 0.12 | 0.56  |     |      |      |      |
-| dru & idru (vec) | MiniBatchKmean (n_cluster=10,top=max RL)     |        |      |       |     |      |      |      |
+| dru  (vec)       | MiniBatchKmean (n_cluster=5,top=max RL)      | 25,757 | 0.12 | 0.56  |     |      |      |      |
+| dru  (vec)       | MiniBatchKmean (n_cluster=10,top=max RL)     |        |      |       |     |      |      |      |
+| dru  (vec)       | MiniBatchKmean (n_cluster=100,top=max RL)    |        |      |       |     |      |      |      |
+| dru  (vec)       | MiniBatchKmean (n_cluster=1000,top=max RL)   |        |      |       |     |      |      |      |
+| dru  (vec)       | MiniBatchKmean (n_cluster=5000,top=max RL)   |        |      |       |     |      |      |      |
+| reg (vec)        | MiniBatchKmean (n_cluster=5,top=max RL)      | 18,009 | 0.05 | 0.39  |     |      |      |      |
+| rad (vec)        | MiniBatchKmean (n_cluster=5,top=max RL)      |  | 0. | 0.  |     |      |      |      |
 | dru (raw)        | Alex secret (RL_3)                           | 42     | 0.55 | 0.016 |     |      |      |      |
 | dru (raw)        | Alex secret (RL)                             | 180    | 0.46 | 0.012 |     |      |      |      |
 | idru (raw)       | Alex secret (RL_3)                           | 79     | 0.58 | 0.014 |     |      |      |      |
