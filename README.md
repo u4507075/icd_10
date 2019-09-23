@@ -482,9 +482,9 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | lab (raw)        | Alex secret (RL_3)                           | 59     | 0.36 | 0.026 |     |      |      |      |
 | lab (raw)        | Alex secret (RL)                             | 279    | 0.33 | 0.025 |     |      |      |      |
 | rad (raw)        | Yassien secret (RL_3)                        | 18     | 0.53 | 0.94  |     |      |      |      |
-| rad (raw)        | Yassien secret (RL)                          | 70     | 0.48 | 0.77  |     |      |      |      |
+| rad (raw)        | Yassien secret (RL)                          | 84     | 0.44 | 0.04  | 0.32|      |      |      |
 | irad (raw)       | Yassien secret (RL_3)                        | 11     | 0.66 | 0.45  |     |      |      |      |
-| irad (raw)       | Yassien secret (RL)                          | 26     | 0.62 | 0.26  |     |      |      |      |
+| irad (raw)       | Yassien secret (RL)                          | 206    | 0.39 | 0.04  | 0.64|      |      |      |
 
 
 CR = coverage error, 
