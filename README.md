@@ -475,7 +475,8 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | reg (vec)        | MiniBatchKmean (n_cluster=5,top=max RL)      | 18,009 | 0.05 | 0.39  |     |      |      |      |
 | reg (vec)        | MiniBatchKmean (n_cluster=10,top=max RL)     | 15,863 | 0.07 | 0.34  |     |      |      |      |
 | reg (vec)        | MiniBatchKmean (n_cluster=100,top=max RL)    | 10,411 | 0.14 | 0.21  |     |      |      |      |
-| reg (vec)        | MiniBatchKmean (n_cluster=1000,top=max RL)   |        |      |       |     |      |      |      |
+| reg (vec)        | MiniBatchKmean (n_cluster=1000,top=max RL)   | 5,852  | 0.19 | 0.11  |     |      |      |      |
+| reg (vec)        | MiniBatchKmean (n_cluster=5000,top=max RL)   |        |      |       |     |      |      |      |
 | rad (vec)        | MiniBatchKmean (n_cluster=5,top=max RL)      | 18,118 | 0.02 | 0.42  |     |      |      |      |
 | rad (vec)        | MiniBatchKmean (n_cluster=10,top=max RL)     | 4,323  | 0.02 | 0.11  |     |      |      |      |
 | rad (vec)        | MiniBatchKmean (n_cluster=100,top=max RL)    | 2,278  | 0.02 | 0.05  |     |      |      |      |
