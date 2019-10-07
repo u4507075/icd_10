@@ -7,6 +7,7 @@ from preprocessing.trainmodel import kmean
 #from preprocessing.trainmodel import predict_kmean
 from preprocessing.trainmodel import get_neighbour
 from preprocessing.trainmodel import get_weight
+from preprocessing.trainmodel import get_total_weight
 from preprocessing.trainmodel import birch_train
 from preprocessing.trainmodel import predict_cluster
 from preprocessing.trainmodel import predict_icd10
@@ -17,6 +18,7 @@ from preprocessing.trainmodel import kmean_finetune
 #from preprocessing.trainmodel import train_lgb
 #from preprocessing.trainmodel import train_xgb
 from preprocessing.trainmodel import validate
+from preprocessing.trainmodel import total_validate
 from preprocessing.trainmodel import combine_prediction
 
 from preprocessing.preprocess import get_icd10_data
@@ -70,18 +72,31 @@ scale_data('../../secret/data/vec/','idru')
 scale_data('../../secret/data/vec/','lab')
 scale_data('../../secret/data/vec/','ilab')
 '''
+#n = 10
+#kmean(n,['dru','idru'],'drug')
+#kmean(n,['reg','adm'],'reg')
+#kmean(n,['rad','irad'],'rad')
+#kmean(n,['lab','ilab'],'lab')
 
-#kmean('dru')
-#kmean('idru')
-#kmean('reg')
-#kmean('adm')
-#kmean('lab')
-#kmean('ilab')
-#kmean('rad')
-#kmean('irad')
+#get_total_weight(n,['dru','idru'],'drug')
+#get_total_weight(n,['reg','adm'],'reg')
+#get_total_weight(n,['rad','irad'],'rad')
+#get_total_weight(n,['lab','ilab'],'lab')
 
+#total_validate(n,['dru','idru'],'drug')
+#total_validate(n,['reg','adm'],'reg')
+#total_validate(n,['rad','irad'],'rad')
+#total_validate(n,['lab','ilab'],'lab')
 
+def validate_kmean(n,files,name):
+	kmean(n,files,name)
+	get_total_weight(n,files,name)
+	total_validate(n,files,name)
 
+#validate_kmean(5000,['dru','idru'],'drug')
+#validate_kmean(5000,['reg','adm'],'reg')
+#validate_kmean(1000,['rad','irad'],'rad')
+validate_kmean(100,['lab','ilab'],'lab')
 
 
 #kmean(['dru','idru'],'drug')
@@ -180,6 +195,7 @@ scale_data('../../secret/data/vec/','ilab')
 
 #train_had()
 #eval_had('dru')
+#eval_had('idru')
 
 #train_xgb(['rad','ilab'])
 

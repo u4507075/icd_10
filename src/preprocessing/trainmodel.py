@@ -24,6 +24,7 @@ from sklearn.cluster import Birch
 from sklearn.decomposition import MiniBatchDictionaryLearning
 
 from sklearn.metrics import precision_recall_fscore_support
+from sklearn.utils import resample
 
 import os
 import re
@@ -424,19 +425,19 @@ def evaluate_lstm_model(name):
 		predict(X_validation,Y_validation,ssc,regressor)
 
 
-def kmean(name):
+def kmean(n,train,modelname):
 	chunk = 30000
-	n = 15000
 	#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
 	kmeans = MiniBatchKMeans(n_clusters=n, random_state=0, batch_size=1000)
-	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-		df.drop(['txn'], axis=1, inplace=True)
-		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-		#X_train = ssc.transform(X_train)
-		kmeans = kmeans.partial_fit(X_train)
-		print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
-		print(kmeans.inertia_)
-	save_model(kmeans,name+'_kmean_'+str(n))
+	for name in train:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			#X_train = ssc.transform(X_train)
+			kmeans = kmeans.partial_fit(X_train)
+			print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
+			print(kmeans.inertia_)
+	save_model(kmeans,modelname+'_kmean_'+str(n))
 '''
 def predict_kmean(name,modelname):
 	chunk = 10000
@@ -498,6 +499,77 @@ def get_weight(modelname):
 	df.to_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv')
 	print('save weight to '+modelname)
 
+def remove_all_temp_weight(modelname,n):
+	for i in range(n):
+		remove_file(mypath+'model_prediction/'+modelname+'_'+str(n)+'_'+str(i)+'.csv')
+
+def agg_weight(df1,df2):
+	df2 = df2[['icd10','icd10_count']]
+	df = df1.append(df2)
+	result = df.groupby('icd10')['icd10_count'].agg('sum').to_frame()
+	result = result.sort_values(by=['icd10'], ascending=[True])
+	result = result.reset_index()
+	return result
+
+def save_weight(modelname,df,n,x):
+	p = mypath+'model_prediction/'+modelname+'_'+str(n)+'_'+str(x)+'.csv'
+	file = Path(p)
+	if file.is_file():
+		d = pd.read_csv(p, index_col=0)
+		result = agg_weight(d,df)
+		result.to_csv(p)
+	else:
+		data = []
+		for i in range(38970):
+			data.append([i,0])
+		d = pd.DataFrame(data,columns=['icd10','icd10_count'])
+		result = agg_weight(d,df)
+		result.to_csv(p)
+def get_total_weight(n,train,modelname):
+
+	chunk = 10000
+	model = pickle.load(open(mypath+'model/'+modelname+'_kmean_'+str(n)+'.pkl', 'rb'))
+	remove_all_temp_weight(modelname,n)
+	for name in train:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_testset(df)
+			df['cluster'] = model.predict(X_train)[:len(X_train)]
+			result = df['icd10'].groupby(df['cluster']).apply(top).to_frame()
+			result = result.rename(columns={'icd10':'icd10_count'})
+			result.reset_index(inplace=True)
+			result = result.rename(columns={'level_1':'icd10'})
+			#print(result)
+			for i in range(n):
+				save_weight(modelname,result[result['cluster']==i],n,i)
+			print('append total weight to '+modelname)
+
+	for i in range(n):
+		p = mypath+'model_prediction/'+modelname+'_'+str(n)+'_'+str(i)+'.csv'
+		df = pd.read_csv(p, index_col=0)
+		df['icd10_weight'] =  df['icd10_count']/df['icd10_count'].sum()
+		df.to_csv(p)
+		print('saved icd10 weight '+str(i))
+	print('saved weight')
+
+def total_validate(n,train,modelname):
+	chunk = 5000
+	model = pickle.load(open(mypath+'model/'+modelname+'_kmean_'+str(n)+'.pkl', 'rb'))
+	print('n_cluster = '+str(n))
+	print('model name = '+modelname)
+	for name in train:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			txn = df['txn']
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_testset(df)
+			df['cluster'] = model.predict(X_train)[:len(X_train)]
+			df['txn'] = txn
+			df = df.rename(columns={'icd10':'actual_icd10'})
+			df['n'] = n
+			df['modelname'] = modelname
+			performance(df)
+			break
+		break
 def predict_cluster(train,modelname):
 	chunk = 10000
 	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
@@ -641,7 +713,7 @@ def fn(x):
 	return len(x[(pd.notna(x['actual_icd10'])) & (x['predicted_icd10'].isna())])
 
 def rank_y_true(x):
-	y_true = [0] * 38969
+	y_true = [0] * 38970
 
 	for i in x['actual_icd10'].values.tolist():
 		if pd.notna(i):
@@ -650,19 +722,24 @@ def rank_y_true(x):
 	return y_true
 
 def rank_y_score(x):
-	y_score = [0] * 38969
+	y_score = [0] * 38970
 	
 	for i in range(len(x['predicted_icd10'].values.tolist())):
 		v = x['predicted_icd10'].values.tolist()[i]
 		if pd.notna(v):
 			y_score[int(v)] = x['sum_weight'].values.tolist()[i]
 	return y_score
-	
+
+def rank_total_y_score(x):
+	p = mypath+'model_prediction/'+x['modelname'].iloc[0]+'_'+str(x['n'].iloc[0])+'_'+str(x['cluster'].iloc[0])+'.csv'
+	df = pd.read_csv(p, index_col=0)
+	return df['icd10_weight'].values.tolist()
+
 def performance(df):
 	#print(df)
 	#df = pd.read_csv('test.csv', index_col=0)
 	#df = df.head(500)
-
+	'''
 	result = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(count).reset_index(name='n')
 	result['dxn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(dxn).reset_index(name='dxn')['dxn']
 	result['tp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(tp).reset_index(name='tp')['tp']
@@ -679,9 +756,10 @@ def performance(df):
 	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
 	print((result['f_measure']*result['dxn']).sum()/result['dxn'].sum())
-
+	'''
 	y_true = np.array(df.groupby('txn').apply(rank_y_true).reset_index(name='y_true')['y_true'].values.tolist())
-	y_score = np.array(df.groupby('txn').apply(rank_y_score).reset_index(name='y_score')['y_score'].values.tolist())
+	#y_score = np.array(df.groupby('txn').apply(rank_y_score).reset_index(name='y_score')['y_score'].values.tolist())
+	y_score = np.array(df.groupby('txn').apply(rank_total_y_score).reset_index(name='y_score')['y_score'].values.tolist())
 	print('coverage error '+ str(coverage_error(y_true, y_score)))
 	print('Average precision score '+ str(label_ranking_average_precision_score(y_true, y_score)))
 	print('Ranking loss '+ str(label_ranking_loss(y_true, y_score)))
@@ -848,10 +926,12 @@ def train_had():
 	icd10_map = dict(zip(icd10['code'],icd10.index))
 	had = pd.read_csv(mypath+'had.csv', index_col=0)
 	had = had['drug'].values.tolist()
-	chunk = 10000
+	chunk = 50000
 	n = 0
-	m = Incremental(MLPClassifier())
+	#m = Incremental(MLPClassifier())
 	for name in ['dru','idru']:
+		m = Incremental(MLPClassifier())
+		#m = Incremental(BernoulliNB())
 		for df in  pd.read_csv(mypath+'trainingset/raw/'+name+'.csv', chunksize=chunk, index_col=0, low_memory=False):	
 			df = df[['icd10','dx_type','drug']]
 			df = pd.concat([df.drop('icd10', axis=1), df['icd10'].map(icd10_map)], axis=1)
@@ -866,31 +946,68 @@ def train_had():
 			m.partial_fit(X_train, Y_train, classes=[0,1])
 			n = n + chunk
 			print('fit '+str(n))
-			print('Loss :'+str(m.loss_))
+			#print('Loss :'+str(m.loss_))
 
-	save_model(m,'had_mlpclassifier')
+		save_model(m,name+'_had_mlpclassifier')
+		#save_model(m,name+'_had_nb')
+	#save_model(m,'drug_had_mlpclassifier')
 
 def eval_had(name):
-	chunk = 10000
-	loaded_model = pickle.load(open(mypath+'model/had_mlpclassifier.pkl', 'rb'))
+	chunk = 1000000
+	#loaded_model = pickle.load(open(mypath+'model/'+name+'_had_mlpclassifier.pkl', 'rb'))
+	#loaded_model = pickle.load(open(mypath+'model/'+name+'_had_nb.pkl', 'rb'))
+	loaded_model = pickle.load(open(mypath+'model/drug_had_mlpclassifier.pkl', 'rb'))
 	icd10 =  pd.read_csv(mypath+'raw/icd10.csv', index_col=0)
 	icd10_map = dict(zip(icd10['code'],icd10.index))
+	had = pd.read_csv(mypath+'had.csv', index_col=0)
+	had = had['drug'].values.tolist()
 
 	for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=chunk, index_col=0):
 		dftest = df.copy()
 		dftest = pd.concat([dftest.drop('icd10', axis=1), dftest['icd10'].map(icd10_map)], axis=1)
-		dftest.drop(['txn'], axis=1, inplace=True)
+		
+		dftest['had'] = np.where(dftest['drug'].isin(had), 1, 0)
+		dftest = dftest[['icd10','dx_type','had']]
+		df1 = dftest[dftest['had'] == 1]
+		df1 = df1.drop_duplicates()
+		df2 = dftest[~dftest['icd10'].isin(df1['icd10'].values.tolist())]
+		df2 = df2.drop_duplicates()
+		dftest = pd.concat([df1,df2])
+		'''
+		no_had = dftest[dftest['had']==0]
+		yes_had = dftest[dftest['had']==1]
+		if len(no_had) > len(yes_had):
+			no_had = resample(no_had,
+                                replace = False, # sample without replacement
+                                n_samples = len(yes_had), # match minority n
+                                random_state = 27) # reproducible results
+		else:
+			yes_had = resample(yes_had,
+                                replace = False, # sample without replacement
+                                n_samples = len(no_had), # match minority n
+                                random_state = 27) # reproducible results
+		dftest = pd.concat([no_had,yes_had])
+		'''
+		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
+		y_pred = loaded_model.predict(X_train)
+		cf = confusion_matrix(Y_train, y_pred)
+		print(cf)
+		cr = classification_report(Y_train, y_pred)
+		print(cr)
+		
+		dftest = df.copy()
+		dftest = pd.concat([dftest.drop('icd10', axis=1), dftest['icd10'].map(icd10_map)], axis=1)
 		dftest = dftest[['icd10','dx_type','drug']]
 		X_train, X_validation, Y_train, Y_validation = get_testset(dftest)
 		p = loaded_model.predict_proba(X_train)
 		dfp = pd.DataFrame(data=p,columns=['no_had','yes_had'])
 		df['no_had'] = dfp['no_had'].values.tolist()
 		df['yes_had'] = dfp['yes_had'].values.tolist()
-		print(df)
-		#df['had'] = loaded_model.predict(X_train)[:len(X_train)]
-		#save_file(df,'/media/bon/My Passport/data/model_prediction/'+name+'_had.csv')
+		#print(df)
 		print('Predict '+name)
+		df = df.head(10000)
 		df.to_csv(mypath+'model_prediction/'+name+'_had.csv')
+		
 		break
 
 def cosine_vectorized(array1, array2):
