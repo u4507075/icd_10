@@ -20,6 +20,7 @@ from preprocessing.trainmodel import kmean_finetune
 from preprocessing.trainmodel import validate
 from preprocessing.trainmodel import total_validate
 from preprocessing.trainmodel import combine_prediction
+from preprocessing.trainmodel import get_total_icd10_weight
 
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
@@ -90,13 +91,26 @@ scale_data('../../secret/data/vec/','ilab')
 
 def validate_kmean(n,files,name):
 	kmean(n,files,name)
-	get_total_weight(n,files,name)
-	total_validate(n,files,name)
+	get_total_weight(n,files,name,inplace=True)
+	#total_validate(n,files,name)
 
-#validate_kmean(5000,['dru','idru'],'drug')
+for i in range(2,10000):
+	print(i)
+	kmean(i,['dru','idru'],'drug')
+	kmean(i,['reg','adm'],'reg')
+	kmean(i,['rad','irad'],'rad')
+	kmean(i,['lab','ilab'],'lab')
+
+#5,10,100,1000,5000,10000,15000
+#validate_kmean(1000,['dru','idru'],'drug')
 #validate_kmean(5000,['reg','adm'],'reg')
-#validate_kmean(1000,['rad','irad'],'rad')
-validate_kmean(100,['lab','ilab'],'lab')
+#validate_kmean(100,['rad','irad'],'rad')
+#validate_kmean(10,['lab','ilab'],'lab')
+
+#total_validate(5,['dru','idru'],'drug')
+#total_validate(5,['reg','adm'],'reg')
+
+#get_total_icd10_weight(5,'drug')
 
 
 #kmean(['dru','idru'],'drug')

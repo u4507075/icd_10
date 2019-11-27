@@ -2,10 +2,12 @@ pandas
 mysql-connector-python
 scikit-learn
 spacy
-mathplotlib
+matplotlib
+setuptools
 keras
 tensorflow
 dask-ml
 joblib
 lightgbm
 xgboost
+fsspec

@@ -427,17 +427,22 @@ def evaluate_lstm_model(name):
 
 def kmean(n,train,modelname):
 	chunk = 30000
-	#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
-	kmeans = MiniBatchKMeans(n_clusters=n, random_state=0, batch_size=1000)
-	for name in train:
-		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df.drop(['txn'], axis=1, inplace=True)
-			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
-			#X_train = ssc.transform(X_train)
-			kmeans = kmeans.partial_fit(X_train)
-			print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
-			print(kmeans.inertia_)
-	save_model(kmeans,modelname+'_kmean_'+str(n))
+	p = Path(mypath+'model/'+modelname+'_kmean_'+str(n)+".pkl" )
+	print(modelname)
+	if p.is_file():
+		print('Model '+modelname+'_kmean_'+str(n)+' already exists')
+	else:
+		#ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
+		kmeans = MiniBatchKMeans(n_clusters=n, random_state=0, batch_size=1000)
+		for name in train:
+			for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+				df.drop(['txn'], axis=1, inplace=True)
+				X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+				#X_train = ssc.transform(X_train)
+				kmeans = kmeans.partial_fit(X_train)
+				#print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
+				#print(kmeans.inertia_)
+		save_model(kmeans,modelname+'_kmean_'+str(n))
 '''
 def predict_kmean(name,modelname):
 	chunk = 10000
@@ -525,30 +530,75 @@ def save_weight(modelname,df,n,x):
 		d = pd.DataFrame(data,columns=['icd10','icd10_count'])
 		result = agg_weight(d,df)
 		result.to_csv(p)
-def get_total_weight(n,train,modelname):
-
-	chunk = 10000
-	model = pickle.load(open(mypath+'model/'+modelname+'_kmean_'+str(n)+'.pkl', 'rb'))
-	remove_all_temp_weight(modelname,n)
-	for name in train:
-		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
-			df.drop(['txn'], axis=1, inplace=True)
-			X_train, X_validation, Y_train, Y_validation = get_testset(df)
-			df['cluster'] = model.predict(X_train)[:len(X_train)]
-			result = df['icd10'].groupby(df['cluster']).apply(top).to_frame()
-			result = result.rename(columns={'icd10':'icd10_count'})
-			result.reset_index(inplace=True)
-			result = result.rename(columns={'level_1':'icd10'})
-			#print(result)
-			for i in range(n):
-				save_weight(modelname,result[result['cluster']==i],n,i)
-			print('append total weight to '+modelname)
-
+def get_total_icd10_weight(n,modelname):
+	dfs = []
 	for i in range(n):
 		p = mypath+'model_prediction/'+modelname+'_'+str(n)+'_'+str(i)+'.csv'
 		df = pd.read_csv(p, index_col=0)
-		df['icd10_weight'] =  df['icd10_count']/df['icd10_count'].sum()
-		df.to_csv(p)
+		dfs.append(df)
+	df = pd.concat(dfs)
+	df['total_icd10_count'] = df.groupby(['icd10'])['icd10_count'].transform('sum')
+	df.drop(['icd10_count'], axis=1, inplace=True)
+	df = df.drop_duplicates()
+	return df
+	print(df)
+	for i in range(n):
+		p = mypath+'model_prediction/'+modelname+'_'+str(n)+'_'+str(i)+'.csv'
+		d = pd.read_csv(p, index_col=0)
+		result = pd.merge(d,df, how='inner', on='icd10')
+		result = result.drop_duplicates()
+		print(result)
+	return df
+
+def get_total_weight(n,train,modelname,inplace=True):
+
+	num = 0
+	chunk = 1000
+	model = pickle.load(open(mypath+'model/'+modelname+'_kmean_'+str(n)+'.pkl', 'rb'))
+	start = True
+	if inplace:
+		remove_all_temp_weight(modelname,n)
+	else:
+		log = Path(mypath+'log/'+modelname+'.txt')
+		if log.is_file():
+			start = False
+	for name in train:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			if start:
+				df.drop(['txn'], axis=1, inplace=True)
+				X_train, X_validation, Y_train, Y_validation = get_testset(df)
+				df['cluster'] = model.predict(X_train)[:len(X_train)]
+				result = df.groupby(['cluster','icd10']).size().reset_index(name='icd10_count')
+				#result = df['icd10'].groupby(df['cluster']).apply(top).to_frame()
+				#result = result.rename(columns={'icd10':'icd10_count'})
+				#result.reset_index(inplace=True)
+				#result = result.rename(columns={'level_1':'icd10'})
+				#print(result)
+				for i in range(n):
+					save_weight(modelname,result[result['cluster']==i],n,i)
+				num = num + chunk
+				print('append total weight to '+modelname+': '+name+'_'+str(num))
+				f = open(mypath+'log/'+modelname+'.txt','w+')
+				f.write(name+'_'+str(num))
+				f.close()
+			else:
+				f = open(mypath+'log/'+modelname+'.txt','r')
+				s = f.read()
+				num = num + chunk
+				print('skip '+name+'_'+str(num))
+				if s == name+'_'+str(num):
+					start = True
+
+	total = get_total_icd10_weight(n,modelname)
+	for i in range(n):
+		p = mypath+'model_prediction/'+modelname+'_'+str(n)+'_'+str(i)+'.csv'
+		df = pd.read_csv(p, index_col=0)
+		df['icd10_inner_weight'] =  df['icd10_count']/df['icd10_count'].sum()
+		result = pd.merge(df,total, how='inner', on='icd10')
+		result['icd10_weight'] = result['icd10_inner_weight']/result['total_icd10_count']
+		result = result.fillna(0)
+		print(result)
+		result.to_csv(p)
 		print('saved icd10 weight '+str(i))
 	print('saved weight')
 
@@ -567,6 +617,7 @@ def total_validate(n,train,modelname):
 			df = df.rename(columns={'icd10':'actual_icd10'})
 			df['n'] = n
 			df['modelname'] = modelname
+			#print(df)
 			performance(df)
 			break
 		break
@@ -760,6 +811,37 @@ def performance(df):
 	y_true = np.array(df.groupby('txn').apply(rank_y_true).reset_index(name='y_true')['y_true'].values.tolist())
 	#y_score = np.array(df.groupby('txn').apply(rank_y_score).reset_index(name='y_score')['y_score'].values.tolist())
 	y_score = np.array(df.groupby('txn').apply(rank_total_y_score).reset_index(name='y_score')['y_score'].values.tolist())
+	'''
+	l = 10
+	for i in range(len(y_true)):
+		d = pd.DataFrame([y_true[i],y_score[i]]).T
+		d.rename(columns={0:'actual_icd10',1:'predicted_icd10'},inplace=True)
+		d = d.sort_values(by=['predicted_icd10'], ascending=[False])
+		n = len(d[d['actual_icd10']==1])
+		#print('total actual icd10: '+str(n))
+		print(d[d['actual_icd10']==1])
+		d = d.head(l)
+		print(d)
+		d.reset_index(drop=True,inplace=True)
+		d['index'] = d.index
+		tp = len(d[d['actual_icd10']==1])
+		fp = l
+		tn = 0
+		if len(d[d['actual_icd10']==1]) > 0:
+			lastp = d[d['actual_icd10']==1].tail(1).index.values.astype(int)[0]
+			fp = len(d[(d['actual_icd10']==0)&(d['index']<lastp)])
+			tn = len(d[d['index'] > lastp])
+		fn = n-tp
+		#print('TP = '+str(tp))
+		#print('FP = '+str(fp))
+		#print('TN = '+str(tn))
+		#print('FN = '+str(fn))
+		print('Accuracy = '+str((tp+tn)/l))
+		print('Precision = '+str(tp/(tp+fp)))
+		print('Recall = '+str(tp/(tp+fn)))
+		print('F1-measure = '+str(2*tp/((2*tp)+fp+fn)))
+	'''
+
 	print('coverage error '+ str(coverage_error(y_true, y_score)))
 	print('Average precision score '+ str(label_ranking_average_precision_score(y_true, y_score)))
 	print('Ranking loss '+ str(label_ranking_loss(y_true, y_score)))
