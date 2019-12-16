@@ -59,6 +59,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import coverage_error
 from sklearn.metrics import label_ranking_average_precision_score
 from sklearn.metrics import label_ranking_loss
+from sklearn.decomposition import PCA
 
 mypath = '../../secret/data/'
 #mypath = '/media/bon/My Passport/data/'
@@ -289,21 +290,21 @@ def save_history():
 			if filename == 'L1901' and target == 'M8445':
 				stop = True
 '''
-def scale_data(path,filename):
+def scale_data(filename):
 	# scale to 0 - 1 without changing the distribution pattern, outlier still affects
 	mmsc = MinMaxScaler(feature_range = (0, 1))
 	# (x - mean)/sd = makes mean close to 0
 	ssc = StandardScaler()
 	chunk = 100000
-	for df in  pd.read_csv(path+filename+'.csv', chunksize=chunk, index_col=0):
+	for df in  pd.read_csv(mypath+'trainingset/vec/'+filename+'.csv', chunksize=chunk, index_col=0):
 		df.drop(['txn'], axis=1, inplace=True)
 		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
 		ssc.partial_fit(X_train)
 		mmsc.partial_fit(X_train)
 	print('fit scaler '+filename)
 
-	joblib.dump(mmsc, path+filename+'_minmaxscaler.save') 
-	joblib.dump(ssc, path+filename+'_standardscaler.save') 
+	joblib.dump(mmsc, mypath+'scaler/'+filename+'_minmaxscaler.save') 
+	joblib.dump(ssc, mypath+'scaler/'+filename+'_standardscaler.save') 
 
 def predict(testset,testvalue,ssc,regressor):
 	pre = regressor.predict(testset)
@@ -443,6 +444,33 @@ def kmean(n,train,modelname):
 				#print('Number of clusters: '+str(len(kmeans.cluster_centers_)))
 				#print(kmeans.inertia_)
 		save_model(kmeans,modelname+'_kmean_'+str(n))
+
+def eval_kmean(name,test,s,e,c):
+	data = []
+	for i in range(s,e,c):
+		print('Cluster '+str(i))
+		modelname = name+'_kmean_'+str(i)
+		p = mypath+'model/'+modelname+'.pkl'
+		if Path(p).is_file():
+			model = pickle.load(open(p, 'rb'))
+			df = pd.read_csv(mypath+'/testset/vec/'+test+'.csv', index_col=0).head(500000)
+			df.drop(['txn'], axis=1, inplace=True)
+			X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+			preds = model.predict(X_train)
+			from sklearn import metrics
+			rs = metrics.adjusted_rand_score(Y_train,preds)
+			mis = metrics.adjusted_mutual_info_score(Y_train,preds,average_method='arithmetic')
+			fms = metrics.fowlkes_mallows_score(Y_train,preds)
+			print('Adjusted Rand index: %0.3f' % rs)
+			print('Adjusted Mutual Information score: %0.3f' % mis)
+			print('Fowlkes-Mallows score: %0.3f' % fms)
+			data.append([i,rs,mis,fms])
+		else:
+			print('No model: '+modelname+'.pkl')
+	df = pd.DataFrame(data,columns=['cluster','adjusted_rand_score','adjusted_mutual_info_score','fowlkes_mallows_score'])
+	df.to_csv(mypath+'model/kmean_eval_'+test+'.csv')
+	print('save kmean evaluation')
+
 '''
 def predict_kmean(name,modelname):
 	chunk = 10000
@@ -1161,4 +1189,29 @@ def train_xgb(train):
 			del df, X_train, X_validation, Y_train, Y_validation
 			gc.collect()
 
+
+def apply_pca(name):
+	chunk = 1000000
+	print(name)
+	ssc = joblib.load(mypath+'vec/'+name+'_standardscaler.save')
+	for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+		df.drop(['txn'], axis=1, inplace=True)
+		X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+		X_train = ssc.transform(X_train)
+		kmeans = MiniBatchKMeans(n_clusters=10, random_state=0, batch_size=1000)
+		kmeans = kmeans.partial_fit(X_train)
+		print('Before PCA')
+		print(kmeans.inertia_)
+
+		#keep 95% variance
+		pca = PCA(n_components=0.80)
+		#guess the best dimension
+		#pca = PCA(n_components='mle')
+		pca.fit(X_train)
+		#print(pca.n_components_)
+		X_train = pca.transform(X_train)
+		kmeans = MiniBatchKMeans(n_clusters=10, random_state=0, batch_size=1000)
+		kmeans = kmeans.partial_fit(X_train)
+		print('After PCA')
+		print(kmeans.inertia_)
 

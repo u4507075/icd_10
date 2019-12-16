@@ -4,7 +4,7 @@ from preprocessing.trainmodel import scale_data
 #from preprocessing.trainmodel import lstm_model
 #from preprocessing.trainmodel import evaluate_lstm_model
 from preprocessing.trainmodel import kmean
-#from preprocessing.trainmodel import predict_kmean
+from preprocessing.trainmodel import eval_kmean
 from preprocessing.trainmodel import get_neighbour
 from preprocessing.trainmodel import get_weight
 from preprocessing.trainmodel import get_total_weight
@@ -21,6 +21,7 @@ from preprocessing.trainmodel import validate
 from preprocessing.trainmodel import total_validate
 from preprocessing.trainmodel import combine_prediction
 from preprocessing.trainmodel import get_total_icd10_weight
+from preprocessing.trainmodel import apply_pca
 
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
@@ -31,6 +32,7 @@ from preprocessing.preprocess import get_rad_data
 from preprocessing.preprocess import get_txn_test_data
 from preprocessing.preprocess import split_data
 from preprocessing.preprocess import csv_to_sqldb
+
 
 #from preprocessing.vec import word_to_vec
 #from preprocessing.vec import radio_to_vec
@@ -64,15 +66,26 @@ import config
 #split_data('vec')
 
 '''
-scale_data('../../secret/data/vec/','reg')
-scale_data('../../secret/data/vec/','adm')
-scale_data('../../secret/data/vec/','rad')
-scale_data('../../secret/data/vec/','irad')
-scale_data('../../secret/data/vec/','dru')
-scale_data('../../secret/data/vec/','idru')
-scale_data('../../secret/data/vec/','lab')
-scale_data('../../secret/data/vec/','ilab')
+scale_data('reg')
+scale_data('adm')
+scale_data('rad')
+scale_data('irad')
+scale_data('dru')
+scale_data('idru')
+scale_data('lab')
+scale_data('ilab')
 '''
+
+apply_pca('reg')
+apply_pca('adm')
+apply_pca('rad')
+apply_pca('irad')
+apply_pca('dru')
+apply_pca('idru')
+#apply_pca('lab')
+#apply_pca('ilab')
+
+
 #n = 10
 #kmean(n,['dru','idru'],'drug')
 #kmean(n,['reg','adm'],'reg')
@@ -93,13 +106,25 @@ def validate_kmean(n,files,name):
 	kmean(n,files,name)
 	get_total_weight(n,files,name,inplace=True)
 	#total_validate(n,files,name)
-
+'''
 for i in range(2,10000):
 	print(i)
 	kmean(i,['dru','idru'],'drug')
 	kmean(i,['reg','adm'],'reg')
 	kmean(i,['rad','irad'],'rad')
 	kmean(i,['lab','ilab'],'lab')
+'''
+
+'''
+print('dru')
+eval_kmean('drug','dru',2,300,10)
+print('reg')
+eval_kmean('reg','reg',2,300,10)
+print('rad')
+eval_kmean('rad','rad',2,300,10)
+print('lab')
+eval_kmean('lab','lab',2,300,10)
+'''
 
 #5,10,100,1000,5000,10000,15000
 #validate_kmean(1000,['dru','idru'],'drug')
