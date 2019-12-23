@@ -494,7 +494,9 @@ weighted average F1 score top20 (F20) = ((0.35 x 5) + (1.00 x 1) + (0.67 x 1))/7
 | rad (raw)        | Yassien secret (RL)                          | 84     | 0.44 | 0.04  | 0.32|      |      |      |
 | irad (raw)       | Yassien secret (RL_3)                        | 11     | 0.66 | 0.45  |     |      |      |      |
 | irad (raw)       | Yassien secret (RL)                          | 206    | 0.39 | 0.04  | 0.64|      |      |      |
-
+| lab & ilab       | BME                                          | 46     | 0.25 | 0.24  | 0.29| 0.20 | 0.30 | 0.20 |
+| rad & irad       | BME                                          | 112    | 0.39 | 0.15  | 0.26| 0.17 | 0.09 | 0.09 |
+| lab & ilab & rad & irad | BME                                   | 449    | 0.03 | 0.33  | 0.08| 0.12 | 0.07 | 0.04 |
 
 CR = coverage error, 
 AP = label ranking average precision, 
