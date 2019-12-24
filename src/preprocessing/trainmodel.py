@@ -17,7 +17,7 @@ from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import PassiveAggressiveRegressor
 from sklearn.neural_network import MLPClassifier
-from xgboost import XGBClassifier
+#from xgboost import XGBClassifier
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.cluster import KMeans
 from sklearn.cluster import Birch
