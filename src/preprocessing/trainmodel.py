@@ -22,8 +22,9 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.cluster import KMeans
 from sklearn.cluster import Birch
 from sklearn.decomposition import MiniBatchDictionaryLearning
-
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import precision_recall_fscore_support
+from sklearn.model_selection import cross_val_score
 from sklearn.utils import resample
 
 import os
@@ -497,7 +498,7 @@ def topsum(x):
 	return x.sum().head(5)
 
 def get_neighbour(train,modelname):
-	chunk = 10000
+	chunk = 1000000
 	results = []
 	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
 	for name in train:
@@ -630,7 +631,7 @@ def get_total_weight(n,train,modelname,inplace=True):
 		print('saved icd10 weight '+str(i))
 	print('saved weight')
 
-def total_validate(n,train,modelname):
+def cluster_validate(n,train,modelname):
 	chunk = 5000
 	model = pickle.load(open(mypath+'model/'+modelname+'_kmean_'+str(n)+'.pkl', 'rb'))
 	print('n_cluster = '+str(n))
@@ -646,28 +647,30 @@ def total_validate(n,train,modelname):
 			df['n'] = n
 			df['modelname'] = modelname
 			#print(df)
-			performance(df)
+			cluster_performance(df)
 			break
 		break
 def predict_cluster(train,modelname):
-	chunk = 10000
+	chunk = 100000
 	model = pickle.load(open(mypath+'model/'+modelname+'.pkl', 'rb'))
 	neighbour = pd.read_csv(mypath+'model_prediction/'+modelname+'_neighbour.csv', index_col=0)
 	neighbour = neighbour.rename(columns={'icd10':'predicted_icd10'})
 	for name in train:
 		remove_file(mypath+'result/'+name+'_'+modelname+'.csv')
 		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			txn = df['txn']
 			df.drop(['txn'], axis=1, inplace=True)
 			index = df.index
 			X_train, X_validation, Y_train, Y_validation = get_testset(df)
 			#X_train = ssc.transform(X_train)
 			df.insert(0,'index',index)
+			df['txn'] = txn
 			df['model_name'] = modelname
 			df['cluster'] = model.predict(X_train)[:len(X_train)]
 			result = pd.merge(df,neighbour, how='left', on='cluster')
 			#print(result)
 			save_file(result,mypath+'result/'+name+'_'+modelname+'.csv')
-			print('append result to '+modelname)
+			print('append predicted cluster to '+modelname)
 			#print(df)
 	print('complete')
 def combine_prediction(files,modelname):
@@ -681,28 +684,56 @@ def combine_prediction(files,modelname):
 			print('append combine_prediction')
 	print('Saved combined_'+modelname)
 
+def test_icd10_prediction(name,modelname):
+	preds = pd.read_csv(mypath+'result/'+name+'_'+modelname+'_prediction.csv', index_col=0)
+	testset = preds.copy()
+	result = None
+	remove_file(mypath+'result/'+name+'_'+modelname+'_prediction_onehot.csv')
+	for i in range(10):
+		if i == 0:
+			result = preds.groupby('txn').nth(i)
+			result = result.rename(columns={'predicted_icd10':'predicted_icd10_0','sum_weight':'sum_weight_0'})
+		else:
+			result['predicted_icd10_'+str(i)] = preds.groupby('txn').nth(i)['predicted_icd10']
+			result['sum_weight_'+str(i)] = preds.groupby('txn').nth(i)['sum_weight']
+	result = result.reset_index()
+	result.to_csv(mypath+'result/'+name+'_'+modelname+'_prediction_onehot.csv')
+
 def predict_icd10(train,modelname):
-	chunk = 1000
+	chunk = 100000
 	for name in train:
-		id = []
+		print(name)
+		remove_file(mypath+'result/'+name+'_'+modelname+'_prediction.csv')
+		txns = []
 		for df in pd.read_csv(mypath+'testset/vec/'+name+'.csv', chunksize=100000, index_col=0):
-			id = id + df.index.values.tolist()
+			txns.append(df['txn'])
+
+		id = pd.concat(txns)
+		id = id.drop_duplicates()
+		id = id.tolist()
 
 		for i in range(0, len(id), chunk):
 			index = id[i:i + chunk]
 			result = []
-			for df in pd.read_csv(mypath+'result/'+modelname+'.csv', chunksize=chunk, index_col=0):
-				df = df[df['index'].isin(index)]
+			for df in pd.read_csv(mypath+'result/'+name+'_'+modelname+'.csv', chunksize=chunk, index_col=0):
+				df = df[df['txn'].isin(index)]
 				result.append(df)
 			total = pd.concat(result)
-			total = total[['index','predicted_icd10','weight']]
-			total = total.groupby(['index', 'predicted_icd10'])['weight'].agg('sum').reset_index()
-			total = total.sort_values(by=['index','weight'], ascending=[True,False])
+			print(total)
+			total = total[['txn','predicted_icd10','weight']]
+			#total = total.groupby(['txn', 'predicted_icd10'])['weight'].agg('sum')
+			total['sum_weight'] = total.groupby(['txn','predicted_icd10'])['weight'].transform('sum')
+			total = total[['txn','predicted_icd10','sum_weight']]
+			total = total.drop_duplicates()
+			total = total.sort_values(by=['txn','sum_weight'], ascending=[True,False])
+			print(total)
 			save_file(total,mypath+'result/'+name+'_'+modelname+'_prediction.csv')
-			print('append prediction')
+			print('append predicted_icd10 prediction')
+			#break
+		
 	print('complete')
 
-def validate(train,modelname,combine=False):
+def bag_validate(train,modelname,combine=False):
 
 	chunk = 10000
 	n = 10
@@ -717,22 +748,22 @@ def validate(train,modelname,combine=False):
 			for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
 				df = df[df['txn'].isin(txn_range)]
 				df = df[['txn','icd10']]
-				df['index'] = df.index
 				test.append(df)
 			testset = pd.concat(test)
+			testset = testset.drop_duplicates()
 			result = []
 			filename = name+'_'+modelname
 			if combine:
 				filename = modelname
 			for df in pd.read_csv(mypath+'result/'+filename+'.csv', chunksize=chunk, index_col=0):
-				df = df[df['index'].isin(testset.index.values.tolist())]
+				df = df[df['txn'].isin(testset.txn.values.tolist())]
 				result.append(df)
 			predictset = pd.concat(result)
-			predictset = predictset[['index','icd10','predicted_icd10','weight']]
+			predictset = predictset[['txn','icd10','predicted_icd10','weight']]
 			predictset = predictset.rename(columns={'icd10':'actual_icd10'})
-			#print(testset)
-			#print(predictset)
-			total = pd.merge(testset, predictset, on=['index'])
+			print(testset)
+			print(predictset)
+			total = pd.merge(testset, predictset, on=['txn'])
 			#total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
 			#total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
 			#print(total)
@@ -751,9 +782,9 @@ def validate(train,modelname,combine=False):
 			dataset = dataset1.append(dataset2, ignore_index=True)
 			dataset = dataset.drop_duplicates()
 			dataset = dataset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
-			#print(dataset)
-			#dataset.to_csv('test.csv')
-			performance(dataset.head(10000))
+			print(dataset)
+			dataset.to_csv('test.csv')
+			bag_performance(dataset.head(1000))
 			break
 			#print('append prediction')
 		break
@@ -767,10 +798,10 @@ def count(x):
 def dxn(x):
 	return len(x[pd.notna(x['actual_icd10'])])
 
-def tp(x):
+def true_positive(x):
 	return len(x[(pd.notna(x['actual_icd10'])) & (pd.notna(x['predicted_icd10']))])
 
-def fp(x):
+def false_positive(x):
 	df = x.reset_index()
 	total = len(df)
 	actual = len(df[(pd.notna(df['actual_icd10']))])
@@ -780,7 +811,7 @@ def fp(x):
 	else:
 		return df.tail(1).index.values.astype(int)[0]-len(df)+1
 
-def tn(x):
+def true_negative(x):
 	df = x.reset_index()
 	df1 = df[(pd.notna(df['actual_icd10'])) & (pd.notna(df['predicted_icd10']))]
 	if len(df1) == 0:
@@ -788,7 +819,7 @@ def tn(x):
 	else:
 		return len(df[(df['actual_icd10'].isna()) & (df['predicted_icd10'].index > df1.tail(1).index.values.astype(int)[0])])
 
-def fn(x):
+def false_negative(x):
 	return len(x[(pd.notna(x['actual_icd10'])) & (x['predicted_icd10'].isna())])
 
 def rank_y_true(x):
@@ -814,7 +845,7 @@ def rank_total_y_score(x):
 	df = pd.read_csv(p, index_col=0)
 	return df['icd10_weight'].values.tolist()
 
-def performance(df):
+def cluster_performance(df):
 	#print(df)
 	#df = pd.read_csv('test.csv', index_col=0)
 	#df = df.head(500)
@@ -873,6 +904,60 @@ def performance(df):
 	print('coverage error '+ str(coverage_error(y_true, y_score)))
 	print('Average precision score '+ str(label_ranking_average_precision_score(y_true, y_score)))
 	print('Ranking loss '+ str(label_ranking_loss(y_true, y_score)))
+
+def bag_performance(df):
+	#print(df)
+	#df = pd.read_csv('test.csv', index_col=0)
+	#df = df.head(1000)
+
+	result = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(count).reset_index(name='n')
+	result['dxn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(dxn).reset_index(name='dxn')['dxn']
+	result['tp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(true_positive).reset_index(name='tp')['tp']
+	result['fp'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(false_positive).reset_index(name='fp')['fp']
+	result['tn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(true_negative).reset_index(name='tn')['tn']
+	result['fn'] = df.groupby('txn')['actual_icd10','predicted_icd10'].apply(false_negative).reset_index(name='fn')['fn']
+	result['accuracy'] = (result['tp']+result['tn'])/result['n']
+	result['precision'] = result['tp']/(result['tp']+result['fp'])
+	result['recall'] = result['tp']/(result['tp']+result['fn'])
+	result['f_measure'] = 2*result['tp']/((2*result['tp'])+result['fp']+result['fn'])
+
+	#print(result)
+	print((result['accuracy']*result['dxn']).sum()/result['dxn'].sum())
+	print((result['precision']*result['dxn']).sum()/result['dxn'].sum())
+	print((result['recall']*result['dxn']).sum()/result['dxn'].sum())
+	print((result['f_measure']*result['dxn']).sum()/result['dxn'].sum())
+
+	y_true = np.array(df.groupby('txn').apply(rank_y_true).reset_index(name='y_true')['y_true'].values.tolist())
+	y_score = np.array(df.groupby('txn').apply(rank_y_score).reset_index(name='y_score')['y_score'].values.tolist())
+
+	l = 10
+	for i in range(len(y_true)):
+		d = pd.DataFrame([y_true[i],y_score[i]]).T
+		d.rename(columns={0:'actual_icd10',1:'predicted_icd10'},inplace=True)
+		d = d.sort_values(by=['predicted_icd10'], ascending=[False])
+		n = len(d[d['actual_icd10']==1])
+		#print('total actual icd10: '+str(n))
+		print(d[d['actual_icd10']==1])
+		d = d.head(l)
+		print(d)
+		d.reset_index(drop=True,inplace=True)
+		d['index'] = d.index
+		tp = len(d[d['actual_icd10']==1])
+		fp = l
+		tn = 0
+		if len(d[d['actual_icd10']==1]) > 0:
+			lastp = d[d['actual_icd10']==1].tail(1).index.values.astype(int)[0]
+			fp = len(d[(d['actual_icd10']==0)&(d['index']<lastp)])
+			tn = len(d[d['index'] > lastp])
+		fn = n-tp
+		print('TP = '+str(tp))
+		print('FP = '+str(fp))
+		print('TN = '+str(tn))
+		print('FN = '+str(fn))
+		print('Accuracy = '+str((tp+tn)/l))
+		print('Precision = '+str(tp/(tp+fp)))
+		print('Recall = '+str(tp/(tp+fn)))
+		print('F1-measure = '+str(2*tp/((2*tp)+fp+fn)))
 
 def distance(x,t):
 	return x
@@ -1215,3 +1300,41 @@ def apply_pca(name):
 		print('After PCA')
 		print(kmeans.inertia_)
 
+def get_random_dataset(name,n):
+	d = []
+	chunk = 1000000
+	icd10 = pd.read_csv(mypath+'raw/icd10.csv', index_col=0)
+	icd10_dict = dict(zip(icd10.index,icd10.code))
+	while True:
+		for df in  pd.read_csv(mypath+'trainingset/vec/'+name+'.csv', chunksize=chunk, index_col=0):
+			d.append(df.sample(n=1000))
+			result = pd.concat(d)
+			result = result.drop_duplicates()
+			#print(result.groupby('icd10').count().sort_values(by=['txn'], ascending=[False]))
+			#top_dx = result.groupby('icd10').count().sort_values(by=['txn'], ascending=[False]).reset_index()
+			#print(top_dx['icd10'].head(10))
+			#result = result[result['icd10'].isin(top_dx['icd10'].head(10))]
+			print(result)
+			if len(result) >= n:
+				result['icd10'] = result['icd10'].apply(lambda x: icd10_dict[x] if x in icd10_dict else 'no_icd10')
+				return result
+
+def train_gb(df,name,i):
+	df.drop(['txn'], axis=1, inplace=True)
+	X_train, X_validation, Y_train, Y_validation = get_dataset(df, None)
+	clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=10, random_state=0)
+	clf.fit(X_train,Y_train)
+	pkl_filename = mypath+'gb_model_random/'+name+'_gb_'+str(i)+'.pkl'
+	with open(pkl_filename, 'wb') as file:
+		 pickle.dump(clf, file)
+	print("save model")
+	#scores = cross_val_score(clf, X_train, Y_train, cv=3)
+	#print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+
+
+def create_gradientboosting_group(name):
+	for i in range(10):
+		print(i)
+		df = get_random_dataset('dru',10000)
+		print(df)
+		train_gb(df,name,i)

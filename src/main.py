@@ -17,11 +17,13 @@ from preprocessing.trainmodel import birch_finetune
 from preprocessing.trainmodel import kmean_finetune
 #from preprocessing.trainmodel import train_lgb
 #from preprocessing.trainmodel import train_xgb
-from preprocessing.trainmodel import validate
-from preprocessing.trainmodel import total_validate
+from preprocessing.trainmodel import cluster_validate
+from preprocessing.trainmodel import bag_validate
 from preprocessing.trainmodel import combine_prediction
 from preprocessing.trainmodel import get_total_icd10_weight
 from preprocessing.trainmodel import apply_pca
+from preprocessing.trainmodel import test_icd10_prediction
+from preprocessing.trainmodel import create_gradientboosting_group
 
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
@@ -76,12 +78,12 @@ scale_data('lab')
 scale_data('ilab')
 '''
 
-apply_pca('reg')
-apply_pca('adm')
-apply_pca('rad')
-apply_pca('irad')
-apply_pca('dru')
-apply_pca('idru')
+#apply_pca('reg')
+#apply_pca('adm')
+#apply_pca('rad')
+#apply_pca('irad')
+#apply_pca('dru')
+#apply_pca('idru')
 #apply_pca('lab')
 #apply_pca('ilab')
 
@@ -132,37 +134,23 @@ eval_kmean('lab','lab',2,300,10)
 #validate_kmean(100,['rad','irad'],'rad')
 #validate_kmean(10,['lab','ilab'],'lab')
 
-#total_validate(5,['dru','idru'],'drug')
-#total_validate(5,['reg','adm'],'reg')
+#cluster_validate(10,['dru','idru'],'drug')
+#cluster_validate(5,['reg','adm'],'reg')
 
 #get_total_icd10_weight(5,'drug')
 
 
-#kmean(['dru','idru'],'drug')
-#get_neighbour(['dru','idru'],'drug_kmean_15000')
+#kmean(15000,['dru','idru'],'drug')
+#get_neighbour(['dru','idru'],'drug_kmean_300')
 #get_weight('drug_kmean_15000')
 #predict_cluster(['dru','idru'],'drug_kmean_15000')
+#optional step:  predict icd10
 #predict_icd10(['dru','idru'],'drug_kmean_15000')
-#validate(['dru','idru'],'drug_kmean_15000')
+#optional step: onehot icd10 prediction
+#test_icd10_prediction('dru','drug_kmean_10')
+bag_validate(['dru','idru'],'drug_kmean_15000')
 
-#kmean(['reg','adm'],'reg')
-#get_neighbour(['reg','adm'],'reg_kmean_15000')
-#get_weight('reg_kmean_15000')
-#predict_cluster(['reg','adm'],'reg_kmean_15000')
-#validate(['reg','adm'],'reg_kmean_15000')
-
-#kmean(['lab','ilab'],'lab')
-#get_neighbour(['lab','ilab'],'lab_kmean_15000')
-#get_weight('lab_kmean_15000')
-#predict_cluster(['lab','ilab'],'lab_kmean_15000')
-#validate(['lab','ilab'],'lab_kmean_15000')
-
-#kmean(['rad','irad'],'rad')
-#get_neighbour(['rad','irad'],'rad_kmean_15000')
-#get_weight('rad_kmean_15000')
-#predict_cluster(['rad','irad'],'rad_kmean_15000')
-#validate(['rad','irad'],'rad_kmean_15000')
-
+#create_gradientboosting_group('dru')
 
 #combine_prediction(['dru_drug_kmean_15000','idru_drug_kmean_15000','reg_reg_kmean_15000','adm_reg_kmean_15000','rad_rad_kmean_15000','irad_rad_kmean_15000'],'kmean_15000')
 #validate(['reg'],'combined_kmean_15000',combine=True)
