@@ -469,7 +469,7 @@ def eval_kmean(name,test,s,e,c):
 		else:
 			print('No model: '+modelname+'.pkl')
 	df = pd.DataFrame(data,columns=['cluster','adjusted_rand_score','adjusted_mutual_info_score','fowlkes_mallows_score'])
-	df.to_csv(mypath+'model/kmean_eval_'+test+'.csv')
+	#df.to_csv(mypath+'model/kmean_eval_'+test+'.csv')
 	print('save kmean evaluation')
 
 '''

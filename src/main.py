@@ -127,6 +127,7 @@ eval_kmean('rad','rad',2,300,10)
 print('lab')
 eval_kmean('lab','lab',2,300,10)
 '''
+#eval_kmean('drug','dru',14999,15001,1)
 
 #5,10,100,1000,5000,10000,15000
 #validate_kmean(1000,['dru','idru'],'drug')
@@ -140,15 +141,20 @@ eval_kmean('lab','lab',2,300,10)
 #get_total_icd10_weight(5,'drug')
 
 
-#kmean(15000,['dru','idru'],'drug')
-#get_neighbour(['dru','idru'],'drug_kmean_300')
-#get_weight('drug_kmean_15000')
-#predict_cluster(['dru','idru'],'drug_kmean_15000')
+data = ['lab','ilab']
+name = 'lab'
+num = 15000
+kmean(num,data,name)
+get_neighbour(data,name+'_kmean_'+str(num))
+get_weight(name+'_kmean_'+str(num))
+predict_cluster(data,name+'_kmean_'+str(num))
 #optional step:  predict icd10
 #predict_icd10(['dru','idru'],'drug_kmean_15000')
 #optional step: onehot icd10 prediction
 #test_icd10_prediction('dru','drug_kmean_10')
-bag_validate(['dru','idru'],'drug_kmean_15000')
+bag_validate(data,name+'_kmean_'+str(num))
+
+
 
 #create_gradientboosting_group('dru')
 
