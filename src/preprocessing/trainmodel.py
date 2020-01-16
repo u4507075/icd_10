@@ -41,7 +41,7 @@ from keras.layers import Dropout
 from keras.optimizers import SGD
 from dask_ml.wrappers import Incremental
 import lightgbm as lgb
-import xgboost as xgb
+#import xgboost as xgb
 
 from sklearn.externals import joblib
 from keras.models import model_from_json
@@ -736,8 +736,11 @@ def predict_icd10(train,modelname):
 def bag_validate(train,modelname,combine=False):
 
 	chunk = 10000
-	n = 10
+	n = 0
+	upper_n = 20000
+	rank_n = 10
 	for name in train:
+		n = 0
 		txn = []
 		for df in pd.read_csv(mypath+'testset/raw/'+name+'.csv', chunksize=100000, index_col=0):
 			txn = txn + df['txn'].values.tolist()
@@ -761,8 +764,6 @@ def bag_validate(train,modelname,combine=False):
 			predictset = pd.concat(result)
 			predictset = predictset[['txn','icd10','predicted_icd10','weight']]
 			predictset = predictset.rename(columns={'icd10':'actual_icd10'})
-			print(testset)
-			print(predictset)
 			total = pd.merge(testset, predictset, on=['txn'])
 			#total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
 			#total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
@@ -772,7 +773,7 @@ def bag_validate(train,modelname,combine=False):
 			validateset = validateset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
 			validateset.drop(['weight'], axis=1, inplace=True)
 			validateset = validateset.drop_duplicates()
-			validateset = validateset.groupby('txn').head(n)
+			validateset = validateset.groupby('txn').head(rank_n)
 
 			actualset = total[['txn','actual_icd10']]
 			actualset = actualset.drop_duplicates()
@@ -783,15 +784,93 @@ def bag_validate(train,modelname,combine=False):
 			dataset = dataset.drop_duplicates()
 			dataset = dataset.sort_values(by=['txn','sum_weight'], ascending=[True,False])
 			print(dataset)
-			dataset.to_csv('test.csv')
-			bag_performance(dataset.head(1000))
-			break
-			#print('append prediction')
-		break
+			save_file(dataset,name+'_'+modelname+'_validation_total.csv')
+			#bag_performance(dataset.head(upper_n))
+			n = n + len(dataset)
+			#if n > upper_n:
+			#	break
+			print('append prediction')
 	print('complete')
 
-	#performance(None)
+def bag_combine_validate(n_kmean):
+	rank_n = 10
+	chunk = 1000
+	#train = ['reg','rad','dru','lab']
+	train = ['adm','irad','idru','ilab']
+	model = ['reg','rad','drug','lab']
+	vtotal = []
+	for i in range(len(model)):
+		txn = []
+		for df in pd.read_csv(mypath + 'testset/raw/' + train[i] + '.csv', chunksize=100000, index_col=0):
+			txn = txn + df['txn'].values.tolist()
+		for k in range(0, len(txn), chunk):
+			txn_range = txn[k:k+ chunk]
+			test = []
+			for df in pd.read_csv(mypath+'testset/raw/'+train[i]+'.csv', chunksize=100000, index_col=0):
+				df = df[df['txn'].isin(txn_range)]
+				df = df[['txn','icd10']]
+				test.append(df)
+			testset = pd.concat(test)
+			testset = testset.drop_duplicates()
+			result = []
+			filename = train[i]+'_'+model[i] + '_kmean_' + str(n_kmean)
+			for df in pd.read_csv(mypath+'result/'+filename+'.csv', chunksize=chunk, index_col=0):
+				df = df[df['txn'].isin(testset.txn.values.tolist())]
+				result.append(df)
+			predictset = pd.concat(result)
+			predictset = predictset[['txn','icd10','predicted_icd10','weight']]
+			predictset = predictset.rename(columns={'icd10':'actual_icd10'})
+			total = pd.merge(testset, predictset, on=['txn'])
+			#total.drop(['drug_y','drug_name_y'], axis=1, inplace=True)
+			#total = total.rename(columns={'drug_x':'drug','drug_name_x':'drug_name','icd10_x':'icd10','icd10_y':'actual_icd10'})
+			#print(train[i])
+			#print(total)
+			#total = total.head(200000)
+			#vtotal.append(total)
+			#print('append prediction')
+			#break
 
+			#total = pd.concat(vtotal)
+			validateset = total[['txn', 'predicted_icd10', 'weight']]
+			validateset['sum_weight'] = validateset.groupby(['txn', 'predicted_icd10'])['weight'].transform('sum')
+			validateset = validateset.sort_values(by=['txn', 'sum_weight'], ascending=[True, False])
+			validateset.drop(['weight'], axis=1, inplace=True)
+			validateset = validateset.drop_duplicates()
+			validateset = validateset.groupby('txn').head(rank_n)
+
+			actualset = total[['txn', 'actual_icd10']]
+			actualset = actualset.drop_duplicates()
+
+			dataset1 = pd.merge(validateset, actualset, how='left', left_on=['txn', 'predicted_icd10'],
+								right_on=['txn', 'actual_icd10'])
+			dataset2 = pd.merge(actualset, validateset, how='left', right_on=['txn', 'predicted_icd10'],
+								left_on=['txn', 'actual_icd10'])
+			dataset = dataset1.append(dataset2, ignore_index=True)
+			dataset = dataset.drop_duplicates()
+			dataset = dataset.sort_values(by=['txn', 'sum_weight'], ascending=[True, False])
+			print(dataset)
+			save_file(dataset, 'icombine_'+str(n_kmean)+'_validation.csv')
+			#bag_performance(dataset.head(upper_n))
+	print('complete')
+def bag_eval(x):
+	if np.isnan(x['predicted_icd10']):
+		return 'n'
+	elif x['predicted_icd10'] == x['actual_icd10']:
+		return 'y'
+	else:
+		return ''
+def bag_evaluation(name):
+	df = pd.read_csv(name+'.csv',index_col=0)
+	df['eval'] = df.apply(lambda row: bag_eval(row), axis=1)
+	result = df[['actual_icd10','eval']].groupby(['actual_icd10','eval']).size()
+	result = result.unstack()
+	result = result.fillna(0)
+	result['y_percent'] = result['y']*100/(result['y']+result['n'])
+	result['total'] = result['y'] + result['n']
+	result = result.sort_values(by=['total'], ascending=[False])
+	print(df)
+	print(result)
+	result.to_csv(name+'_eval.csv')
 def count(x):
 	return len(x[x['actual_icd10'].isna()]) + len(x[(pd.notna(x['actual_icd10'])) & (pd.notna(x['predicted_icd10']))])
 

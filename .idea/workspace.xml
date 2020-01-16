@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8b994f73-06e7-485b-b5a4-b8aea7777940" name="Default Changelist" comment="" />
+    <list default="true" id="8b994f73-06e7-485b-b5a4-b8aea7777940" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/icd_10.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/icd_10.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/preprocessing/trainmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/preprocessing/trainmodel.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="ADD_SUFFIX_TO_CHERRY_PICKS_OF_PUBLISHED_COMMITS" value="false" />
@@ -23,16 +36,18 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Anaconda3" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="icd_10" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="NUMBAPRO_NVVM" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\nvvm\bin\nvvm64_33_0.dll" />
+        <env name="NUMBAPRO_LIBDEVICE" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\nvvm\libdevice" />
       </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
@@ -48,6 +63,56 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="icd_10" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="NUMBAPRO_NVVM" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\nvvm\bin\nvvm64_33_0.dll" />
+        <env name="NUMBAPRO_LIBDEVICE" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\nvvm\libdevice" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="icd_10" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/obsolete" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/obsolete/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.test" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -85,17 +150,44 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="174" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577084071887">
-      <screen x="0" y="0" width="1290" height="645" />
+    <state x="630" y="334" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577462880818">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="174" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1290.645@0.0.1290.645" timestamp="1577084071887" />
-    <state x="146" y="0" key="SettingsEditor" timestamp="1577084253079">
-      <screen x="0" y="0" width="1290" height="645" />
+    <state x="630" y="334" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577462880818" />
+    <state x="932" y="361" key="EnvironmentVariablesDialog" timestamp="1577462879409">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="932" y="361" key="EnvironmentVariablesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577462879409" />
+    <state x="495" y="132" key="FileChooserDialogImpl" timestamp="1577429727496">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="495" y="132" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1577429727496" />
+    <state width="1894" height="280" key="GridCell.Tab.0.bottom" timestamp="1578456471242">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1894" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471242" />
+    <state width="1894" height="280" key="GridCell.Tab.0.center" timestamp="1578456471241">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1894" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471241" />
+    <state width="1894" height="280" key="GridCell.Tab.0.left" timestamp="1578456471240">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1894" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471240" />
+    <state width="1894" height="280" key="GridCell.Tab.0.right" timestamp="1578456471241">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1894" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471241" />
+    <state x="217" y="0" key="SettingsEditor" timestamp="1577429781051">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="146" y="0" key="SettingsEditor/0.0.1290.645@0.0.1290.645" timestamp="1577084253079" />
-    <state x="346" y="147" key="com.intellij.ide.util.TipDialog" timestamp="1577083210013">
+    <state x="217" y="0" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1577429781051" />
+    <state x="121" y="144" key="com.intellij.ide.util.TipDialog" timestamp="1578502492675">
       <screen x="0" y="0" width="1290" height="645" />
     </state>
-    <state x="346" y="147" key="com.intellij.ide.util.TipDialog/0.0.1290.645@0.0.1290.645" timestamp="1577083210013" />
+    <state x="121" y="144" key="com.intellij.ide.util.TipDialog/0.0.1290.645@0.0.1290.645" timestamp="1578502492675" />
+    <state x="515" y="237" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577466146341" />
   </component>
 </project>

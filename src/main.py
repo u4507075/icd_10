@@ -19,6 +19,8 @@ from preprocessing.trainmodel import kmean_finetune
 #from preprocessing.trainmodel import train_xgb
 from preprocessing.trainmodel import cluster_validate
 from preprocessing.trainmodel import bag_validate
+from preprocessing.trainmodel import bag_combine_validate
+from preprocessing.trainmodel import bag_evaluation
 from preprocessing.trainmodel import combine_prediction
 from preprocessing.trainmodel import get_total_icd10_weight
 from preprocessing.trainmodel import apply_pca
@@ -140,21 +142,36 @@ eval_kmean('lab','lab',2,300,10)
 
 #get_total_icd10_weight(5,'drug')
 
-
+#data = ['reg','adm']
+#data = ['rad','irad']
+#data = ['dru','idru']
 data = ['lab','ilab']
+#name = 'reg'
+#name = 'rad'
+#name = 'drug'
 name = 'lab'
+
 num = 15000
-kmean(num,data,name)
-get_neighbour(data,name+'_kmean_'+str(num))
-get_weight(name+'_kmean_'+str(num))
-predict_cluster(data,name+'_kmean_'+str(num))
+#kmean(num,data,name)
+#get_neighbour(data,name+'_kmean_'+str(num))
+#get_weight(name+'_kmean_'+str(num))
+#predict_cluster(data,name+'_kmean_'+str(num))
 #optional step:  predict icd10
 #predict_icd10(['dru','idru'],'drug_kmean_15000')
 #optional step: onehot icd10 prediction
 #test_icd10_prediction('dru','drug_kmean_10')
-bag_validate(data,name+'_kmean_'+str(num))
+#bag_validate(data,name+'_kmean_'+str(num))
 
+#bag_combine_validate(15000)
 
+#bag_evaluation('reg_reg_kmean_15000_validation_total')
+#bag_evaluation('adm_reg_kmean_15000_validation_total')
+#bag_evaluation('rad_rad_kmean_15000_validation_total')
+#bag_evaluation('irad_rad_kmean_15000_validation_total')
+#bag_evaluation('dru_drug_kmean_15000_validation_total')
+#bag_evaluation('idru_drug_kmean_15000_validation_total')
+bag_evaluation('lab_lab_kmean_15000_validation_total')
+#bag_evaluation('combine_15000_validation')
 
 #create_gradientboosting_group('dru')
 
