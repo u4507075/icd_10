@@ -21,11 +21,18 @@ from preprocessing.trainmodel import cluster_validate
 from preprocessing.trainmodel import bag_validate
 from preprocessing.trainmodel import bag_combine_validate
 from preprocessing.trainmodel import bag_evaluation
+from preprocessing.trainmodel import bag_performance
+from preprocessing.trainmodel import bag_performance_icd10
+from preprocessing.trainmodel import bag_combine_performance_icd10
 from preprocessing.trainmodel import combine_prediction
 from preprocessing.trainmodel import get_total_icd10_weight
 from preprocessing.trainmodel import apply_pca
 from preprocessing.trainmodel import test_icd10_prediction
 from preprocessing.trainmodel import create_gradientboosting_group
+
+from visualisation.visualisation import visualise_cluster
+from visualisation.visualisation import visualise_associate_icd10
+from visualisation.visualisation import visualise_predicted_icd10
 
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
@@ -90,16 +97,16 @@ scale_data('ilab')
 #apply_pca('ilab')
 
 
-#n = 10
+n = 15000
 #kmean(n,['dru','idru'],'drug')
 #kmean(n,['reg','adm'],'reg')
 #kmean(n,['rad','irad'],'rad')
 #kmean(n,['lab','ilab'],'lab')
 
-#get_total_weight(n,['dru','idru'],'drug')
-#get_total_weight(n,['reg','adm'],'reg')
-#get_total_weight(n,['rad','irad'],'rad')
-#get_total_weight(n,['lab','ilab'],'lab')
+#get_total_weight(n,['dru','idru'],'drug',inplace=False)
+#get_total_weight(n,['reg','adm'],'reg',inplace=False)
+#get_total_weight(n,['rad','irad'],'rad',inplace=False)
+#get_total_weight(n,['lab','ilab'],'lab',inplace=False)
 
 #total_validate(n,['dru','idru'],'drug')
 #total_validate(n,['reg','adm'],'reg')
@@ -129,7 +136,7 @@ eval_kmean('rad','rad',2,300,10)
 print('lab')
 eval_kmean('lab','lab',2,300,10)
 '''
-#eval_kmean('drug','dru',14999,15001,1)
+#eval_kmean('drug','dru',15000,15001,1)
 
 #5,10,100,1000,5000,10000,15000
 #validate_kmean(1000,['dru','idru'],'drug')
@@ -137,7 +144,7 @@ eval_kmean('lab','lab',2,300,10)
 #validate_kmean(100,['rad','irad'],'rad')
 #validate_kmean(10,['lab','ilab'],'lab')
 
-#cluster_validate(10,['dru','idru'],'drug')
+#cluster_validate(15000,['dru'],'drug')
 #cluster_validate(5,['reg','adm'],'reg')
 
 #get_total_icd10_weight(5,'drug')
@@ -145,11 +152,12 @@ eval_kmean('lab','lab',2,300,10)
 #data = ['reg','adm']
 #data = ['rad','irad']
 #data = ['dru','idru']
-data = ['lab','ilab']
+data = ['ilab']
 #name = 'reg'
 #name = 'rad'
 #name = 'drug'
 name = 'lab'
+#name = 'drug'
 
 num = 15000
 #kmean(num,data,name)
@@ -163,6 +171,7 @@ num = 15000
 #bag_validate(data,name+'_kmean_'+str(num))
 
 #bag_combine_validate(15000)
+#bag_combine_validate(15000,prefix='i')
 
 #bag_evaluation('reg_reg_kmean_15000_validation_total')
 #bag_evaluation('adm_reg_kmean_15000_validation_total')
@@ -170,8 +179,55 @@ num = 15000
 #bag_evaluation('irad_rad_kmean_15000_validation_total')
 #bag_evaluation('dru_drug_kmean_15000_validation_total')
 #bag_evaluation('idru_drug_kmean_15000_validation_total')
-bag_evaluation('lab_lab_kmean_15000_validation_total')
+#bag_evaluation('lab_lab_kmean_15000_validation_total')
+#bag_evaluation('ilab_lab_kmean_15000_validation_total')
 #bag_evaluation('combine_15000_validation')
+#bag_evaluation('icombine_15000_validation')
+
+#bag_performance('reg_reg_kmean_15000_validation_total')
+#bag_performance('adm_reg_kmean_15000_validation_total')
+#bag_performance('rad_rad_kmean_15000_validation_total')
+#bag_performance('irad_rad_kmean_15000_validation_total')
+#bag_performance('dru_drug_kmean_15000_validation_total')
+#bag_performance('idru_drug_kmean_15000_validation_total')
+#bag_performance('lab_lab_kmean_15000_validation_total')
+#bag_performance('ilab_lab_kmean_15000_validation_total')
+#bag_performance('combine_15000_validation')
+#bag_performance('icombine_15000_validation')
+
+#bag_performance_icd10('reg','reg')
+#bag_performance_icd10('adm','reg')
+#bag_performance_icd10('rad','rad')
+#bag_performance_icd10('irad','rad')
+#bag_performance_icd10('dru','drug')
+#bag_performance_icd10('idru','drug')
+#bag_performance_icd10('lab','lab')
+#bag_performance_icd10('ilab','lab')
+#bag_combine_performance_icd10()
+#bag_combine_performance_icd10(prefix='i')
+
+#visualise_cluster(['reg','adm','rad','irad','dru','idru'])
+name = ['reg','adm','rad','irad','dru','idru','combine']
+#for n in name:
+#	visualise_cluster([n])
+#visualise_cluster(['adm','idru','irad','icombine'])
+#visualise_cluster(['reg','dru','rad','lab','combine'])
+#visualise_associate_icd10('reg_reg_kmean_15000_validation_total')
+#visualise_predicted_icd10('combine')
+visualise_predicted_icd10()
+
+'''
+d = ['reg','adm','dru','idru','lab','ilab','rad','irad']
+import pandas as pd
+for i in d:
+	n = 0
+	for df in pd.read_csv('../../secret/data/testset/vec/'+i+'.csv', chunksize=100000):
+		n = n+len(df)
+	print(i)
+	print(n)
+'''
+
+
 
 #create_gradientboosting_group('dru')
 

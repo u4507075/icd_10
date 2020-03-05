@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b994f73-06e7-485b-b5a4-b8aea7777940" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/icd_10.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/icd_10.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/obsolete/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/obsolete/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/preprocessing/trainmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/preprocessing/trainmodel.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,10 +35,15 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Anaconda3" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/obsolete" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\icdi\icd10\icd10\icd10\icd_10\src\obsolete" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main (1)">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="icd_10" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -55,6 +59,29 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="icd_10" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="NUMBAPRO_NVVM" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\nvvm\bin\nvvm64_33_0.dll" />
+        <env name="NUMBAPRO_LIBDEVICE" value="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.2\nvvm\libdevice" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../../../../osteoporosis/osteoporosis/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../../../../osteoporosis/osteoporosis/src/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -109,8 +136,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
+        <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.test" />
+        <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
@@ -163,31 +191,43 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="495" y="132" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1577429727496" />
-    <state width="1894" height="280" key="GridCell.Tab.0.bottom" timestamp="1578456471242">
+    <state width="1899" height="251" key="GridCell.Tab.0.bottom" timestamp="1582097671894">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1894" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471242" />
-    <state width="1894" height="280" key="GridCell.Tab.0.center" timestamp="1578456471241">
+    <state width="1269" height="224" key="GridCell.Tab.0.bottom/0.0.1290.645@0.0.1290.645" timestamp="1580614501297" />
+    <state width="1805" height="253" key="GridCell.Tab.0.bottom/0.0.1826.956@0.0.1826.956" timestamp="1579163655394" />
+    <state width="1899" height="251" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1582097671894" />
+    <state width="1899" height="251" key="GridCell.Tab.0.center" timestamp="1582097671893">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1894" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471241" />
-    <state width="1894" height="280" key="GridCell.Tab.0.left" timestamp="1578456471240">
+    <state width="1269" height="224" key="GridCell.Tab.0.center/0.0.1290.645@0.0.1290.645" timestamp="1580614501297" />
+    <state width="1805" height="253" key="GridCell.Tab.0.center/0.0.1826.956@0.0.1826.956" timestamp="1579163655394" />
+    <state width="1899" height="251" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1582097671893" />
+    <state width="1899" height="251" key="GridCell.Tab.0.left" timestamp="1582097671893">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1894" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471240" />
-    <state width="1894" height="280" key="GridCell.Tab.0.right" timestamp="1578456471241">
+    <state width="1269" height="224" key="GridCell.Tab.0.left/0.0.1290.645@0.0.1290.645" timestamp="1580614501296" />
+    <state width="1805" height="253" key="GridCell.Tab.0.left/0.0.1826.956@0.0.1826.956" timestamp="1579163655393" />
+    <state width="1899" height="251" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1582097671893" />
+    <state width="1899" height="251" key="GridCell.Tab.0.right" timestamp="1582097671893">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1894" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1578456471241" />
+    <state width="1269" height="224" key="GridCell.Tab.0.right/0.0.1290.645@0.0.1290.645" timestamp="1580614501297" />
+    <state width="1805" height="253" key="GridCell.Tab.0.right/0.0.1826.956@0.0.1826.956" timestamp="1579163655394" />
+    <state width="1899" height="251" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1582097671893" />
     <state x="217" y="0" key="SettingsEditor" timestamp="1577429781051">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="146" y="0" key="SettingsEditor/0.0.1290.645@0.0.1290.645" timestamp="1577084253079" />
     <state x="217" y="0" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1577429781051" />
-    <state x="121" y="144" key="com.intellij.ide.util.TipDialog" timestamp="1578502492675">
-      <screen x="0" y="0" width="1290" height="645" />
+    <state x="515" y="237" key="com.intellij.ide.util.TipDialog" timestamp="1579272861061">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="121" y="144" key="com.intellij.ide.util.TipDialog/0.0.1290.645@0.0.1290.645" timestamp="1578502492675" />
-    <state x="515" y="237" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577466146341" />
+    <state x="515" y="237" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1579272861061" />
+    <state x="623" y="225" key="search.everywhere.popup" timestamp="1580365736880">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1580365736880" />
   </component>
 </project>
