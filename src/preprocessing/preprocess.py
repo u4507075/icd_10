@@ -366,7 +366,7 @@ def save_data(df,path,name):
 			os.makedirs(path)
 	file = Path(p)
 	if file.is_file():
-		with open(p, 'a') as f:
+		with open(p, 'a', encoding="utf-8") as f:
 			df.to_csv(f, header=False)
 	else:
 		df.to_csv(p)
@@ -414,6 +414,8 @@ def split_data(folder):
 	#folder = 'raw' or 'vec'
 	opds = ['reg','lab','dru','rad']
 	ipds = ['adm','ilab','idru','irad']
+	#opds = ['rad']
+	#ipds = ['irad']
 	test = pd.read_csv('../../secret/data/raw/test.csv',index_col=0)['txn'].values.tolist()
 	itest = pd.read_csv('../../secret/data/raw/itest.csv',index_col=0)['txn'].values.tolist()
 	for f in opds:

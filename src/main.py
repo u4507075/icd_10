@@ -1,8 +1,9 @@
-from preprocessing.trainmodel import scale_data
+#from preprocessing.trainmodel import scale_data
 #from preprocessing.trainmodel import dask_model
 #from preprocessing.trainmodel import eval_model
 #from preprocessing.trainmodel import lstm_model
 #from preprocessing.trainmodel import evaluate_lstm_model
+'''
 from preprocessing.trainmodel import kmean
 from preprocessing.trainmodel import eval_kmean
 from preprocessing.trainmodel import get_neighbour
@@ -33,7 +34,7 @@ from preprocessing.trainmodel import create_gradientboosting_group
 from visualisation.visualisation import visualise_cluster
 from visualisation.visualisation import visualise_associate_icd10
 from visualisation.visualisation import visualise_predicted_icd10
-
+'''
 from preprocessing.preprocess import get_icd10_data
 from preprocessing.preprocess import get_adm_data
 from preprocessing.preprocess import get_reg_data
@@ -214,7 +215,7 @@ name = ['reg','adm','rad','irad','dru','idru','combine']
 #visualise_cluster(['reg','dru','rad','lab','combine'])
 #visualise_associate_icd10('reg_reg_kmean_15000_validation_total')
 #visualise_predicted_icd10('combine')
-visualise_predicted_icd10()
+#visualise_predicted_icd10()
 
 '''
 d = ['reg','adm','dru','idru','lab','ilab','rad','irad']
